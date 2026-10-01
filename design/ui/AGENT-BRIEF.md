@@ -2,7 +2,7 @@
 
 You are building high-fidelity, responsive page designs (static HTML + CSS) for **Wi-Fight**, a website that checks whether a household gets the internet speed it pays for. These are design mockups, not the working app: no JavaScript frameworks, no build step, no real network calls. Small inline `<script>` is allowed only for trivial visual state.
 
-## Read these first (all paths under `/Users/ibrahimtraore/Documents/AAMU CLASS/SEMINAR/Prototype/design/`)
+## Read these first (all paths under `design/`)
 1. `04-design-direction.md` : the principles, tokens, and which borrowed pattern lands on which page.
 2. `05-sample-data.md` : canonical numbers. Use them exactly. Never invent different values.
 3. `01-product-blueprint.md` : screen map, and what AI and security do on each page.

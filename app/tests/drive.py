@@ -5,7 +5,8 @@ Usage examples (run with /opt/homebrew/opt/python@3.13/bin/python3.13):
 """
 import sys, json
 from playwright.sync_api import sync_playwright
-BASE = 'http://localhost:4810/'
+import os
+BASE = os.environ.get('WF_BASE', 'http://localhost:4810/')
 
 def open_page(p, mobile=False):
     b = p.chromium.launch(channel='chrome', headless=True)

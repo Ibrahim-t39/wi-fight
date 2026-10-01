@@ -2,7 +2,7 @@
 
 The 13 designed pages are in `app/public/` as static HTML. Your job is to make your assigned pages **really work**: every number computed from stored tests, every button doing what it says, with honest labels. The goal is a class demo graded on: prototype functionality (25), AI and cybersecurity (20), problem clarity (15), impact and limits (15).
 
-All paths below are under `/Users/ibrahimtraore/Documents/AAMU CLASS/SEMINAR/Prototype/app/`.
+All paths below are under `app/`.
 
 ## The server is already running
 `http://localhost:4810/` (started with `node server.js`). Do not stop it, do not start another, and do not use port 5173 (another project of the user's lives there). Pages must be opened through `http://localhost:4810/`, not `file://`.
