@@ -39,6 +39,8 @@ async function live(task, payload) {
   if (task === 'bill' ? set.aiBill === false : set.aiAnalyze === false) return null;
   const s = await AI.status();
   if (!s.live) return null;
+  // Some backends leave the short cards to the built-in writer (see server.js). Do not ask them.
+  if (s.writerFor && s.writerFor.includes(task)) return null;
   try {
     const r = await fetch('api/ai', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ task, ...payload }) });
     if (!r.ok) return null;
@@ -112,6 +114,7 @@ export const AI = {
               else if (j.error) err = j.error;
             }
           }
+          if (meta && meta.text) { text = meta.text; onDelta(text, ''); } // the server's tidied final text
           if (text && !err) return { text, mode: 'live', provider: (meta && meta.provider) || st.provider, model: (meta && meta.model) || st.model, ungrounded: (meta && meta.ungrounded) || [], stopped: false };
           if (err && !text) throw new Error(err);
           if (text) return { text, mode: 'live', provider: st.provider, model: st.model, ungrounded: [], stopped: false, warning: err };

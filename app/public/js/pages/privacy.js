@@ -10,7 +10,9 @@ const plural = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
 const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>';
 const WARN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 6v7M12 17v.5"/></svg>';
 const isPaused = () => { const p = S().settings && S().settings.pausedUntil; return !!p && new Date(p) > now(S()); };
-const userMsgs = () => (S().chat || []).filter((m) => m.role === 'user').length;
+// All messages across saved conversations (the chat page stores them in state.chats).
+const allMsgs = () => (S().chats || []).flatMap((c) => c.messages || []).concat(S().chat || []);
+const userMsgs = () => allMsgs().filter((m) => m.role === 'user').length;
 
 function paint() {
   const st = S(), enc = Store.isEncrypted(), sent = st.sent || [], set = st.settings || {};
@@ -67,7 +69,7 @@ const VIEWS = {
   plan: () => { const p = S().plan; return `<div class="h3">Plan and price</div>${p ? kv('Provider', p.provider) + kv('Plan', p.name) + kv('Download on the label', `${p.down} Mbps`) + kv('Upload on the label', `${p.up} Mbps`) + kv('Response time on the label', `${p.latency} ms`) + kv('Price', `$${p.price} a month`) + kv('How it was added', p.source) : '<p class="body">No plan is stored.</p>'}`; },
   photo: () => '<div class="h3">Bill photo</div><p class="body" style="margin-top:8px">Wi-Fight never stores a bill photo. A photo is read once to fill in the bill details, and only the details you confirm are kept.</p>',
   bill: () => { const b = S().bill; return `<div class="h3">Bill details</div>${b ? kv('Plan price', `$${b.planPrice}`) + kv('Equipment', `$${b.equipment}`) + (b.fees || []).map((f) => kv(`Fee: ${f.name}`, `$${f.amount}`)).join('') + kv('Total', `$${b.total}`) + kv('Promo ends', b.promoEnds) : '<p class="body" style="margin-top:8px">No bill details are stored.</p>'}`; },
-  chat: () => { const c = S().chat || []; return `<div class="h3">Messages to Proof AI</div><p class="small" style="margin:4px 0 12px">${plural(userMsgs(), 'question')} from you and ${plural(c.length - userMsgs(), 'answer')}.</p>${c.length ? `<div class="vscroll col gap8">${c.map((m) => `<div class="msg"><b>${m.role === 'user' ? 'You' : 'Proof AI'} · ${fmtDate(m.t)}, ${fmtTime(m.t)}</b><div>${AI.html(m.text)}</div></div>`).join('')}</div>` : '<p class="body">No messages are stored.</p>'}`; },
+  chat: () => { const c = allMsgs(); return `<div class="h3">Messages to Proof AI</div><p class="small" style="margin:4px 0 12px">${plural(userMsgs(), 'question')} from you and ${plural(c.length - userMsgs(), 'answer')}.</p>${c.length ? `<div class="vscroll col gap8">${c.map((m) => `<div class="msg"><b>${m.role === 'user' ? 'You' : 'Proof AI'} · ${fmtDate(m.t)}, ${fmtTime(m.t)}</b><div>${AI.html(m.text)}</div></div>`).join('')}</div>` : '<p class="body">No messages are stored.</p>'}`; },
   account: () => { const u = S().user || {}; return `<div class="h3">Name and email</div>${kv('Name', u.name) + kv('Email', u.email) + kv('Sign-in', u.method === 'code' ? 'Email code' : u.method === 'passkey' ? 'Passkey' : u.method === 'sample' ? 'Demo sign-in' : u.method)}<p class="small" style="margin-top:10px">No password is stored.</p>`; },
   sent: () => { const x = S().sent || []; return `<div class="h3">What was sent</div>${x.length ? `<p class="small" style="margin:4px 0 12px">Wi-Fight did not send these itself. Each line is a message it opened in your email app.</p><div class="vscroll col gap8">${x.map((m) => `<div class="msg"><b>${when(m.at)}</b><div>To: ${esc(m.to || 'no address')}</div><div>Subject: ${esc(m.subject)}</div><div>Report fingerprint: <span class="monoi">${esc(String(m.hash || '').slice(0, 4))}…${esc(String(m.hash || '').slice(-4))}</span></div><div>FCC page offered: ${m.fcc ? 'Yes' : 'No'}</div></div>`).join('')}</div>` : '<p class="body" style="margin-top:8px">Nothing has been sent.</p>'}`; },
 };
@@ -83,7 +85,7 @@ $('#wipe').onclick = () => {
     <ul class="dlist">
       <li>${plural((st.tests || []).length, 'speed result')}</li>
       <li>Your plan and price${st.bill ? ', and your bill details' : ''}</li>
-      <li>${plural((st.chat || []).length, 'message')} with Proof AI</li>
+      <li>${plural((st.chats || []).reduce((n, c) => n + (c.messages || []).length, 0) + (st.chat || []).length, 'message')} with Proof AI</li>
       <li>Your report draft and the list of what was sent (${(st.sent || []).length})</li>
       <li>Your name, email, settings, and consent record</li>
       <li>The encryption key, so nothing left behind can ever be read</li>

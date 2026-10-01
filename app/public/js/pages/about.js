@@ -9,7 +9,7 @@ await boot({ need: 'none' });
 const status = await AI.status();
 $('#aiStatus').classList.add(status.live ? 'good' : 'warn');
 bind({
-  aiStatus: status.live ? 'Proof AI is running live with Claude.' : 'Proof AI is in offline mode on this computer.',
+  aiStatus: status.live ? (status.provider === 'local' ? 'Proof AI is running live on this computer.' : `Proof AI is running live with ${status.label || 'a language model'}.`) : 'Proof AI is in offline mode on this computer.',
   aiStatusNote: status.live ? (status.model ? `Model: ${status.model}.` : '') : 'No AI key is set on the server, so the built-in writer produces the wording.',
   fairPct: Math.round(FAIR * 100), streak: STREAK,
 });

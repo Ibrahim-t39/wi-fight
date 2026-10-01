@@ -179,10 +179,12 @@ code{font:600 12.5px ui-monospace,Menlo,monospace;background:var(--surface);bord
           </div>
           <div class="box">
             <div class="eyebrow">Layer 2 · Through the local server</div>
-            <div class="h3">Language and vision by Claude</div>
+            <div class="h3">Language and vision by a language model</div>
             <div class="method">
+            <div class="m"><b>Which model.</b> The server uses the first one available: Claude or a model hosted on Groq when a key is set, or a model running on this computer through Ollama, which needs no key and sends nothing off the device. With a local model, the short dashboard and verdict cards use the built-in writer, and the chat and the report draft use the model.</div>
+            <div class="m"><b>Every number is checked.</b> The server compares each number the model writes with your data. A short answer with a number that is not in your data is discarded. A chat answer gets a visible warning.</div>
               <div class="m"><b>What the model writes.</b> The explanation on the dashboard and verdict, chat answers grounded in the user's own numbers, the report draft, and the reading of a bill photo. <code>AI.insight</code> <code>AI.verdict</code> <code>AI.answer</code> <code>AI.draft</code> <code>AI.readBill</code></div>
-              <div class="m"><b>The key stays on the server.</b> The browser calls <code>/api/ai</code> on this computer. Only the server holds the AI key and talks to Claude. The key is never in the browser.</div>
+              <div class="m"><b>The key stays on the server.</b> The browser calls <code>/api/ai</code> on this computer. Only the server holds an AI key and talks to the model. A key is never in the browser.</div>
               <div class="m"><b>Only a trimmed set of facts is sent.</b> The model gets a summary: first name, plan, median, days below the fair line, the dips that were ignored, the diagnosis, and bill figures if a bill was added. It does not get the email address or the raw test list. Chat also sends the question and the recent conversation. <code>slim</code></div>
               <div class="m"><b>The model is told to stay inside the facts.</b> Its instructions say to use only the numbers the app gives it, and to never claim that something was sent.</div>
             </div>
@@ -317,7 +319,7 @@ code{font:600 12.5px ui-monospace,Menlo,monospace;background:var(--surface);bord
         <div class="sechead"><span class="secnum">9</span><h2 class="h2">Credits</h2></div>
         <div class="three">
           <div class="target"><b>Speed tests</b>Measurement Lab (M-Lab) ndt7. Apache-2.0 license.</div>
-          <div class="target"><b>AI</b>Anthropic's Claude, when a key is set. A built-in writer when it is not.</div>
+          <div class="target"><b>AI</b>A language model chosen by the server: Anthropic's Claude, a model on Groq, or Google's Gemma 3 running locally through Ollama. A built-in writer when none is available.</div>
           <div class="target"><b>Design and type</b>Design references studied from Mobbin. Fonts: Bricolage Grotesque and Inter.</div>
         </div>
       </section>

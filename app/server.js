@@ -10,6 +10,7 @@
 import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
+import os from 'node:os';
 import { fileURLToPath } from 'node:url';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -28,7 +29,9 @@ const PORT = Number(process.env.PORT || 4810);
 const MODEL = 'claude-opus-5-5';
 const OLLAMA = process.env.OLLAMA_URL || 'http://127.0.0.1:11434';
 // Local models, best first. The first one that is installed is used. Override with WIFIGHT_LOCAL_MODEL.
-const LOCAL_PREFS = process.env.WIFIGHT_LOCAL_MODEL ? [process.env.WIFIGHT_LOCAL_MODEL] : ['gemma3:12b', 'gemma3:4b'];
+// The larger model answers better but needs about 8 GB of memory, so it is only preferred on machines with 24 GB or more.
+const BIG_MEMORY = os.totalmem() >= 24 * 1024 ** 3;
+const LOCAL_PREFS = process.env.WIFIGHT_LOCAL_MODEL ? [process.env.WIFIGHT_LOCAL_MODEL] : BIG_MEMORY ? ['gemma3:12b', 'gemma3:4b'] : ['gemma3:4b', 'gemma3:12b'];
 let LOCAL_MODEL = LOCAL_PREFS[0];
 const hasKey = Boolean(process.env.ANTHROPIC_API_KEY || process.env.ANTHROPIC_AUTH_TOKEN);
 // Groq (OpenAI-compatible API). Model names can be changed in .env without touching code.
@@ -71,7 +74,7 @@ async function provider() {
   if (await localReady()) return 'local';
   return null;
 }
-const describe = (p) => (p === 'claude' ? { live: true, provider: 'claude', model: MODEL, label: 'Claude' } : p === 'groq' ? { live: true, provider: 'groq', model: GROQ_MODEL, label: `Groq (${GROQ_MODEL})` } : p === 'local' ? { live: true, provider: 'local', model: LOCAL_MODEL, label: `a model on this computer (${LOCAL_MODEL})` } : { live: false, provider: null, model: null, label: 'offline mode' });
+const describe = (p) => (p === 'claude' ? { live: true, provider: 'claude', model: MODEL, label: 'Claude' } : p === 'groq' ? { live: true, provider: 'groq', model: GROQ_MODEL, label: `Groq (${GROQ_MODEL})` } : p === 'local' ? { live: true, provider: 'local', model: LOCAL_MODEL, label: `a model on this computer (${LOCAL_MODEL})`, writerFor: ['insight', 'verdict'] } : { live: false, provider: null, model: null, label: 'offline mode' });
 
 // Grounding check. Every number the model writes must exist in the facts it was given.
 // A model that invents a number about the user's connection is caught here.
@@ -163,6 +166,14 @@ RULES
 - Plain words. Say "provider", not ISP. No jargon without explaining it. Never use an em dash. No emoji.
 - Format: short paragraphs. Use **bold** for the one or two key phrases. Use lines starting with "- " for a short list when it helps. No headings.
 - Keep it under 120 words unless the user asks for more detail.
+- Never say the words "fact sheet". Say "your results" instead.
+- Do not describe buttons, menus, or options inside pages. You only know what each page is for: Run a test (starts a speed test), History (past tests), Diagnosis (Wi-Fi or provider), Plans (compare plans), Report (drafts the message to the provider for the user to approve), Privacy (data and settings).
+
+EXAMPLES OF THE RIGHT BEHAVIOUR
+User: Write me a poem about my cat.
+You: I only help with internet service, so I will skip the poem. I can tell you why your evenings are slower, or whether your speed is worth a complaint.
+User: What is the capital of France?
+You: That is outside what I do. I only help with internet service. Want to know if you are getting the speed you pay for?
 
 FACT SHEET
 ${factSheet(facts)}`;
@@ -298,6 +309,7 @@ async function runChat(body, res) {
   const ac = new AbortController();
   res.on('close', () => { closed = true; ac.abort(); });
   const noDash = (t) => t.replace(/\s*[\u2014\u2013]\s*/g, ', ');
+  const tidy = (t) => t.replace(/(according to|in|on|from) the fact sheet/gi, 'in your results').replace(/the fact sheet/gi, 'your results');
   try {
     if (p === 'claude') {
       const stream = client.messages.stream({ model: MODEL, max_tokens: 64000, system, output_config: { effort: 'low' }, messages: history }, { signal: ac.signal });
@@ -324,7 +336,9 @@ async function runChat(body, res) {
       }
     } else {
       const r = await fetch(`${OLLAMA}/api/chat`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: ac.signal,
-        body: JSON.stringify({ model: LOCAL_MODEL, stream: true, keep_alive: '30m', options: { temperature: 0.2, num_ctx: 8192 }, messages: [{ role: 'system', content: system }, ...history] }) });
+        body: JSON.stringify({ model: LOCAL_MODEL, stream: true, keep_alive: '30m', options: { temperature: 0.2, num_ctx: 8192 },
+          // Small local models follow a reminder placed right next to the question better than one far above it.
+          messages: [{ role: 'system', content: system }, ...history.slice(0, -1), { role: 'user', content: `${history[history.length - 1].content}\n\n(Reminder for the assistant, not from the user: only answer questions about internet service, politely decline anything else. Use only numbers from the fact sheet. Do not invent buttons or options. Never write the words "fact sheet".)` }] }) });
       if (!r.ok || !r.body) { send({ error: `Local model error ${r.status}` }); return res.end(); }
       const dec = new TextDecoder(); let buf = '';
       for await (const chunk of r.body) {
@@ -338,7 +352,8 @@ async function runChat(body, res) {
         }
       }
     }
-    send({ done: true, ...describe(p), ungrounded: ungrounded(full, body.facts || {}) });
+    const clean = tidy(full);
+    send({ done: true, ...describe(p), text: clean !== full ? clean : undefined, ungrounded: ungrounded(full, body.facts || {}) });
   } catch (error) {
     if (!closed) {
       let msg = 'The AI service stopped unexpectedly.';

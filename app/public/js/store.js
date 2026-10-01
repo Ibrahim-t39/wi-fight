@@ -73,9 +73,9 @@ export const Store = {
   /** Load the labelled sample two weeks (9 days in, or the finished 14). Keeps consent and sign-in. */
   async loadSample(days = 9) {
     const s = buildSample(days);
-    return this.update((st) => { st.tests = s.tests; st.startedAt = s.startedAt; st.clock = s.clock; st.sample = true; st.plan = { ...SAMPLE_PLAN }; st.bill = { ...SAMPLE_BILL }; st.report = null; st.chat = []; if (!st.consent) st.consent = { mlab: true, ai: true, at: new Date().toISOString(), viaSample: true }; if (!st.user) st.user = { name: 'Jordan', email: 'jordan@example.com', method: 'sample' }; });
+    return this.update((st) => { st.tests = s.tests; st.startedAt = s.startedAt; st.clock = s.clock; st.sample = true; st.plan = { ...SAMPLE_PLAN }; st.bill = { ...SAMPLE_BILL }; st.report = null; st.chat = []; st.chats = []; if (!st.consent) st.consent = { mlab: true, ai: true, at: new Date().toISOString(), viaSample: true }; if (!st.user) st.user = { name: 'Jordan', email: 'jordan@example.com', method: 'sample' }; });
   },
-  async clearTests() { return this.update((st) => { st.tests = []; st.startedAt = null; st.clock = null; st.sample = false; st.report = null; }); },
+  async clearTests() { return this.update((st) => { st.tests = []; st.startedAt = null; st.clock = null; st.sample = false; st.report = null; st.chat = []; st.chats = []; }); },
   /** Everything Wi-Fight holds, as one JSON file the user can keep. */
   exportJSON() { const { clock, ...rest } = state; return JSON.stringify({ exportedAt: new Date().toISOString(), app: 'Wi-Fight prototype', ...rest }, null, 2); },
   /** Delete everything: data, and the encryption key itself. */

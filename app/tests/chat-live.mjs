@@ -7,7 +7,7 @@ const ask = async (messages) => {
   const t0 = Date.now(); let first = null, text = '', meta = null;
   const r = await fetch('http://localhost:4810/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ messages, facts }) });
   const dec = new TextDecoder(); let buf = '';
-  for await (const c of r.body) { buf += dec.decode(c, { stream: true }); let i; while ((i = buf.indexOf('\n\n')) >= 0) { const l = buf.slice(0, i); buf = buf.slice(i + 2); const j = JSON.parse(l.slice(5)); if (j.delta) { if (first == null) first = Date.now() - t0; text += j.delta; } else meta = j; } }
+  for await (const c of r.body) { buf += dec.decode(c, { stream: true }); let i; while ((i = buf.indexOf('\n\n')) >= 0) { const l = buf.slice(0, i); buf = buf.slice(i + 2); const j = JSON.parse(l.slice(5)); if (j.delta) { if (first == null) first = Date.now() - t0; text += j.delta; } else { meta = j; if (j.text) text = j.text; } } }
   console.log(`\n>>> ${messages[messages.length - 1].content}\n${text}\n[first token ${first} ms, total ${Date.now() - t0} ms, ungrounded: ${JSON.stringify(meta && meta.ungrounded)}, provider: ${meta && meta.provider}]`);
   return text;
 };

@@ -72,8 +72,14 @@ with sync_playwright() as p:
         w = page.evaluate('document.documentElement.scrollWidth')
         ok(f'{name}: loads at desktop', w <= 1441, w)
     page.goto(BASE + 'chat.html'); page.wait_for_timeout(700)
-    page.locator('input[type=text], textarea').last.fill('Why is my internet slow at night?'); page.keyboard.press('Enter'); page.wait_for_timeout(2500)
-    ok('chat answers from the engine numbers', '390' in page.inner_text('body') and '432' in page.inner_text('body'))
+    page.locator('#q').fill('Why is my internet slow at night?'); page.keyboard.press('Enter')
+    # a real language model may take a while: wait for the live (streaming) message to finish, up to 2 minutes
+    page.wait_for_selector('#live', state='attached', timeout=15000)
+    page.wait_for_selector('#live', state='detached', timeout=120000); page.wait_for_timeout(800)
+    chat = state()['chats'][0]['messages']
+    reply = chat[1]['text'] if len(chat) > 1 else ''
+    print('    model reply:', reply[:260].replace('\n', ' '))
+    ok('chat: a saved reply that uses the engine numbers', len(reply) > 40 and any(n in reply for n in ['389', '390', '432', '78']) and not chat[1].get('ungrounded'))
     page.screenshot(path=f'{OUT}/chat-answer-desktop.png')
 
     # 3b. switching Proof AI off is honoured everywhere
