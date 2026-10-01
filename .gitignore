@@ -1,0 +1,19 @@
+# Secrets: API keys live here and must never be committed
+.env
+.env.*
+!.env.example
+
+# Installed packages (restore with: npm install)
+node_modules/
+
+# macOS and editor files
+.DS_Store
+*.log
+
+# Design reference images: third-party app screenshots, and live captures that show
+# the home network's provider and city. The notes are kept, the images are not.
+design/references/**/*.jpg
+design/references/**/*.jpeg
+design/references/**/*.png
+design/references/**/*.webp
+design/references/**/_preview/

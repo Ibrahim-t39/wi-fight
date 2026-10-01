@@ -1,0 +1,110 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Wi-Fight · Live test</title><link rel="stylesheet" href="../ds.css">
+<style>
+html{background:#070A12}
+.stage{position:relative;min-height:100vh;background:var(--bg);color:var(--ink);overflow:hidden;display:flex;justify-content:center}
+.stage .glow{background:radial-gradient(520px 420px at 50% 300px,rgba(39,71,245,.42),transparent 72%)}
+.column{position:relative;z-index:1;width:100%;max-width:560px;padding:20px 20px 36px;display:flex;flex-direction:column;align-items:center}
+.testnav{width:100%;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;height:44px}
+.testnav .title{font:600 14px var(--body);color:var(--ink-2)}
+.testnav .title b{color:var(--ink);font-weight:700}
+.testnav .badge{justify-self:end}
+.ringbox{position:relative;width:390px;height:390px;margin-top:6px}
+.ringbox svg{width:100%;height:100%;display:block}
+.ringbox text{font:700 13px var(--body);fill:var(--ink-2)}
+.ringcenter{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.bignum{font-size:104px;line-height:.95}
+.ringcenter .cap{font:600 15px var(--body);color:var(--ink-2);margin-top:6px}
+.marks{display:flex;gap:22px;justify-content:center;font:600 13px var(--body);color:var(--ink-2);margin-top:-6px}
+.marks span{display:inline-flex;align-items:center;gap:8px}
+.marks b{color:var(--ink);font-weight:700}
+.marks i{display:block;width:3px;height:12px;border-radius:2px;background:#fff}
+.marks i.plan{background:#8FA2FF}
+.status{font:700 24px/1.2 var(--display);letter-spacing:-.01em;margin-top:22px;display:flex;align-items:center;gap:10px}
+.live{width:8px;height:8px;border-radius:50%;background:#8FA2FF;box-shadow:0 0 0 0 rgba(143,162,255,.6);animation:pulse 1.6s infinite}
+@keyframes pulse{to{box-shadow:0 0 0 10px rgba(143,162,255,0)}}
+.slots{width:100%;display:grid;grid-template-columns:repeat(3,1fr);margin-top:26px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.slot{padding:14px 6px;display:flex;flex-direction:column;align-items:center;gap:7px;text-align:center}
+.slot + .slot{border-left:1px solid var(--line)}
+.slot .v{font-size:24px;line-height:1}
+.slot .v.wait{font:600 15px/24px var(--body);color:var(--ink-3);letter-spacing:0}
+.slot .s{display:inline-flex;align-items:center;gap:5px;font:600 12px var(--body);color:var(--ink-3)}
+.slot .s.done{color:var(--good)}.slot .s.now{color:#9DB0FF}
+.slot .s svg{width:13px;height:13px}
+.read{width:100%;margin-top:22px;padding:16px;display:flex;flex-direction:column;gap:12px;box-shadow:0 10px 40px rgba(92,80,246,.25)}
+.read .ai-text{font-size:15.5px}
+.cancel{margin-top:20px;height:44px;padding:0 20px;background:none;border:0;font:700 15px var(--body);color:var(--ink)}
+.foot{margin-top:10px;text-align:center;font:500 12px/1.45 var(--body);color:var(--ink-3);max-width:400px}
+@media (max-width:720px){
+  .column{padding:12px 16px 28px}
+  .ringbox{width:340px;height:340px;margin-top:0}
+  .bignum{font-size:90px}
+  .stage .glow{background:radial-gradient(360px 340px at 50% 240px,rgba(39,71,245,.45),transparent 72%)}
+  .status{font-size:22px;margin-top:18px}
+  .slots{margin-top:20px}.slot .v{font-size:22px}
+  .read{margin-top:18px}
+}
+</style></head><body>
+<div class="stage dark">
+  <div class="glow"></div>
+  <div class="column">
+
+    <div class="testnav">
+      <a class="iconbtn" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></a>
+      <div class="title">Test <b>37</b> of 56</div>
+      <span class="badge lock"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Encrypted</span>
+    </div>
+
+    <!-- THE RING: full circle = your 500 Mbps plan. Working state = broken, round-capped arc. -->
+    <div class="ringbox">
+      <svg viewBox="0 0 360 360" role="img" aria-label="366 Mbps download so far, out of a 500 Mbps plan">
+        <defs><filter id="blur" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="9"/></filter></defs>
+        <circle cx="180" cy="180" r="130" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="16"/>
+        <g transform="rotate(-90 180 180)" fill="none" stroke-linecap="round">
+          <circle cx="180" cy="180" r="130" stroke="#2747F5" stroke-width="20" opacity=".75" filter="url(#blur)" stroke-dasharray="124 30 144 30 114 30 126 218.8"/>
+          <circle cx="180" cy="180" r="130" stroke="#3D5BFF" stroke-width="16" stroke-dasharray="124 30 144 30 114 30 126 218.8"/>
+        </g>
+        <!-- plan mark at the top (500) -->
+        <line x1="180" y1="38" x2="180" y2="27" stroke="#8FA2FF" stroke-width="3" stroke-linecap="round"/>
+        <text x="180" y="18" text-anchor="middle">500</text>
+        <!-- fair line mark at 80% (400) -->
+        <g transform="rotate(198 180 180)"><line x1="322" y1="180" x2="333" y2="180" stroke="#fff" stroke-width="3" stroke-linecap="round"/></g>
+        <text x="22" y="133" text-anchor="middle">400</text>
+      </svg>
+      <div class="ringcenter">
+        <div class="num bignum">366</div>
+        <div class="cap">Mbps download</div>
+      </div>
+    </div>
+
+    <div class="marks">
+      <span><i class="plan"></i>Your plan: <b>500</b></span>
+      <span><i></i>Fair line: <b>400</b></span>
+    </div>
+
+    <div class="status"><span class="live"></span>Measuring download...</div>
+
+    <div class="slots">
+      <div class="slot"><div class="eyebrow">Download</div><div class="num v">366<span class="unit" style="font-size:11px">Mbps</span></div><span class="s now"><span class="dot"></span>Live</span></div>
+      <div class="slot"><div class="eyebrow">Upload</div><div class="v wait">waiting</div><span class="s">Up next</span></div>
+      <div class="slot"><div class="eyebrow">Response time</div><div class="num v">28<span class="unit" style="font-size:11px">ms</span></div><span class="s done"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Done · Good</span></div>
+    </div>
+
+    <section class="ai-card read">
+      <div class="row between">
+        <span class="ai-tag"><svg viewBox="0 0 24 24" fill="#8B5CF6"><path d="M12 2l1.9 5.6a3 3 0 0 0 1.9 1.9L21.4 11.4l-5.600 1.900a3 3 0 0 0-1.900 1.900L12 20.800l-1.900-5.600a3 3 0 0 0-1.900-1.900L2.600 11.400l5.600-1.900a3 3 0 0 0 1.900-1.900z"/></svg>PROOF AI · LIVE READ</span>
+        <span class="ai-meta">Reading as it runs</span>
+      </div>
+      <p class="ai-text">This result <b>fits your evening pattern</b>. It is not a one-off dip, so it <b>will count</b> toward today's median.</p>
+      <div class="row gap8" style="flex-wrap:wrap">
+        <span class="evidence"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>7:42 PM</span>
+        <span class="evidence">matches 3 earlier evening tests</span>
+      </div>
+      <div class="ai-note">Generated by AI from this test and your earlier results. It can make mistakes. Sample data.</div>
+    </section>
+
+    <button class="cancel">Cancel test</button>
+    <p class="foot">Runs on M-Lab's open test. This test's result and IP address are published by M-Lab.</p>
+  </div>
+</div>
+</body></html>

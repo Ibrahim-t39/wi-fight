@@ -1,0 +1,512 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Wi-Fight · Are you getting the internet you pay for?</title><link rel="stylesheet" href="../ds.css">
+<style>
+html{scroll-behavior:smooth}
+body{overflow-x:hidden}
+a{text-decoration:none}
+.wrap{max-width:1208px;margin:0 auto;padding:0 24px;position:relative}
+.sec{padding:112px 0}
+.sec.white{background:var(--surface)}
+.sec-head{max-width:760px;margin:0 auto 56px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:16px}
+.sec-title{font:700 46px/1.06 var(--display);letter-spacing:-.025em;text-wrap:balance}
+.sec-sub{font:400 19px/1.5 var(--body);color:var(--ink-2);text-wrap:balance}
+.eyebrow.c{color:var(--cobalt)}
+.eyebrow.wrapok{white-space:normal;line-height:1.5}
+.lnav .brand span,.foot .brand span{display:inline}
+
+/* ---------- top nav ---------- */
+.lnav{display:flex;align-items:center;justify-content:space-between;height:84px;position:relative;z-index:2}
+.lnav .brand{padding:0;color:var(--ink)}
+.lnav-links{display:flex;gap:36px;font:600 15px var(--body);color:var(--ink-2)}
+.lnav-links a:hover{color:var(--ink)}
+
+/* ---------- hero ---------- */
+.hero{position:relative;background:var(--bg);color:var(--ink);overflow:hidden}
+.hero .glow{background:radial-gradient(46% 52% at 76% 46%,rgba(39,71,245,.5),transparent 70%),radial-gradient(40% 40% at 8% 0%,rgba(39,71,245,.22),transparent 70%)}
+.hero-grid{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(0,.88fr);gap:56px;align-items:center;padding:56px 0 96px;position:relative;z-index:1}
+.hero h1{font:700 72px/1.0 var(--display);letter-spacing:-.035em;text-wrap:balance}
+.hero h1 em{font-style:normal;color:#8FA4FF}
+.hero-sub{font:400 20px/1.5 var(--body);color:var(--ink-2);max-width:540px;margin-top:24px}
+.hero-cta{display:flex;gap:12px;margin-top:36px;flex-wrap:wrap}
+.hero .btn.ghost{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.18)}
+.hero-pill{display:inline-flex;align-items:center;gap:8px;height:32px;padding:0 12px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.04);font:600 13px var(--body);color:var(--ink-2);margin-bottom:24px;white-space:nowrap}
+.hero-pill i{width:7px;height:7px;border-radius:50%;background:var(--good)}
+
+.pv{position:relative;padding-bottom:8px}
+.pv .card{padding:22px;box-shadow:0 30px 80px rgba(0,0,0,.5)}
+.pv-score{width:calc(100% - 44px)}
+.ringwrap{position:relative;width:164px;height:164px;flex:none}
+.ringwrap svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ringcenter{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ringcenter .num{font-size:52px;line-height:1}
+.rl{font-size:11.500px}
+.pv .kv{padding:10px 0;font-size:14px}
+.pv-ai{margin:-26px 0 0 60px;position:relative;z-index:2;box-shadow:0 24px 60px rgba(0,0,0,.55),0 0 0 1px rgba(139,92,246,.08)}
+.pv-ai .ai-text{font-size:17px}
+.sample{position:absolute;top:-30px;right:44px;font:600 11px var(--body);letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
+
+.trust{border-top:1px solid var(--line);position:relative;z-index:1}
+.trust-row{display:flex;justify-content:center;gap:14px 40px;flex-wrap:wrap;padding:22px 0;font:600 14px var(--body);color:var(--ink-2)}
+.trust-row span{display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+.trust-row svg{width:16px;height:16px;color:#8FA4FF}
+
+/* ---------- the gap ---------- */
+.gap-line{font:700 46px/1.08 var(--display);letter-spacing:-.025em;text-align:center;max-width:900px;margin:0 auto 56px;text-wrap:balance}
+.gap-line span{color:var(--ink-3)}
+.cmp{--cw:210px;position:relative;display:grid;grid-template-columns:minmax(0,1fr) var(--cw) var(--cw);max-width:920px;margin:0 auto;padding:14px 14px 14px 32px;border-radius:28px}
+.cmp::before{content:"";position:absolute;top:14px;bottom:14px;right:14px;width:var(--cw);border-radius:20px;background:var(--cobalt-50);border:1.5px solid var(--cobalt)}
+.cmp > div{position:relative;display:flex;align-items:center;min-height:68px;padding:14px 0;border-top:1px solid var(--line)}
+.cmp > .hd{border-top:0;min-height:76px}
+.cmp > .f{font:600 17px/1.3 var(--body);padding-right:16px}
+.cmp > .c{justify-content:center;gap:8px;font:600 14px var(--body);color:var(--ink-3)}
+.cmp > .p{border-top-color:rgba(39,71,245,.16);color:var(--good)}
+.cmp > .hd.c{font:700 15px/1.2 var(--body);color:var(--ink-2);text-align:center}
+.cmp > .hd.p{color:var(--cobalt);font:700 19px var(--display);letter-spacing:-.01em}
+.mk{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;flex:none;background:var(--surface-2);border:1px solid var(--line);color:var(--ink-3)}
+.mk svg{width:13px;height:13px}
+.mk.y{background:var(--good);border-color:var(--good);color:#fff}
+.c.yes{color:var(--good)}
+
+/* ---------- how it works ---------- */
+.step{padding:26px;display:flex;flex-direction:column;gap:12px;background:var(--bg);box-shadow:none;position:relative}
+.step-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:26px}
+.step-n{font:700 44px/1 var(--display);letter-spacing:-.03em;color:var(--cobalt)}
+.step .itile{width:44px;height:44px;border-radius:14px;background:var(--surface);box-shadow:var(--shadow)}
+.step .itile svg{width:21px;height:21px}
+.step h3{font:700 23px/1.15 var(--display);letter-spacing:-.01em}
+.step p{font:400 15px/1.5 var(--body);color:var(--ink-2);flex:1}
+.step .sfoot{display:flex;align-items:center;gap:7px;padding-top:14px;margin-top:6px;border-top:1px solid var(--line);font:600 13px var(--body);color:var(--ink-2)}
+.step .sfoot svg{width:15px;height:15px;color:var(--cobalt);flex:none}
+
+/* ---------- Proof AI ---------- */
+.ai-sec{position:relative;overflow:hidden;padding:128px 0}
+.ai-sec::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(38% 34% at 20% 8%,rgba(39,71,245,.10),transparent 70%),radial-gradient(40% 36% at 82% 14%,rgba(139,92,246,.12),transparent 70%),radial-gradient(40% 30% at 50% 100%,rgba(47,217,160,.10),transparent 70%)}
+.ai-title{font:700 76px/1.0 var(--display);letter-spacing:-.035em;text-wrap:balance}
+.ai-title b{background:var(--ai-grad);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:700}
+.ai-pill{display:inline-flex;align-items:center;height:36px;padding:0 16px;border-radius:999px;background:linear-gradient(var(--surface),var(--surface)) padding-box,var(--ai-grad) border-box;border:1.5px solid transparent}
+.ft{padding:24px;display:flex;flex-direction:column;gap:12px;min-height:100%}
+.ft-head{display:flex;align-items:center;justify-content:space-between}
+.ft-n{font:700 12px var(--body);color:var(--ink-3);font-variant-numeric:tabular-nums}
+.ft h3{font:700 23px/1.15 var(--display);letter-spacing:-.015em;text-wrap:balance}
+.ft p{font:400 15px/1.5 var(--body);color:var(--ink-2)}
+.ex{margin-top:auto;background:var(--surface-2);border:1px solid var(--line);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.ex-label{font:600 11px var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+.quote{font:500 15px/1.45 var(--body);color:var(--ink)}
+.mb{display:flex;align-items:flex-end;gap:6px;height:60px;position:relative}
+.mb i{flex:1;border-radius:5px 5px 2px 2px;background:var(--cobalt)}
+.mb i.low{background:var(--bad)}
+.mb u{position:absolute;left:0;right:0;bottom:80%;border-top:1.5px dashed var(--ink-3)}
+.meter{height:8px;border-radius:4px;background:var(--line);overflow:hidden}
+.meter i{display:block;height:100%;width:86%;border-radius:4px;background:var(--cobalt)}
+.ex .evidence{background:var(--surface);padding:5px 9px;font-size:11.500px}
+.q{align-self:flex-end;background:var(--cobalt);color:#fff;font:500 14px/1.35 var(--body);padding:8px 12px;border-radius:16px 16px 5px 16px}
+.ex .btn.sm{height:34px;font-size:13px;padding:0 13px}
+.ex .btn svg{width:14px;height:14px}
+.ft .ai-note{padding-top:2px}
+.ai-promise{margin-top:28px;display:flex;align-items:center;gap:20px;padding:26px 30px}
+.ai-promise p{font:600 21px/1.35 var(--display);letter-spacing:-.01em;flex:1}
+.ai-promise .itile{width:52px;height:52px;border-radius:16px}
+.ai-promise .itile svg{width:24px;height:24px}
+
+/* ---------- privacy ---------- */
+.pc{padding:30px;display:flex;flex-direction:column;gap:6px;min-height:100%}
+.pc.never{background:var(--surface-2);box-shadow:none;border:1px solid var(--line)}
+.pc-head{display:flex;align-items:center;gap:14px;padding-bottom:16px;border-bottom:1px solid var(--line);margin-bottom:4px}
+.pc-head .itile{width:48px;height:48px;border-radius:50%}
+.pc-head .itile svg{width:22px;height:22px}
+.pc .lrow{font:500 16px/1.35 var(--body);padding:13px 0}
+.pc .lrow small{display:block;font:500 13px/1.35 var(--body);color:var(--ink-3);margin-top:2px}
+.pc.never .lrow{color:var(--ink-2)}
+.pc .itile{width:32px;height:32px;border-radius:10px}
+.pc .itile svg{width:16px;height:16px}
+.pc.never .lrow .itile{background:var(--surface);border:1px solid var(--line)}
+.mlab{display:flex;gap:16px;align-items:flex-start;padding:22px 26px;border-radius:20px;background:var(--warn-bg);color:var(--ink)}
+.mlab .itile{background:var(--surface);color:var(--warn)}
+.mlab b{display:block;font:700 15px var(--body);margin-bottom:4px}
+.mlab p{font:500 15px/1.5 var(--body);color:var(--ink-2)}
+.tp{display:flex;flex-direction:column;gap:10px;padding:8px 4px}
+.tp .ico{width:56px;height:56px;border-radius:50%;background:var(--cobalt-50);color:var(--cobalt);display:grid;place-items:center;margin-bottom:8px}
+.tp .ico svg{width:24px;height:24px}
+.tp h3{font:700 21px/1.2 var(--display);letter-spacing:-.01em;margin-bottom:8px}
+.tp p{font:400 15px/1.5 var(--body);color:var(--ink-2)}
+
+/* ---------- why it matters ---------- */
+.sdg{display:grid;grid-template-columns:auto minmax(0,1fr);gap:40px;align-items:center;padding:44px;border-radius:32px}
+.nine{width:168px;height:168px;border-radius:32px;background:var(--ink);color:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
+.nine b{font:700 96px/.9 var(--display);letter-spacing:-.04em}
+.nine span{font:700 11px var(--body);letter-spacing:.12em;text-transform:uppercase;opacity:.7}
+.sdg blockquote{font:700 34px/1.12 var(--display);letter-spacing:-.02em;text-wrap:balance;margin:10px 0 14px}
+
+/* ---------- final CTA + footer ---------- */
+.cta{border-radius:36px;background:var(--cobalt);color:#fff;padding:72px 40px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:18px;position:relative;overflow:hidden}
+.cta::before{content:"";position:absolute;inset:0;background:radial-gradient(50% 80% at 50% 120%,rgba(255,255,255,.28),transparent 70%)}
+.cta > *{position:relative}
+.cta h2{font:700 56px/1.02 var(--display);letter-spacing:-.03em;text-wrap:balance}
+.cta p{font:400 19px/1.5 var(--body);color:rgba(255,255,255,.82);max-width:520px}
+.cta .btn{background:#fff;color:var(--cobalt);margin-top:10px}
+.cta small{font:500 13px var(--body);color:rgba(255,255,255,.72)}
+.foot{display:flex;align-items:center;justify-content:space-between;gap:16px 32px;flex-wrap:wrap;padding:36px 0 44px}
+.foot .brand{padding:0;font-size:18px}
+.foot .brand .mark{width:30px;height:30px;border-radius:9px}
+
+@media (max-width:1100px){
+  .hero-grid{grid-template-columns:1fr;gap:64px;padding:40px 0 80px}
+  .pv{max-width:520px}
+  .hero h1{font-size:60px}
+  .ai-title{font-size:60px}
+  .ft-grid .span-4{grid-column:span 6}
+  .step.span-3{grid-column:span 6}
+  .tpg .span-4{grid-column:span 4}
+}
+@media (max-width:720px){
+  .wrap{padding:0 16px}
+  .sec{padding:68px 0}
+  .ai-sec{padding:76px 0}
+  .sec-head{margin-bottom:32px;gap:12px}
+  .sec-title,.gap-line{font-size:31px}
+  .gap-line{margin-bottom:28px}
+  .sec-sub{font-size:16px}
+  .lnav{height:68px}
+  .lnav-links{display:none}
+  .hero-grid{padding:20px 0 56px;gap:60px}
+  .hero h1{font-size:41px;line-height:1.03}
+  .hero-sub{font-size:17px;margin-top:18px}
+  .hero-cta{flex-direction:column;margin-top:28px}
+  .hero-cta .btn{width:100%}
+  .hero-pill{margin-bottom:18px}
+  .pv .card{padding:16px}
+  .pv-score{width:100%}
+  .pv-score .scorebody{gap:14px}
+  .ringwrap{width:128px;height:128px}
+  .ringcenter .num{font-size:38px}
+  .rl{font-size:10px;max-width:70px;text-align:center;line-height:1.2}
+  .pv-ai{margin:-14px 0 0 18px}
+  .pv-ai .ai-text{font-size:16px}
+  .sample{right:0}
+  .trust-row{display:grid;grid-template-columns:1fr 1fr;gap:14px 12px;justify-content:start;font-size:13px;padding:20px 0}
+  .cmp{--cw:86px;grid-template-columns:minmax(0,1fr) 78px var(--cw);padding:8px 8px 8px 16px;border-radius:22px}
+  .cmp::before{top:8px;bottom:8px;right:8px;border-radius:16px}
+  .cmp > div{min-height:62px;padding:12px 0}
+  .cmp > .f{font-size:14.500px;padding-right:10px}
+  .cmp > .c{flex-direction:column;gap:4px;font-size:12px}
+  .cmp > .hd.c{font-size:12px;padding:0 4px}
+  .cmp > .hd.p{font-size:14px}
+  .step.span-3,.ft-grid .span-4,.tpg .span-4{grid-column:span 12}
+  .step{padding:20px;border-radius:22px}
+  .step-top{margin-bottom:10px}
+  .step-n{font-size:36px}
+  .ai-title{font-size:42px}
+  .ft{padding:20px}
+  .ai-promise{flex-direction:column;align-items:flex-start;gap:14px;padding:20px}
+  .ai-promise p{font-size:18px}
+  .ai-promise .small{max-width:none !important}
+  .ai-promise .btn{width:100%}
+  .pc{padding:20px}
+  .mlab{padding:18px;flex-direction:column;gap:12px}
+  .tp{flex-direction:row;gap:14px;padding:4px 0}
+  .tp .ico{width:48px;height:48px;flex:none;margin:0}
+  .tp h3{font-size:19px;margin-bottom:4px}
+  .sdg{grid-template-columns:1fr;gap:22px;padding:22px;border-radius:24px}
+  .nine{width:104px;height:104px;border-radius:24px}
+  .nine b{font-size:58px}
+  .nine span{font-size:9px}
+  .sdg blockquote{font-size:25px}
+  .cta{padding:48px 20px;border-radius:28px}
+  .cta h2{font-size:36px}
+  .cta p{font-size:16px}
+  .cta .btn{width:100%}
+  .foot{flex-direction:column;align-items:flex-start;padding:28px 0 36px}
+}
+</style></head><body>
+
+<!-- ================= HERO (dark, immersive) ================= -->
+<section class="hero dark">
+  <div class="glow"></div>
+  <div class="wrap">
+    <nav class="lnav">
+      <a class="brand" href="#"><div class="mark"><svg viewBox="0 -1.300 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.300 16.200A8.300 8.300 0 0 1 16.900 6.300"/><path d="M19.900 12.300a8.300 8.300 0 0 1-.6 3.900"/><path d="m8 12.600 3 3 8.400-9.700"/></svg></div><span>Wi-Fight</span></a>
+      <div class="lnav-links"><a href="#how">How it works</a><a href="#ai">Proof AI</a><a href="#privacy">Privacy</a></div>
+      <a class="btn primary sm" href="#start">Start your check</a>
+    </nav>
+
+    <div class="hero-grid">
+      <div>
+        <div class="hero-pill"><i></i>A two-week check for your home internet</div>
+        <h1>Are you getting the internet <em>you pay for?</em></h1>
+        <p class="hero-sub">Wi-Fight tests your speed for two weeks, compares it to what your provider promised, and gives you proof.</p>
+        <div class="hero-cta">
+          <a class="btn primary" href="#start">Start your two-week check</a>
+          <a class="btn ghost" href="#how">See how it works</a>
+        </div>
+      </div>
+
+      <!-- product visual, built in HTML -->
+      <div class="pv">
+        <span class="sample">Sample data</span>
+        <div class="card pv-score col gap12">
+          <div class="row between"><div class="eyebrow">Get vs. pay for</div><span class="badge bad"><span class="dot"></span>Below plan</span></div>
+          <div class="row gap20 scorebody">
+            <div class="ringwrap">
+              <svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="84" fill="none" stroke="var(--line)" stroke-width="18"/>
+                <circle cx="100" cy="100" r="84" fill="none" stroke="var(--bad)" stroke-width="18" stroke-linecap="round" stroke-dasharray="411.700 527.800"/>
+                <g transform="rotate(288 100 100)"><line x1="170" y1="100" x2="198" y2="100" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/></g></svg>
+              <div class="ringcenter"><div class="num">78<span class="unit" style="font-size:20px">%</span></div><div class="small rl">of your plan speed</div></div>
+            </div>
+            <div class="grow">
+              <div class="kv"><span class="k">You get</span><span class="v num" style="font-size:20px">389<span class="unit" style="font-size:12px">Mbps</span></span></div>
+              <div class="kv"><span class="k">You pay for</span><span class="v num" style="font-size:20px">500<span class="unit" style="font-size:12px">Mbps</span></span></div>
+              <div class="kv"><span class="k">Fair line</span><span class="v">400 Mbps</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="ai-card pv-ai col gap12">
+          <div class="row between">
+            <span class="ai-tag"><svg viewBox="0 0 24 24" fill="#8B5CF6"><path d="M12 2l1.900 5.600a3 3 0 0 0 1.900 1.900L21.400 11.400l-5.600 1.900a3 3 0 0 0-1.900 1.900L12 20.800l-1.900-5.600a3 3 0 0 0-1.900-1.900L2.600 11.400l5.600-1.900a3 3 0 0 0 1.900-1.900z"/></svg>PROOF AI</span>
+            <span class="ai-meta">Updated 12 min ago</span>
+          </div>
+          <p class="ai-text"><b>Below the fair line 3 days in a row.</b> The pattern points to your provider, not your Wi-Fi.</p>
+          <div class="row gap8" style="flex-wrap:wrap"><span class="evidence">36 tests</span><span class="evidence">9 days</span><span class="evidence">Confidence: high</span></div>
+          <div class="ai-note">Generated by AI from your own test results. Check the evidence.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="trust"><div class="wrap"><div class="trust-row">
+    <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h4l3-8 4 16 3-8h6"/></svg>Open M-Lab speed tests</span>
+    <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Consent first</span>
+    <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2.500"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Encrypted</span>
+    <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4.500 6v6c0 4.500 3.200 7.600 7.500 9 4.300-1.400 7.500-4.500 7.500-9V6z"/><path d="m9 12 2 2 4-4"/></svg>You approve everything</span>
+  </div></div></div>
+</section>
+
+<!-- ================= THE GAP ================= -->
+<section class="sec">
+  <div class="wrap">
+    <h2 class="gap-line"><span>Other apps tell you your speed.</span> Wi-Fight tells you if it's the speed you pay for.</h2>
+    <div class="cmp card">
+      <div class="hd"></div><div class="hd c">A speed test app</div><div class="hd c p">Wi-Fight</div>
+
+      <div class="f">Tests your speed</div>
+      <div class="c yes"><span class="mk y"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>Yes</div>
+      <div class="c p"><span class="mk y"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>Yes</div>
+
+      <div class="f">Checks it against your plan</div>
+      <div class="c"><span class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></span>No</div>
+      <div class="c p"><span class="mk y"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>Yes</div>
+
+      <div class="f">Tells real problems from one-off dips</div>
+      <div class="c"><span class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></span>No</div>
+      <div class="c p"><span class="mk y"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>Yes</div>
+
+      <div class="f">Finds the likely cause</div>
+      <div class="c"><span class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></span>No</div>
+      <div class="c p"><span class="mk y"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>Yes</div>
+
+      <div class="f">Gives you a report you can send</div>
+      <div class="c"><span class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></span>No</div>
+      <div class="c p"><span class="mk y"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>Yes</div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= HOW IT WORKS ================= -->
+<section class="sec white" id="how">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow c">How it works</div>
+      <h2 class="sec-title">Four steps. Two weeks. One clear answer.</h2>
+      <p class="sec-sub">Set it up once. Wi-Fight does the testing for you.</p>
+    </div>
+    <div class="g">
+      <div class="card step span-3">
+        <div class="step-top"><span class="step-n">01</span><span class="itile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4.500 6v6c0 4.500 3.200 7.600 7.500 9 4.300-1.400 7.500-4.500 7.500-9V6z"/><path d="m9 12 2 2 4-4"/></svg></span></div>
+        <h3>Agree</h3>
+        <p>See exactly what is collected, and what never is, before anything starts.</p>
+        <div class="sfoot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Consent comes first</div>
+      </div>
+      <div class="card step span-3">
+        <div class="step-top"><span class="step-n">02</span><span class="itile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.500" r="3.500"/></svg></span></div>
+        <h3>Add your plan</h3>
+        <p>Pick your provider from a list, or scan your bill and let Proof AI read it.</p>
+        <div class="sfoot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 6.500C16 5 14.300 4.500 12 4.500c-2.800 0-4.500 1.300-4.500 3.400 0 4.800 10 2.400 10 7.600 0 2.200-2 3.500-5.500 3.500-2.500 0-4.500-.8-5.500-2.500"/></svg>Speed and price on record</div>
+      </div>
+      <div class="card step span-3">
+        <div class="step-top"><span class="step-n">03</span><span class="itile"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 4 14h6l-1 8 9-12h-6z"/></svg></span></div>
+        <h3>Test</h3>
+        <p>4 quick tests a day for 14 days. They run on their own, at different times.</p>
+        <div class="sfoot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>4 a day for 14 days</div>
+      </div>
+      <div class="card step span-3">
+        <div class="step-top"><span class="step-n">04</span><span class="itile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg></span></div>
+        <h3>Get your proof</h3>
+        <p>A verdict and a report you approve before it goes anywhere.</p>
+        <div class="sfoot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2.500"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Nothing sent without you</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PROOF AI (centerpiece) ================= -->
+<section class="ai-sec" id="ai">
+  <div class="wrap">
+    <div class="sec-head" style="max-width:860px;gap:20px">
+      <span class="ai-pill"><span class="ai-tag"><svg viewBox="0 0 24 24" fill="#8B5CF6"><path d="M12 2l1.900 5.600a3 3 0 0 0 1.900 1.900L21.400 11.400l-5.600 1.900a3 3 0 0 0-1.900 1.900L12 20.800l-1.900-5.600a3 3 0 0 0-1.900-1.900L2.600 11.400l5.600-1.900a3 3 0 0 0 1.900-1.900z"/></svg>PROOF AI</span></span>
+      <h2 class="ai-title">AI that <b>shows its work.</b></h2>
+      <p class="sec-sub">Proof AI reads your test results so you do not have to. It does six jobs, and each one shows you the numbers behind it.</p>
+    </div>
+
+    <div class="g ft-grid">
+      <!-- 1 -->
+      <article class="ai-card ft span-4">
+        <div class="ft-head"><span class="ai-tag"><svg viewBox="0 0 24 24" fill="#8B5CF6"><path d="M12 2l1.900 5.600a3 3 0 0 0 1.900 1.900L21.400 11.400l-5.600 1.900a3 3 0 0 0-1.900 1.900L12 20.800l-1.900-5.600a3 3 0 0 0-1.900-1.900L2.600 11.400l5.600-1.900a3 3 0 0 0 1.900-1.900z"/></svg>PROOF AI · SPOTS</span><span class="ft-n">1 of 6</span></div>
+        <h3>Tells real shortfalls from one-off dips</h3>
+        <p>One slow test is not a problem. Three slow days in a row is.</p>
+        <div class="ex">
+          <div class="row between"><span class="ex-label">Daily speed, 7 days</span><span class="ex-label" style="text-transform:none;letter-spacing:0">Fair line 400</span></div>
+          <div class="mb"><u></u><i style="height:89.400%"></i><i style="height:90.400%"></i><i style="height:86.200%"></i><i style="height:83.600%"></i><i class="low" style="height:77.800%"></i><i class="low" style="height:74.400%"></i><i class="low" style="height:76.200%"></i></div>
+          <div class="row gap8" style="flex-wrap:wrap"><span class="evidence">2 one-off dips ignored</span><span class="evidence"><span class="dot" style="color:var(--bad)"></span>3 low days kept</span></div>
+        </div>
+        <div class="ai-note">Based on the daily middle value of 4 tests. Generated by AI.</div>
+      </article>
+      <!-- 2 -->
+      <article class="ai-card ft span-4">
+        <div class="ft-head"><span class="ai-tag"><svg viewBox="0 0 24 24" fill="#8B5CF6"><path d="M12 2l1.900 5.600a3 3 0 0 0 1.900 1.900L21.400 11.400l-5.600 1.900a3 3 0 0 0-1.900 1.900L12 20.800l-1.900-5.600a3 3 0 0 0-1.900-1.900L2.600 11.400l5.600-1.900a3 3 0 0 0 1.900-1.900z"/></svg>PROOF AI · DIAGNOSES</span><span class="ft-n">2 of 6</span></div>
+        <h3>Finds the likely cause, Wi-Fi or provider</h3>
+        <p>It compares tests near the router, far from it, and at different hours.</p>
+        <div class="ex">
+          <div class="row between"><span class="quote" style="font-weight:700">Likely cause: your provider</span></div>
+          <div class="meter"><i></i></div>
+          <div class="row between"><span class="small" style="color:var(--ink-2);font-weight:600">Confidence: high, 86%</span></div>
+          <div class="row gap8" style="flex-wrap:wrap"><span class="evidence">Near router 392 Mbps</span><span class="evidence">Far room 371 Mbps</span></div>
+        </div>
+        <div class="ai-note">Based on a small gap between rooms and slower evenings. Generated by AI.</div>
+      </article>
+      <!-- 3 -->
+      <article class="ai-card ft span-4">
+        <div class="ft-head"><span class="ai-tag"><svg viewBox="0 0 24 24" fill="#8B5CF6"><path d="M12 2l1.900 5.600a3 3 0 0 0 1.900 1.900L21.400 11.400l-5.600 1.900a3 3 0 0 0-1.900 1.900L12 20.800l-1.900-5.600a3 3 0 0 0-1.900-1.900L2.600 11.400l5.600-1.900a3 3 0 0 0 1.900-1.900z"/></svg>PROOF AI · EXPLAINS</span><span class="ft-n">3 of 6</span></div>
+        <h3>Explains your result in plain words</h3>
+        <p>No charts to decode. One or two sentences you can repeat to anyone.</p>
+        <div class="ex">
+          <span class="ex-label">Example</span>
+          <p class="quote">"You get 78% of the speed you pay for. About $18 of your $80 bill pays for speed you did not receive."</p>
+          <div class="row gap8" style="flex-wrap:wrap"><span class="evidence">389 of 500 Mbps</span><span class="evidence">Estimate</span></div>
+        </div>
+        <div class="ai-note">Based on 36 tests over 9 days. Generated by AI.</div>
+      </article>
+      <!-- 4 -->
+      <article class="ai-card ft span-4">
+        <div class="ft-head"><span class="ai-tag"><svg viewBox="0 0 24 24" fill="#8B5CF6"><path d="M12 2l1.900 5.600a3 3 0 0 0 1.900 1.900L21.400 11.400l-5.600 1.900a3 3 0 0 0-1.900 1.900L12 20.800l-1.900-5.600a3 3 0 0 0-1.900-1.900L2.600 11.400l5.600-1.900a3 3 0 0 0 1.900-1.900z"/></svg>PROOF AI · RECOMMENDS</span><span class="ft-n">4 of 6</span></div>
+        <h3>Picks a better plan for how you use the internet</h3>
+        <p>It weighs price and speed against what your household does online.</p>
+        <div class="ex">
+          <div class="row between"><span class="ex-label">AI pick</span><span class="badge good">Saves $120 a year</span></div>
+          <div class="row between" style="align-items:flex-end"><span class="quote" style="font-weight:700">ValleyLink 1 Gig</span><span class="num" style="font-size:24px;line-height:1">$70<span class="unit" style="font-size:12px">a month</span></span></div>
+          <div class="row gap8" style="flex-wrap:wrap"><span class="evidence">3 people</span><span class="evidence">Online classes</span><span class="evidence">Video calls</span></div>
+        </div>
+        <div class="ai-note">Based on your household use and nearby plans. Generated by AI.</div>
+      </article>
+      <!-- 5 -->
+      <article class="ai-card ft span-4">
+        <div class="ft-head"><span class="ai-tag"><svg viewBox="0 0 24 24" fill="#8B5CF6"><path d="M12 2l1.900 5.600a3 3 0 0 0 1.900 1.900L21.400 11.400l-5.600 1.900a3 3 0 0 0-1.900 1.900L12 20.800l-1.900-5.600a3 3 0 0 0-1.900-1.900L2.600 11.400l5.600-1.900a3 3 0 0 0 1.900-1.900z"/></svg>PROOF AI · ANSWERS</span><span class="ft-n">5 of 6</span></div>
+        <h3>Answers your questions from your own test data</h3>
+        <p>Ask in your own words. It answers from your tests, not from guesses.</p>
+        <div class="ex">
+          <span class="q">Why is it slow at night?</span>
+          <p class="quote">"Your evening tests average 352 Mbps. Daytime tests average 441." <span class="src">7 to 11 pm tests</span></p>
+        </div>
+        <div class="ai-note">Each answer names the tests it used. Generated by AI.</div>
+      </article>
+      <!-- 6 -->
+      <article class="ai-card ft span-4">
+        <div class="ft-head"><span class="ai-tag"><svg viewBox="0 0 24 24" fill="#8B5CF6"><path d="M12 2l1.900 5.600a3 3 0 0 0 1.900 1.900L21.400 11.400l-5.600 1.900a3 3 0 0 0-1.900 1.900L12 20.800l-1.900-5.600a3 3 0 0 0-1.900-1.900L2.600 11.400l5.600-1.900a3 3 0 0 0 1.900-1.900z"/></svg>PROOF AI · DRAFTS</span><span class="ft-n">6 of 6</span></div>
+        <h3>Drafts your report, and you approve it</h3>
+        <p>It writes the report and the message to your provider. You have the last word.</p>
+        <div class="ex">
+          <div class="row gap12"><span class="itile" style="background:var(--surface);border:1px solid var(--line)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg></span><div><div class="quote" style="font-weight:700">Wi-Fight speed report</div><div class="small">14 days · Draft, not sent</div></div></div>
+          <div class="row gap8" style="flex-wrap:wrap">
+            <span class="btn primary sm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Approve</span>
+            <span class="btn ghost sm">Edit</span>
+            <span class="btn ghost sm">Regenerate</span>
+          </div>
+        </div>
+        <div class="ai-note">Nothing leaves your account until you approve. Generated by AI.</div>
+      </article>
+    </div>
+
+    <div class="card ai-promise">
+      <span class="itile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4.500 6v6c0 4.500 3.200 7.600 7.500 9 4.300-1.400 7.500-4.500 7.500-9V6z"/><path d="m9 12 2 2 4-4"/></svg></span>
+      <p>Every AI answer shows the evidence it used. Nothing is sent without your approval.</p>
+      <span class="small" style="max-width:250px">Proof AI can make mistakes. That is why the numbers are always next to the words.</span>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PRIVACY AND SECURITY ================= -->
+<section class="sec white" id="privacy">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow c">Privacy and security</div>
+      <h2 class="sec-title">We measure your speed. Not your life.</h2>
+      <p class="sec-sub">Here is the full list, before you sign up.</p>
+    </div>
+    <div class="g">
+      <div class="card pc span-6" style="border:1px solid var(--line)">
+        <div class="pc-head"><span class="itile good"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span><div><div class="h2">What we collect</div><div class="small">Only what the check needs</div></div></div>
+        <div class="lrow"><span class="itile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h4l3-8 4 16 3-8h6"/></svg></span><div>Speed results<small>Download, upload, and response time</small></div></div>
+        <div class="lrow"><span class="itile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span><div>Time of test</div></div>
+        <div class="lrow"><span class="itile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 6.500C16 5 14.300 4.500 12 4.500c-2.800 0-4.500 1.300-4.500 3.400 0 4.800 10 2.400 10 7.600 0 2.200-2 3.500-5.500 3.500-2.500 0-4.500-.8-5.500-2.500"/></svg></span><div>Your plan and price</div></div>
+        <div class="lrow"><span class="itile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.500" r="3.500"/></svg></span><div>Your bill photo<small>Only while it is being read</small></div></div>
+      </div>
+      <div class="card pc never span-6">
+        <div class="pc-head"><span class="itile mute" style="background:var(--surface);border:1px solid var(--line)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2.500"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span><div><div class="h2">What we never collect</div><div class="small">Not now, not later</div></div></div>
+        <div class="lrow"><span class="itile mute"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></span><div>Your browsing<small>We never see the sites or apps you use</small></div></div>
+        <div class="lrow"><span class="itile mute"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></span><div>Your address</div></div>
+        <div class="lrow"><span class="itile mute"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></span><div>Your passwords<small>There is no password to store</small></div></div>
+      </div>
+
+      <div class="mlab span-12">
+        <span class="itile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.500"/><circle cx="12" cy="7.600" r=".6" fill="currentColor"/></svg></span>
+        <div><b>One thing to know before you start</b><p>Speed tests run on M-Lab, an open research platform. M-Lab publishes test results with the IP address. We tell you before your first test.</p></div>
+      </div>
+    </div>
+
+    <div class="g tpg" style="margin-top:56px">
+      <div class="tp span-4"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2.500"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span><div><h3>Encrypted in transit and at rest</h3><p>Your results are locked while they travel and while they are stored.</p></div></div>
+      <div class="tp span-4"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2M9 9v1.500M15 9v1.500M12 9v4h-1M9 16c1.700 1.300 4.300 1.300 6 0"/></svg></span><div><h3>Sign in with an email code or passkey</h3><p>No password to remember, reuse, or leak.</p></div></div>
+      <div class="tp span-4"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg></span><div><h3>Delete everything in one tap</h3><p>Your tests, your plan, and your report. Gone when you say so.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= WHY IT MATTERS ================= -->
+<section class="sec" style="padding-bottom:0">
+  <div class="wrap">
+    <div class="card sdg">
+      <div class="nine"><b>9</b><span>UN Goal</span></div>
+      <div>
+        <div class="eyebrow c wrapok">Why it matters · UN Sustainable Development Goal 9, target 9.c</div>
+        <blockquote>"Universal and affordable access to the Internet"</blockquote>
+        <p class="body" style="font-size:17px;max-width:680px">Affordable only counts if you get what you pay for. Built by Team DiJITZ at Alabama A&amp;M University for Huntsville students, renters, and families.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FINAL CTA ================= -->
+<section class="sec" id="start" style="padding:72px 0 0">
+  <div class="wrap">
+    <div class="cta">
+      <h2>Find out in two weeks.</h2>
+      <p>Four quick tests a day. One clear answer. A report you approve before it goes anywhere.</p>
+      <a class="btn" href="#">Start your two-week check</a>
+      <small>Consent first. Delete everything in one tap.</small>
+    </div>
+    <footer class="foot">
+      <div class="brand"><div class="mark"><svg viewBox="0 -1.300 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.300 16.200A8.300 8.300 0 0 1 16.900 6.300"/><path d="M19.900 12.300a8.300 8.300 0 0 1-.6 3.900"/><path d="m8 12.600 3 3 8.400-9.700"/></svg></div><span>Wi-Fight</span></div>
+      <div class="small">Team DiJITZ · CS 410 · Alabama A&amp;M University</div>
+      <div class="small">Sample figures shown are for demonstration.</div>
+    </footer>
+  </div>
+</section>
+</body></html>

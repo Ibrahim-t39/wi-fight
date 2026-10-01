@@ -1,0 +1,168 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Wi-Fight · Live test</title><link rel="stylesheet" href="css/ds.css">
+<style>
+html{background:#070A12}
+.stage{position:relative;min-height:100vh;background:var(--bg);color:var(--ink);overflow:hidden;display:flex;justify-content:center}
+.stage .glow{background:radial-gradient(520px 420px at 50% 300px,rgba(39,71,245,.42),transparent 72%)}
+.column{position:relative;z-index:1;width:100%;max-width:560px;padding:20px 20px 36px;display:flex;flex-direction:column;align-items:center}
+.testnav{width:100%;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;height:44px}
+.testnav .title{font:600 14px var(--body);color:var(--ink-2)}
+.testnav .title b{color:var(--ink);font-weight:700}
+.testnav .badge{justify-self:end}
+.ringbox{position:relative;width:390px;height:390px;margin-top:6px}
+.ringbox svg{width:100%;height:100%;display:block}
+.ringbox text{font:700 13px var(--body);fill:var(--ink-2)}
+.ringcenter{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.bignum{font-size:104px;line-height:.95}
+.ringcenter .cap{font:600 15px var(--body);color:var(--ink-2);margin-top:6px}
+.marks{display:flex;gap:22px;justify-content:center;font:600 13px var(--body);color:var(--ink-2);margin-top:-6px}
+.marks span{display:inline-flex;align-items:center;gap:8px}
+.marks b{color:var(--ink);font-weight:700}
+.marks i{display:block;width:3px;height:12px;border-radius:2px;background:#fff}
+.marks i.plan{background:#8FA2FF}
+.status{font:700 24px/1.2 var(--display);letter-spacing:-.01em;margin-top:22px;display:flex;align-items:center;gap:10px}
+.live{width:8px;height:8px;border-radius:50%;background:#8FA2FF;box-shadow:0 0 0 0 rgba(143,162,255,.6);animation:pulse 1.6s infinite}
+@keyframes pulse{to{box-shadow:0 0 0 10px rgba(143,162,255,0)}}
+.slots{width:100%;display:grid;grid-template-columns:repeat(3,1fr);margin-top:26px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.slot{padding:14px 6px;display:flex;flex-direction:column;align-items:center;gap:7px;text-align:center}
+.slot + .slot{border-left:1px solid var(--line)}
+.slot .v{font-size:24px;line-height:1}
+.slot .v.wait{font:600 15px/24px var(--body);color:var(--ink-3);letter-spacing:0}
+.slot .s{display:inline-flex;align-items:center;gap:5px;font:600 12px var(--body);color:var(--ink-3)}
+.slot .s.done{color:var(--good)}.slot .s.now{color:#9DB0FF}
+.slot .s svg{width:13px;height:13px}
+.read{width:100%;margin-top:22px;padding:16px;display:flex;flex-direction:column;gap:12px;box-shadow:0 10px 40px rgba(92,80,246,.25)}
+.read .ai-text{font-size:15.5px}
+.cancel{margin-top:20px;height:44px;padding:0 20px;background:none;border:0;font:700 15px var(--body);color:var(--ink)}
+.foot{margin-top:10px;text-align:center;font:500 12px/1.45 var(--body);color:var(--ink-3);max-width:400px}
+@media (max-width:720px){
+  .column{padding:12px 16px 28px}
+  .ringbox{width:340px;height:340px;margin-top:0}
+  .bignum{font-size:90px}
+  .stage .glow{background:radial-gradient(360px 340px at 50% 240px,rgba(39,71,245,.45),transparent 72%)}
+  .status{font-size:22px;margin-top:18px}
+  .slots{margin-top:20px}.slot .v{font-size:22px}
+  .read{margin-top:18px}
+}
+.ringbox .arcs{transition:stroke .4s}
+.ringbox .spin{transform-origin:180px 180px}
+.ringbox.locating .spin{animation:spin 1.3s linear infinite}
+.ringbox.running .halo{animation:breathe 1.4s ease-in-out infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes breathe{50%{opacity:.35}}
+.bignum.idle{color:var(--ink-3)}
+.status.good{color:var(--good)}.status.bad{color:var(--bad)}
+.result{margin-top:10px;text-align:center;font:500 15px/1.45 var(--body);color:var(--ink-2);max-width:440px}
+.result b{color:var(--ink);font-weight:700}
+.notice{width:100%;margin-top:16px;padding:12px 14px;border-radius:14px;border:1px solid var(--line);background:var(--surface);font:600 13px/1.4 var(--body);color:var(--ink-2);text-align:center}
+.notice.warn{border-color:var(--warn);background:var(--warn-bg);color:var(--warn)}
+.ready{width:100%;margin-top:22px;display:flex;flex-direction:column;align-items:center;gap:14px}
+.where{width:100%;display:flex;flex-direction:column;align-items:center;gap:10px}
+.where .opts{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.where .chip{cursor:pointer}
+.where p{font:500 13px/1.45 var(--body);color:var(--ink-3);text-align:center;max-width:420px}
+.ready .btn.primary{width:100%;max-width:360px}
+.textbtn{background:none;border:0;height:40px;padding:0 14px;font:700 14px var(--body);color:var(--ink-2);text-decoration:underline;text-underline-offset:3px}
+.quiet{font:500 12px/1.45 var(--body);color:var(--ink-3);text-align:center;max-width:380px;margin-top:-10px}
+.actions{width:100%;margin-top:18px;display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.actions .btn{flex:1;min-width:150px}
+.routerprompt{width:100%;margin-top:14px;padding:14px;border-radius:16px;border:1px dashed var(--line);display:flex;align-items:center;gap:12px;justify-content:space-between;flex-wrap:wrap}
+.routerprompt span{font:500 13px/1.4 var(--body);color:var(--ink-2);flex:1;min-width:180px}
+.samplerow{margin-top:8px;min-height:0}
+.slot .s.bad{color:var(--bad)}
+@media (max-width:720px){.ringbox{width:min(340px,100%);height:auto;aspect-ratio:1}}
+</style></head><body>
+<div class="stage dark">
+  <div class="glow" id="glow"></div>
+  <div class="column" data-wait>
+
+    <div class="testnav">
+      <a class="iconbtn" aria-label="Close" href="dashboard.html" id="close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></a>
+      <div class="title" data-b="titleHtml"></div>
+      <span class="badge lock"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span data-b="lock"></span></span>
+    </div>
+    <div class="samplerow"><span class="sample">Sample data</span></div>
+
+    <!-- THE RING: full circle = the plan speed. Working state = broken, round-capped arc. -->
+    <div class="ringbox" id="ringbox">
+      <svg viewBox="0 0 360 360" role="img" id="ringsvg" aria-label="Speed test ring">
+        <defs><filter id="blur" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="9"/></filter></defs>
+        <circle cx="180" cy="180" r="130" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="16"/>
+        <g transform="rotate(-90 180 180)" fill="none" stroke-linecap="round"><g class="spin">
+          <circle class="arcs halo" id="arcGlow" cx="180" cy="180" r="130" stroke="#2747F5" stroke-width="20" opacity=".75" filter="url(#blur)" visibility="hidden"/>
+          <circle class="arcs" id="arc" cx="180" cy="180" r="130" stroke="#3D5BFF" stroke-width="16" visibility="hidden"/>
+        </g></g>
+        <!-- plan mark at the top (full circle = plan speed) -->
+        <line x1="180" y1="38" x2="180" y2="27" stroke="#8FA2FF" stroke-width="3" stroke-linecap="round"/>
+        <text x="180" y="18" text-anchor="middle" id="planText"></text>
+        <!-- fair line mark, positioned by the page script from the plan -->
+        <g id="fairMark"><line x1="322" y1="180" x2="333" y2="180" stroke="#fff" stroke-width="3" stroke-linecap="round"/></g>
+        <text text-anchor="middle" id="fairText"></text>
+      </svg>
+      <div class="ringcenter">
+        <div class="num bignum idle" id="big"></div>
+        <div class="cap" id="cap"></div>
+      </div>
+    </div>
+
+    <div class="marks">
+      <span><i class="plan"></i>Your plan: <b data-b="plan"></b></span>
+      <span><i></i>Fair line: <b data-b="fair"></b></span>
+    </div>
+
+    <div class="status" id="status"><span class="live" id="livedot" hidden></span><span id="statusWord"></span></div>
+    <p class="result" id="result" hidden></p>
+    <div class="notice warn" id="practiceLabel" hidden>Practice test, not a real measurement</div>
+    <div class="notice warn" id="fallback" hidden>The real test could not run here, so this is a practice test.</div>
+
+    <div class="notice" id="paused" hidden>
+      <div data-b="pausedText"></div>
+      <button class="btn sm" id="resume" style="margin:10px auto 0">Resume tests</button>
+    </div>
+
+    <div class="ready" id="ready">
+      <div class="where">
+        <div class="eyebrow">Where are you?</div>
+        <div class="opts" role="radiogroup" aria-label="Where are you?">
+          <button class="chip" role="radio" data-loc="normal">Anywhere</button>
+          <button class="chip" role="radio" data-loc="near">Next to the router</button>
+          <button class="chip" role="radio" data-loc="far">Far room</button>
+        </div>
+        <p>One test next to the router and one in a far room let Proof AI tell Wi-Fi from your provider.</p>
+      </div>
+      <button class="btn primary" id="start"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 4 14h6l-1 8 9-12h-6z"/></svg>Start test</button>
+      <button class="textbtn" id="practice">Practice test</button>
+      <p class="quiet">Use this if the network blocks the real test. It is not a real measurement.</p>
+    </div>
+
+    <div class="slots" id="slots">
+      <div class="slot"><div class="eyebrow">Download</div><div id="vDown"></div><span id="sDown"></span></div>
+      <div class="slot"><div class="eyebrow">Upload</div><div id="vUp"></div><span id="sUp"></span></div>
+      <div class="slot"><div class="eyebrow">Response time</div><div id="vLat"></div><span id="sLat"></span></div>
+    </div>
+
+    <section class="ai-card read" id="read" hidden>
+      <div class="row between">
+        <span class="ai-tag"><svg viewBox="0 0 24 24" fill="#8B5CF6"><path d="M12 2l1.9 5.6a3 3 0 0 0 1.9 1.9L21.4 11.4l-5.600 1.900a3 3 0 0 0-1.900 1.900L12 20.800l-1.900-5.600a3 3 0 0 0-1.900-1.900L2.600 11.400l5.600-1.900a3 3 0 0 0 1.900-1.900z"/></svg>PROOF AI · LIVE READ</span>
+        <span class="ai-meta">Read on this device</span>
+      </div>
+      <p class="ai-text" data-b="readHtml"></p>
+      <div class="row gap8" style="flex-wrap:wrap" data-b="readChipsHtml"></div>
+      <div class="ai-note">Computed on this device from this test and your earlier results.</div>
+    </section>
+
+    <div class="routerprompt" id="routerPrompt" hidden>
+      <span data-b="routerText"></span>
+      <button class="btn ghost sm" id="addRouter">Add a router check</button>
+    </div>
+    <div class="actions" id="actions" hidden>
+      <button class="btn primary sm" data-href="dashboard.html">Back to dashboard</button>
+      <button class="btn ghost sm" id="again">Run another</button>
+    </div>
+
+    <button class="cancel" id="cancel" hidden>Cancel test</button>
+    <p class="foot" id="foot">The real test runs on M-Lab's open test. Its result and your IP address are published by M-Lab.</p>
+  </div>
+</div>
+<script type="module" src="js/pages/test.js"></script>
+</body></html>

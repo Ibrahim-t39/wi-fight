@@ -1,0 +1,9 @@
+{
+  "name": "wi-fight-prototype",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Wi-Fight: proof of the speed you pay for. Team DiJITZ, CS 410.",
+  "scripts": { "start": "node server.js", "test": "node tests/engine.test.mjs" },
+  "dependencies": { "@anthropic-ai/sdk": "latest", "zod": "latest" }
+}

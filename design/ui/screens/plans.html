@@ -1,0 +1,252 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Wi-Fight · Plans near you</title><link rel="stylesheet" href="../ds.css">
+<style>
+/* ---------- you are on ---------- */
+.youare{padding:24px;gap:0;min-height:100%}
+.youare .headline{font:700 32px/1.08 var(--display);letter-spacing:-.02em}
+.youare .pay{font:700 19px/1.2 var(--body);color:var(--cobalt);margin-top:10px}
+.youare .kv{padding:12px 0;font-size:14.5px}
+.youare .kv.total{border-top:1.5px solid var(--ink)}
+.youare .kv.total .k{color:var(--ink);font-weight:700}
+.youare .kv.total .v{font:700 20px var(--display)}
+.lost{display:flex;align-items:center;gap:12px;margin:14px 0 12px;font:500 13.5px/1.4 var(--body);color:var(--ink-2)}
+.lost b{color:var(--ink);font-weight:700}
+.promo{display:flex;align-items:center;gap:8px;border-radius:14px;background:var(--surface-2);border:1px solid var(--line);padding:11px 12px;font:600 13px var(--body);color:var(--ink-2)}
+
+/* ---------- AI pick ---------- */
+.pick{padding:24px 26px;gap:18px;min-height:100%}
+.pickhead{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap}
+.pickname{font:700 30px/1.08 var(--display);letter-spacing:-.02em}
+.price{font-size:64px;line-height:.9}
+.price .unit{font-size:16px}
+.inputs{border-radius:16px;background:var(--surface-2);border:1px solid var(--line);padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+.inputs .chips{display:flex;flex-wrap:wrap;gap:6px}
+.inputs .chip{height:30px;font-size:12.5px;padding:0 11px}
+.reasons{counter-reset:r;display:flex;flex-direction:column;gap:11px}
+.reasons div{display:flex;gap:12px;font:500 14.5px/1.45 var(--body);color:var(--ink-2)}
+.reasons div::before{counter-increment:r;content:counter(r);flex:none;width:24px;height:24px;border-radius:50%;background:var(--surface-2);border:1px solid var(--line);display:grid;place-items:center;font:700 12px var(--body);color:var(--ink)}
+.reasons b{color:var(--ink);font-weight:600}
+.whynot{border-left:3px solid var(--line);padding:2px 0 2px 14px;font:500 14px/1.45 var(--body);color:var(--ink-2)}
+.whynot b{color:var(--ink);font-weight:700}
+.conf{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font:500 13px/1.4 var(--body);color:var(--ink-2)}
+
+/* ---------- comparison table ---------- */
+.cmp{display:grid;grid-template-columns:minmax(170px,1.05fr) repeat(4,minmax(0,1fr));padding:22px 24px 26px}
+.cmp > div{padding:15px 16px;display:flex;flex-direction:column;justify-content:center;gap:3px;border-top:1px solid var(--line);min-width:0}
+.cmp .lab{font:500 14.5px/1.3 var(--body);color:var(--ink-2);padding-left:0}
+.cmp .lab small{font:500 12px var(--body);color:var(--ink-3)}
+.cmp .c{align-items:center;text-align:center;font:600 15px/1.3 var(--body)}
+.cmp .c small{font:500 12px/1.3 var(--body);color:var(--ink-3)}
+.cmp .c .big{font:700 22px/1 var(--display);letter-spacing:-.02em}
+.cmp .hd{border-top:0;padding-top:20px;padding-bottom:20px;gap:8px;justify-content:flex-start}
+.cmp .hd.c{padding-left:6px;padding-right:6px}
+.cmp .hd .name{font:700 16.5px/1.2 var(--display);letter-spacing:-.01em;white-space:nowrap}
+.cmp .hd .btn{margin-top:6px;width:100%;max-width:170px}
+.cmp .cap{border-top:0;padding:0;height:34px}
+.cmp .cap.rec{background:var(--cobalt);color:#fff;border-radius:14px 14px 0 0;font:700 12.5px var(--body);letter-spacing:.02em;flex-direction:row;align-items:center;justify-content:center;gap:6px}
+.cmp .rec{background:var(--cobalt-50);border-left:1.5px solid var(--cobalt);border-right:1.5px solid var(--cobalt)}
+.cmp .rec.c{border-top-color:rgba(39,71,245,.16)}
+.cmp .rec.last{border-bottom:1.5px solid var(--cobalt);border-radius:0 0 14px 14px;padding-bottom:20px}
+.cmp .rec.cap{border-color:var(--cobalt)}
+.cmp .last{padding-bottom:20px}
+
+/* ---------- phone plan cards ---------- */
+.pcards{display:flex;flex-direction:column;gap:12px}
+.pcard{border-radius:20px;background:var(--surface);border:1.5px solid var(--line);padding:16px;display:flex;flex-direction:column;gap:12px}
+.pcard.on{border-color:var(--cobalt);background:var(--cobalt-50)}
+.pcard .top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.pcard .nm{font:700 17px/1.2 var(--display)}
+.pcard .pr{text-align:right;font:700 24px/1 var(--display);letter-spacing:-.02em}
+.pcard .pr small{display:block;font:500 12px var(--body);color:var(--ink-3);margin-top:4px;letter-spacing:0}
+.pfacts{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.pfacts div{font:700 14px/1.2 var(--body)}
+.pfacts span{display:block;font:500 11px/1.2 var(--body);color:var(--ink-3);margin-bottom:4px}
+.pcard .fit{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font:500 12.5px var(--body);color:var(--ink-2)}
+.swipehint{display:flex;justify-content:center;gap:6px;padding-top:2px}
+.swipehint i{width:6px;height:6px;border-radius:50%;background:var(--line)}.swipehint i.on{background:var(--cobalt);width:18px;border-radius:3px}
+
+@media (max-width:1100px){.cmp{padding:18px 16px 22px}.cmp > div{padding:14px 8px}}
+@media (max-width:720px){
+  .youare{padding:18px}.youare .headline{font-size:27px}
+  .pick{padding:18px}
+  .pickname{font-size:25px}
+  .price{font-size:56px}
+  .pick .ctl .btn{flex:1 1 100%}
+}
+</style></head><body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><div class="mark"><svg viewBox="0 -1.300 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.300 16.200A8.300 8.300 0 0 1 16.900 6.300"/><path d="M19.900 12.300a8.300 8.300 0 0 1-.6 3.900"/><path d="m8 12.600 3 3 8.400-9.700"/></svg></div><span>Wi-Fight</span></div>
+    <a class="navitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span>Dashboard</span></a>
+    <a class="navitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 20V10M12 20V4M19 20v-7"/></svg><span>History</span></a>
+    <a class="navitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg><span>Report</span></a>
+    <a class="navitem on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 6.500C16 5 14.300 4.500 12 4.500c-2.800 0-4.500 1.300-4.500 3.400 0 4.800 10 2.400 10 7.600 0 2.200-2 3.500-5.500 3.500-2.500 0-4.500-.8-5.500-2.500"/></svg><span>Plans</span></a>
+    <div class="navsep">Proof AI</div>
+    <a class="navitem ai"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.900 5.600a3 3 0 0 0 1.900 1.900L21.400 11.400l-5.600 1.900a3 3 0 0 0-1.900 1.900L12 20.800l-1.900-5.600a3 3 0 0 0-1.900-1.900L2.600 11.400l5.600-1.900a3 3 0 0 0 1.900-1.900z"/></svg><span>Ask Proof AI</span></a>
+    <a class="navitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h4l3-8 4 16 3-8h6"/></svg><span>Diagnosis</span></a>
+    <div class="navsep">Account</div>
+    <a class="navitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4.500 6v6c0 4.500 3.200 7.600 7.500 9 4.300-1.400 7.500-4.500 7.500-9V6z"/><path d="m9 12 2 2 4-4"/></svg><span>Privacy &amp; data</span></a>
+    <div class="sidefoot col gap8">
+      <span class="badge lock" style="align-self:flex-start"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2.500"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Encrypted</span>
+      <div class="small" style="color:var(--ink-2)">Your data stays yours. Nothing is sent without your approval.</div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div class="col gap8">
+        <h1 class="h1">Plans near you</h1>
+        <div class="body">Huntsville, AL · based on what you actually use</div>
+      </div>
+      <div class="row gap12">
+        <span class="chip"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4.5 6v6c0 4.500 3.200 7.600 7.500 9 4.300-1.400 7.500-4.500 7.500-9V6z"/><path d="m9 12 2 2 4-4"/></svg>Not paid by any provider</span>
+      </div>
+    </div>
+
+    <div class="g">
+      <!-- YOU ARE ON -->
+      <section class="card span-5 col youare">
+        <div class="row between"><div class="eyebrow">Your plan now</div><span class="badge bad"><span class="dot"></span>Below plan</span></div>
+        <div class="headline" style="margin-top:14px">You are on<br>Northstar Fiber 500</div>
+        <div class="pay">$80 a month</div>
+        <div class="small" style="margin-top:6px;color:var(--ink-2)">You pay for 500 Mbps. Over two weeks you got 389 Mbps.</div>
+        <div style="margin-top:14px">
+          <div class="kv"><span class="k">Plan price</span><span class="v">$65.00</span></div>
+          <div class="kv"><span class="k">Equipment rental</span><span class="v">$10.00</span></div>
+          <div class="kv"><span class="k row gap8" style="flex-wrap:wrap">Network enhancement fee <span class="badge warn">Possible junk fee</span></span><span class="v">$5.00</span></div>
+          <div class="kv total"><span class="k">Total</span><span class="v">$80.00</span></div>
+        </div>
+        <div class="lost"><div class="itile bad"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 6.5C16 5 14.3 4.5 12 4.500c-2.800 0-4.500 1.300-4.500 3.400 0 4.800 10 2.400 10 7.600 0 2.200-2 3.500-5.500 3.500-2.500 0-4.500-.8-5.500-2.500"/></svg></div><div><b>About $18 a month</b> pays for speed you did not receive. That is 22% of your bill, estimated.</div></div>
+        <div class="promo" style="margin-top:auto"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Promo price ends Jan 2027<span class="small" style="margin-left:auto">From your bill</span></div>
+      </section>
+
+      <!-- PROOF AI PICK -->
+      <section class="ai-card span-7 col pick">
+        <div class="row between" style="flex-wrap:wrap;gap:8px">
+          <span class="ai-tag" style="font-size:13px"><svg viewBox="0 0 24 24" fill="#8B5CF6"><path d="M12 2l1.900 5.600a3 3 0 0 0 1.900 1.900L21.400 11.400l-5.600 1.900a3 3 0 0 0-1.900 1.900L12 20.800l-1.900-5.600a3 3 0 0 0-1.900-1.900L2.600 11.400l5.600-1.900a3 3 0 0 0 1.900-1.900z"/></svg>PROOF AI PICK</span>
+          <span class="ai-meta">Based on your 56 tests, your bill, and 4 plans near you</span>
+        </div>
+        <div class="pickhead">
+          <div class="col gap8">
+            <div class="pickname">ValleyLink 1 Gig</div>
+            <span class="badge good" style="align-self:flex-start;height:28px;font-size:13px;padding:0 11px">Saves about $120 a year</span>
+          </div>
+          <div class="num price">$70<span class="unit">a month</span></div>
+        </div>
+        <div class="inputs">
+          <div class="eyebrow">Based on your household</div>
+          <div class="chips"><span class="chip">3 people</span><span class="chip">Online classes</span><span class="chip">Video calls</span><span class="chip">Streaming</span><span class="chip">Some gaming</span></div>
+        </div>
+        <div class="reasons">
+          <div><span><b>Enough speed for your evening use.</b> Three people on classes, calls, and streaming at once fit well inside this plan.</span></div>
+          <div><span><b>$10 a month less than you pay now.</b> $70 instead of $80. That is about $120 a year.</span></div>
+          <div><span><b>No equipment fee listed.</b> You pay $10 a month for equipment rental today.</span></div>
+        </div>
+        <div class="whynot"><b>Why not the cheapest?</b> Redstone 600 is $10 a month cheaper, but its typical upload speed is much lower. Upload is what three people on video calls lean on.</div>
+        <div class="conf"><span class="evidence">Confidence: medium</span><span>Plan details can change. Check the provider's label before switching.</span></div>
+        <div class="row gap12 ctl" style="flex-wrap:wrap">
+          <button class="btn sm">See the label</button><button class="btn ghost sm">Not for me, show another</button>
+          <span class="ai-note grow" style="min-width:180px">Generated by AI. It suggests, you decide. <span style="white-space:nowrap">Wi-Fight</span> never switches your plan for you.</span>
+        </div>
+      </section>
+
+      <!-- COMPARISON -->
+      <div class="span-12 row between" style="margin-top:8px"><h2 class="h2">Compare all 4 plans</h2><span class="small only-desktop">Prices shown per month, before taxes</span></div>
+
+      <section class="card span-12 cmp only-desktop">
+        <!-- caps -->
+        <div class="cap"></div><div class="cap rec"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.900 5.600a3 3 0 0 0 1.900 1.900L21.400 11.400l-5.600 1.900a3 3 0 0 0-1.900 1.900L12 20.800l-1.900-5.600a3 3 0 0 0-1.900-1.900L2.600 11.400l5.600-1.900a3 3 0 0 0 1.900-1.900z"/></svg>Recommended for you</div><div class="cap"></div><div class="cap"></div><div class="cap"></div>
+        <!-- header -->
+        <div class="hd lab" style="justify-content:flex-end"><span class="eyebrow">What you get</span></div>
+        <div class="hd c rec"><span class="name">ValleyLink 1 Gig</span><span class="small">Proof AI pick</span><button class="btn primary sm">See the label</button></div>
+        <div class="hd c"><span class="name">Northstar Fiber 500</span><span class="small">Your plan now</span><button class="btn ghost sm">See the label</button></div>
+        <div class="hd c"><span class="name">Pinecrest Internet 500</span><span class="small">Promo for 12 months</span><button class="btn ghost sm">See the label</button></div>
+        <div class="hd c"><span class="name">Redstone 600</span><span class="small">Lowest price</span><button class="btn ghost sm">See the label</button></div>
+        <!-- price now -->
+        <div class="lab">Price now</div>
+        <div class="c rec"><span class="big">$70</span><small>a month</small></div>
+        <div class="c"><span class="big">$80</span><small>a month</small></div>
+        <div class="c"><span class="big">$65</span><small>a month</small></div>
+        <div class="c"><span class="big">$60</span><small>a month</small></div>
+        <!-- after promo -->
+        <div class="lab">Price after promo</div>
+        <div class="c rec">$70<small>No promo listed</small></div>
+        <div class="c">Not listed<small>Promo ends Jan 2027</small></div>
+        <div class="c">$90<small>After 12 months</small></div>
+        <div class="c">$60<small>No promo listed</small></div>
+        <!-- down -->
+        <div class="lab">Typical download</div>
+        <div class="c rec">1,000 Mbps</div>
+        <div class="c">500 Mbps<small>You got 389</small></div>
+        <div class="c">500 Mbps</div>
+        <div class="c">600 Mbps</div>
+        <!-- up -->
+        <div class="lab">Typical upload</div>
+        <div class="c rec">1,000 Mbps</div>
+        <div class="c">20 Mbps<small>You got 22</small></div>
+        <div class="c">20 Mbps</div>
+        <div class="c">35 Mbps</div>
+        <!-- 24 months -->
+        <div class="lab">Cost over 24 months<small>Monthly price only</small></div>
+        <div class="c rec"><span class="big">$1,680</span><small>$70 x 24</small></div>
+        <div class="c"><span class="big">$1,920</span><small>$80 x 24, if the price holds</small></div>
+        <div class="c"><span class="big">$1,860</span><small>$65 x 12, then $90 x 12</small></div>
+        <div class="c"><span class="big">$1,440</span><small>$60 x 24</small></div>
+        <!-- fits -->
+        <div class="lab last">Fits your household</div>
+        <div class="c rec last"><span class="badge good">Yes</span><small>Room for all three of you</small></div>
+        <div class="c last"><span class="badge warn">Partly</span><small>Slow in the evening</small></div>
+        <div class="c last"><span class="badge warn">Partly</span><small>Price jumps in year two</small></div>
+        <div class="c last"><span class="badge warn">Partly</span><small>Upload is tight for calls</small></div>
+      </section>
+
+      <!-- PHONE CARDS -->
+      <div class="span-12 only-mobile">
+        <div class="pcards">
+          <div class="pcard on">
+            <div class="top"><div class="col gap8"><span class="badge lock" style="align-self:flex-start">Recommended for you</span><div class="nm">ValleyLink 1 Gig</div></div><div class="pr">$70<small>a month</small></div></div>
+            <div class="pfacts"><div><span>Download</span>1,000 Mbps</div><div><span>Upload</span>1,000 Mbps</div><div><span>24 months</span>$1,680</div></div>
+            <div class="fit"><span class="badge good">Fits: yes</span>No promo listed, stays $70</div>
+          </div>
+          <div class="pcard">
+            <div class="top"><div class="col gap8"><span class="small">Your plan now</span><div class="nm">Northstar Fiber 500</div></div><div class="pr">$80<small>a month</small></div></div>
+            <div class="pfacts"><div><span>Download</span>500 Mbps</div><div><span>Upload</span>20 Mbps</div><div><span>24 months</span>$1,920</div></div>
+            <div class="fit"><span class="badge warn">Fits: partly</span>Slow in the evening. Promo ends Jan 2027</div>
+          </div>
+          <div class="pcard">
+            <div class="top"><div class="col gap8"><span class="small">Promo for 12 months</span><div class="nm">Pinecrest Internet 500</div></div><div class="pr">$65<small>then $90</small></div></div>
+            <div class="pfacts"><div><span>Download</span>500 Mbps</div><div><span>Upload</span>20 Mbps</div><div><span>24 months</span>$1,860</div></div>
+            <div class="fit"><span class="badge warn">Fits: partly</span>Price jumps in year two</div>
+          </div>
+          <div class="pcard">
+            <div class="top"><div class="col gap8"><span class="small">Lowest price</span><div class="nm">Redstone 600</div></div><div class="pr">$60<small>a month</small></div></div>
+            <div class="pfacts"><div><span>Download</span>600 Mbps</div><div><span>Upload</span>35 Mbps</div><div><span>24 months</span>$1,440</div></div>
+            <div class="fit"><span class="badge warn">Fits: partly</span>Upload is tight for calls</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FAIRNESS -->
+      <section class="card span-12">
+        <div class="lrow" style="padding:0;align-items:flex-start">
+          <div class="itile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4.5 6v6c0 4.500 3.200 7.600 7.500 9 4.300-1.400 7.500-4.500 7.500-9V6z"/><path d="m9 12 2 2 4-4"/></svg></div>
+          <div class="col gap4">
+            <div class="h3">Wi-Fight is not paid by any provider.</div>
+            <div class="body">Plan values here are sample values for the demo. Typical speeds come from each provider's broadband label.</div>
+          </div>
+        </div>
+      </section>
+
+      <div class="span-12 small" style="text-align:center;padding-top:4px"><b style="color:var(--ink-2)">Sample data.</b> Plans, prices, and speeds on this page are made up for the demo.</div>
+    </div>
+  </main>
+</div>
+
+<nav class="tabbar">
+  <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Home</div>
+  <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 20V10M12 20V4M19 20v-7"/></svg>History</div>
+  <div class="fab"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 4 14h6l-1 8 9-12h-6z"/></svg></div>
+  <div class="tab"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.900 5.600a3 3 0 0 0 1.900 1.900L21.400 11.400l-5.600 1.900a3 3 0 0 0-1.900 1.900L12 20.800l-1.900-5.600a3 3 0 0 0-1.900-1.900L2.600 11.400l5.600-1.900a3 3 0 0 0 1.900-1.900z"/></svg>Proof AI</div>
+  <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg>Report</div>
+</nav>
+</body></html>

@@ -1,0 +1,220 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Wi-Fight · Ask Proof AI</title><link rel="stylesheet" href="../ds.css">
+<style>
+.badge svg{width:12px;height:12px;flex:none}.chip svg{width:14px;height:14px;flex:none}.btn svg{width:16px;height:16px;flex:none}.ic16{display:inline-grid}.ic16 svg{width:16px;height:16px}
+.chatmain{padding-bottom:0}
+.chatgrid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:32px;align-items:start}
+.convo{max-width:720px;width:100%;margin:0 auto;display:flex;flex-direction:column;gap:18px;min-height:calc(100vh - 124px)}
+.turn-me{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.bubble.me{font-size:16px;padding:13px 17px}
+.steps{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.step{display:inline-flex;align-items:center;gap:8px;height:38px;padding:0 13px 0 9px;border-radius:12px;background:var(--surface);border:1px solid var(--line);font:600 13px var(--body);color:var(--ink-2);white-space:nowrap}
+.step i{width:20px;height:20px;border-radius:50%;background:var(--good-bg);color:var(--good);display:grid;place-items:center;flex:none}
+.step i svg{width:12px;height:12px}
+.answer{padding:22px}
+.answer .lead{font:600 19px/1.4 var(--body);color:var(--ink)}
+.answer p.pt{font:400 15.5px/1.6 var(--body);color:var(--ink-2)}
+.answer p.pt b{color:var(--ink);font-weight:600}
+.src{white-space:nowrap;margin-left:3px}
+.cmp{border-radius:var(--r-tile);background:var(--surface-2);border:1px solid var(--line);padding:16px 16px 14px;display:flex;flex-direction:column;gap:12px}
+.cmprow{display:grid;grid-template-columns:118px minmax(0,1fr) 150px;gap:12px;align-items:center}
+.cmprow .lab{font:600 13px/1.25 var(--body);color:var(--ink)}
+.cmprow .lab small{display:block;font:500 11.5px var(--body);color:var(--ink-3);margin-top:2px}
+.track{position:relative;height:22px;border-radius:7px;background:var(--surface);border:1px dashed var(--line)}
+.track b{position:absolute;left:0;top:-1px;bottom:-1px;border-radius:7px;background:var(--cobalt)}
+.track.low b{background:var(--bad)}
+.track::after{content:"";position:absolute;left:80%;top:-7px;bottom:-7px;border-left:1.5px dashed var(--ink-2)}
+.cmprow .valc{display:flex;align-items:center;gap:8px;justify-content:flex-end}
+.cmprow .valc .num{font-size:20px}
+.cmpfoot{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font:500 12px var(--body);color:var(--ink-3)}
+.afoot{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.srccount{display:inline-flex;align-items:center;gap:8px;font:600 13px var(--body);color:var(--ink-2)}
+.srcstack{display:flex}
+.srcstack i{width:22px;height:22px;border-radius:50%;background:var(--cobalt-50);color:var(--cobalt);display:grid;place-items:center;border:2px solid var(--surface);margin-left:-7px}
+.srcstack i:first-child{margin-left:0}
+.srcstack svg{width:11px;height:11px}
+.acts{display:flex;gap:2px;margin-left:auto}
+.act{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;color:var(--ink-3);background:transparent;border:0}
+.act svg{width:17px;height:17px}
+.follow{display:flex;flex-direction:column}
+.follow a{display:flex;gap:12px;align-items:flex-start;padding:14px 4px;font:600 16px/1.35 var(--body);color:var(--ink);text-decoration:none}
+.follow a + a{border-top:1px solid var(--line)}
+.follow a span{color:var(--ink-3);font-weight:500;flex:none}
+.dock{margin-top:auto;padding:14px 0 28px;display:flex;flex-direction:column;gap:10px;z-index:5}
+.sugg{display:flex;gap:8px;flex-wrap:wrap}
+.composer .plus{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;color:var(--ink-2);margin-left:-8px;flex:none}
+.composer .plus svg{width:18px;height:18px}
+.composer{height:58px;border-radius:29px}
+.docknote{text-align:center}
+.scope{position:sticky;top:28px;padding:20px}
+.scope .lrow{padding:11px 0;align-items:flex-start}
+.scope .lrow .t{font:600 14px/1.3 var(--body);color:var(--ink)}
+.scope .lrow .s{font:500 12.5px/1.35 var(--body);color:var(--ink-3);margin-top:2px}
+.cant{border-radius:14px;background:var(--surface-2);border:1px solid var(--line);padding:12px;display:flex;gap:10px;align-items:flex-start;font:600 13px/1.4 var(--body);color:var(--ink)}
+.cant svg{width:16px;height:16px;flex:none;margin-top:1px;color:var(--cobalt)}
+.consent{display:flex;align-items:center;gap:10px;justify-content:space-between}
+.scopechip{display:none}
+@media (max-width:1100px){
+  .chatgrid{grid-template-columns:minmax(0,1fr)}
+  .scope{display:none}
+  .scopechip{display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 13px;border-radius:999px;background:var(--surface);border:1px solid var(--line);font:600 13px var(--body);color:var(--ink-2);margin:-8px 0 18px;white-space:nowrap;max-width:100%}
+  .scopechip svg{width:14px;height:14px;color:var(--cobalt);flex:none}
+  .scopechip b{color:var(--cobalt);font-weight:700}
+}
+@media (max-width:720px){
+  .chatmain{padding-bottom:250px}
+  .convo{min-height:0;gap:14px}
+  .scopechip{margin:-4px 0 14px}
+  .answer{padding:16px}
+  .answer .lead{font-size:17px}
+  .steps{flex-direction:column;align-items:stretch;gap:6px}
+  .step{height:40px}
+  .cmprow{grid-template-columns:minmax(0,1fr) auto;gap:6px 10px}
+  .cmprow .track{grid-column:1 / -1;grid-row:2}
+  .cmprow .valc .num{font-size:18px}
+  .acts{margin-left:0;width:100%;justify-content:flex-start;margin-top:-4px}
+  .follow a{font-size:15px;padding:13px 2px}
+  .dock{position:fixed;left:0;right:0;bottom:0;margin:0;padding:26px 16px 98px;background:linear-gradient(rgba(243,244,247,0),var(--bg) 24px)}
+  .sugg{flex-wrap:nowrap;overflow-x:auto;margin:0 -16px;padding:0 16px;scrollbar-width:none}
+  .sugg::-webkit-scrollbar{display:none}
+  .docknote{display:none}
+  .composer{height:54px}
+}
+</style></head><body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><div class="mark"><svg viewBox="0 -1.300 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.300 16.200A8.300 8.300 0 0 1 16.900 6.300"/><path d="M19.900 12.300a8.300 8.300 0 0 1-.6 3.900"/><path d="m8 12.600 3 3 8.400-9.700"/></svg></div><span>Wi-Fight</span></div>
+    <a class="navitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span>Dashboard</span></a>
+    <a class="navitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 20V10M12 20V4M19 20v-7"/></svg><span>History</span></a>
+    <a class="navitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg><span>Report</span></a>
+    <a class="navitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 6.500C16 5 14.300 4.500 12 4.500c-2.800 0-4.500 1.300-4.500 3.400 0 4.800 10 2.400 10 7.600 0 2.200-2 3.500-5.500 3.500-2.500 0-4.500-.8-5.500-2.500"/></svg><span>Plans</span></a>
+    <div class="navsep">Proof AI</div>
+    <a class="navitem ai on"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.900 5.600a3 3 0 0 0 1.900 1.900L21.400 11.400l-5.600 1.900a3 3 0 0 0-1.900 1.900L12 20.800l-1.900-5.600a3 3 0 0 0-1.900-1.900L2.600 11.400l5.600-1.900a3 3 0 0 0 1.900-1.900z"/></svg><span>Ask Proof AI</span></a>
+    <a class="navitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h4l3-8 4 16 3-8h6"/></svg><span>Diagnosis</span></a>
+    <div class="navsep">Account</div>
+    <a class="navitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4.500 6v6c0 4.500 3.200 7.600 7.500 9 4.300-1.400 7.500-4.500 7.500-9V6z"/><path d="m9 12 2 2 4-4"/></svg><span>Privacy &amp; data</span></a>
+    <div class="sidefoot col gap8">
+      <span class="badge lock" style="align-self:flex-start"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2.500"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Encrypted</span>
+      <div class="small" style="color:var(--ink-2)">Your data stays yours. Nothing is sent without your approval.</div>
+    </div>
+  </aside>
+
+<main class="main chatmain">
+    <div class="topbar">
+      <div class="col gap8">
+        <div class="eyebrow">Answers from your own results · Day 9 of 14</div>
+        <h1 class="h1">Ask Proof AI</h1>
+      </div>
+      <div class="row gap8">
+        <span class="chip">Sample data</span>
+        <span class="chip only-desktop"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg><span>New chat</span></span>
+      </div>
+    </div>
+    <a class="scopechip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span>Using: 36 tests, your plan · <b>Change</b></span></a>
+
+    <div class="chatgrid">
+      <section class="convo">
+        <div class="turn-me">
+          <div class="bubble me">Why is my internet slow at night?</div>
+          <span class="ai-meta">You · 8:52 PM</span>
+        </div>
+
+        <div class="col gap8">
+          <span class="ai-meta">Proof AI checked your data in 3 steps</span>
+          <div class="steps">
+            <span class="step"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></i>Looked at 36 tests</span>
+            <span class="step"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></i>Compared evening and daytime</span>
+            <span class="step"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></i>Checked router tests</span>
+          </div>
+        </div>
+
+        <article class="ai-card answer col gap16">
+          <div class="row between" style="gap:10px;flex-wrap:wrap">
+            <span class="ai-tag"><svg viewBox="0 0 24 24" fill="#8B5CF6"><path d="M12 2l1.9 5.6a3 3 0 0 0 1.9 1.9L21.4 11.4l-5.6 1.9a3 3 0 0 0-1.9 1.9L12 20.8l-1.9-5.6a3 3 0 0 0-1.9-1.9L2.600 11.4l5.6-1.9a3 3 0 0 0 1.9-1.9z"/></svg>PROOF AI · ANSWER</span>
+            <span class="ai-meta">Based on 36 tests over 9 days · Updated 12 min ago</span>
+          </div>
+          <p class="lead">It looks like your provider's network gets busy at night. It does not look like your Wi-Fi.</p>
+          <p class="pt"><b>Evenings are slower.</b> Your tests between 7 and 11 PM average <b>352 Mbps</b>. Your daytime tests average <b>441 Mbps</b>. <span class="src">evening tests ×12</span></p>
+
+          <div class="cmp">
+            <div class="cmprow">
+              <div class="lab">Evening<small>7 to 11 PM</small></div>
+              <div class="track low"><b style="width:70.4%"></b></div>
+              <div class="valc"><span class="num">352<span class="unit" style="font-size:11px">Mbps</span></span><span class="badge bad">Below</span></div>
+            </div>
+            <div class="cmprow">
+              <div class="lab">Daytime<small>Before 7 PM</small></div>
+              <div class="track"><b style="width:88.2%"></b></div>
+              <div class="valc"><span class="num">441<span class="unit" style="font-size:11px">Mbps</span></span><span class="badge good">On plan</span></div>
+            </div>
+            <div class="cmpfoot"><span>Dashed mark: your fair line, 400 Mbps</span><span>Full bar: your 500 Mbps plan</span></div>
+          </div>
+
+          <p class="pt"><b>It is slow next to the router too.</b> The test beside your router got 392 Mbps and the far room got 371 Mbps. That gap is small, so the walls and distance in your home are not the cause. <span class="src">router check</span></p>
+          <p class="pt"><b>It is under what you pay for.</b> Your plan lists 500 Mbps for $80 a month, so the fair line is 400 Mbps. Your evening speed is below it. <span class="src">plan label</span></p>
+
+          <div class="divider"></div>
+          <div class="afoot">
+            <span class="srccount"><span class="srcstack"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 20V10M12 20V4M19 20v-7"/></svg></i><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2.5 9a14 14 0 0 1 19 0M6 12.5a9 9 0 0 1 12 0M9.2 16a4.5 4.5 0 0 1 5.6 0"/><circle cx="12" cy="19.5" r="1" fill="currentColor"/></svg></i><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="8.5" r="1.3" fill="currentColor"/></svg></i></span>3 sources from your data</span>
+            <span class="evidence">Confidence: high (86%)</span>
+            <div class="acts">
+              <button class="act" aria-label="Copy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg></button>
+              <button class="act" aria-label="Good answer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 11v9H4v-9zM7 11l4-8c1.500 0 2.500 1 2.500 2.500V9h5a2 2 0 0 1 2 2.300l-1.200 7a2 2 0 0 1-2 1.700H7"/></svg></button>
+              <button class="act" aria-label="Bad answer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 13V4H4v9zM7 13l4 8c1.500 0 2.500-1 2.500-2.500V15h5a2 2 0 0 0 2-2.300l-1.200-7a2 2 0 0 0-2-1.700H7"/></svg></button>
+              <button class="act" aria-label="Regenerate"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 0 0-14.3-4.500L4 8M4 4v4h4M4 13a8 8 0 0 0 14.300 4.500L20 16M20 20v-4h-4"/></svg></button>
+            </div>
+          </div>
+          <div class="ai-note">Generated by AI from your own test results. It can make mistakes, so check the sources.</div>
+        </article>
+
+        <div class="col gap4">
+          <span class="eyebrow" style="padding:6px 4px 4px">Ask next</span>
+          <div class="follow">
+            <a><span>↳</span>Is 78% bad enough to complain about?</a>
+            <a><span>↳</span>What should I say to my provider?</a>
+            <a><span>↳</span>Would a different plan fix this?</a>
+          </div>
+        </div>
+
+        <div class="dock">
+          <div class="sugg">
+            <span class="chip">Am I getting what I pay for?</span>
+            <span class="chip">Which day was my worst?</span>
+            <span class="chip">How much am I overpaying?</span>
+          </div>
+          <div class="composer"><span class="plus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>Ask about your internet<span class="send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M6 11l6-6 6 6"/></svg></span></div>
+          <div class="ai-note docknote">Proof AI can make mistakes. It only reads the data listed under "What Proof AI can see".</div>
+        </div>
+      </section>
+
+      <aside class="card scope col gap16">
+        <div class="col gap4">
+          <div class="h3">What Proof AI can see</div>
+          <div class="small">Only this data is used to answer you.</div>
+        </div>
+        <div>
+          <div class="lrow"><div class="itile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 20V10M12 20V4M19 20v-7"/></svg></div><div><div class="t">36 speed tests, 9 days</div><div class="s">Download, upload, response time</div></div></div>
+          <div class="lrow"><div class="itile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="8.5" r="1.3" fill="currentColor"/></svg></div><div><div class="t">Your plan label</div><div class="s">500 Mbps, $80 a month</div></div></div>
+          <div class="lrow"><div class="itile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2.5 9a14 14 0 0 1 19 0M6 12.5a9 9 0 0 1 12 0M9.2 16a4.5 4.5 0 0 1 5.6 0"/><circle cx="12" cy="19.5" r="1" fill="currentColor"/></svg></div><div><div class="t">2 near/far router checks</div><div class="s">392 Mbps near, 371 Mbps far</div></div></div>
+          <div class="lrow"><div class="itile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 6.5C16 5 14.3 4.5 12 4.5c-2.8 0-4.5 1.3-4.5 3.4 0 4.800 10 2.400 10 7.600 0 2.200-2 3.500-5.500 3.500-2.500 0-4.500-.8-5.500-2.500"/></svg></div><div><div class="t">Your bill fields</div><div class="s">Price, fees, promo end date</div></div></div>
+        </div>
+        <div class="cant"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span>It cannot see the sites you visit.</span></div>
+        <div class="divider"></div>
+        <div class="consent">
+          <div><div style="font:600 14px/1.3 var(--body)">Let Proof AI use my data</div><div class="small" style="color:var(--good);font-weight:700;margin-top:3px">On</div></div>
+          <span class="switch on"></span>
+        </div>
+        <div class="small">Turn this off any time in Privacy &amp; data.</div>
+      </aside>
+    </div>
+  </main>
+</div>
+
+<nav class="tabbar">
+  <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Home</div>
+  <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 20V10M12 20V4M19 20v-7"/></svg>History</div>
+  <div class="fab"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 4 14h6l-1 8 9-12h-6z"/></svg></div>
+  <div class="tab on"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.900 5.600a3 3 0 0 0 1.900 1.900L21.400 11.400l-5.600 1.900a3 3 0 0 0-1.900 1.900L12 20.800l-1.900-5.600a3 3 0 0 0-1.900-1.900L2.600 11.400l5.600-1.900a3 3 0 0 0 1.900-1.900z"/></svg>Proof AI</div>
+  <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg>Report</div>
+</nav>
+</body></html>

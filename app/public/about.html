@@ -1,0 +1,336 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Wi-Fight · About this prototype</title><link rel="stylesheet" href="css/ds.css">
+<style>
+.sec{padding:24px;display:flex;flex-direction:column;gap:16px}
+.sechead{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.secnum{width:30px;height:30px;border-radius:50%;background:var(--surface-2);border:1px solid var(--line);display:grid;place-items:center;font:700 12px var(--body);color:var(--ink-2);flex:none}
+.lead{font:500 17px/1.5 var(--body);color:var(--ink);max-width:760px}
+.body b{color:var(--ink);font-weight:600}
+.body{max-width:760px}
+.link{color:var(--cobalt);font-weight:700;text-decoration:none}
+.link:hover{text-decoration:underline}
+.team{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
+.member{padding:14px;border-radius:var(--r-tile);background:var(--surface-2);border:1px solid var(--line)}
+.member b{display:block;font:600 15px/1.3 var(--body)}
+.member span{font:500 13px/1.35 var(--body);color:var(--ink-3)}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.stat{padding:18px;border-radius:var(--r-tile);background:var(--surface-2);border:1px solid var(--line);display:flex;flex-direction:column;gap:8px}
+.stat .num{font-size:40px;line-height:1}
+.stat p{font:500 14px/1.4 var(--body);color:var(--ink-2)}
+.stat cite{font:500 12px/1.3 var(--body);color:var(--ink-3);font-style:normal}
+.fr{display:flex;flex-direction:column}
+.fr-row{display:grid;grid-template-columns:56px 1.5fr 1fr 1.5fr;gap:16px;align-items:start;padding:14px 0;border-top:1px solid var(--line);font:500 14px/1.45 var(--body);color:var(--ink-2)}
+.fr-row.head{border-top:0;padding:0 0 8px;font:600 11px var(--body);letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3)}
+.fr-row .id{font:700 18px var(--display);color:var(--ink)}
+.fr-row .what{color:var(--ink);font-weight:600}
+.fr-row .where{display:flex;flex-wrap:wrap;gap:4px 14px}
+.fr-row .st{display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+.two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.three{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.box{padding:18px;border-radius:var(--r-tile);background:var(--surface-2);border:1px solid var(--line);display:flex;flex-direction:column;gap:10px}
+.box .h3{font-size:16px}
+.method{display:flex;flex-direction:column}
+.m{padding:11px 0;font:400 14px/1.5 var(--body);color:var(--ink-2)}
+.m + .m{border-top:1px solid var(--line)}
+.m b{color:var(--ink);font-weight:600}
+code{font:600 12.5px ui-monospace,Menlo,monospace;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:1px 5px;color:var(--ink-2);white-space:nowrap}
+.statusline{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:var(--r-tile);background:var(--surface-2);border:1px solid var(--line);font:600 14px/1.4 var(--body);color:var(--ink)}
+.statusline .dot{flex:none;width:9px;height:9px;color:var(--ink-3)}
+.statusline.good .dot{color:var(--good)}.statusline.warn .dot{color:var(--warn)}
+.statusline small{font:500 13px var(--body);color:var(--ink-3)}
+.demo{border-radius:var(--r-tile);border:1px solid var(--line);background:var(--surface-2);padding:18px;display:flex;flex-direction:column;gap:14px}
+.tchips{display:flex;flex-wrap:wrap;gap:8px}
+.tchip{display:flex;flex-direction:column;gap:2px;padding:9px 13px;border-radius:14px;background:var(--surface);border:1px solid var(--line);min-width:84px}
+.tchip small{font:600 11px var(--body);color:var(--ink-3)}
+.tchip b{font:700 18px var(--display);letter-spacing:-.02em}
+.tchip b i{font:600 11px var(--body);font-style:normal;color:var(--ink-3);margin-left:3px}
+.tchip.edit{border:2px solid var(--cobalt);background:var(--cobalt-50)}
+.tchip.edit.flag{border-color:var(--bad);background:var(--bad-bg)}
+.ctl{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.ctl input[type=range]{flex:1;min-width:160px;accent-color:var(--cobalt);height:28px}
+.ctl input[type=number]{width:92px;height:44px;border-radius:12px;border:1px solid var(--line);background:var(--surface);padding:0 10px;font:700 16px var(--body);color:var(--ink)}
+.out{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.o{padding:12px;border-radius:14px;background:var(--surface);border:1px solid var(--line);display:flex;flex-direction:column;gap:5px}
+.o .eyebrow{white-space:normal;line-height:1.3}
+.o .v{font:700 20px var(--display);letter-spacing:-.02em}
+.o .v .unit{font-size:12px}
+.o .n{font:500 12px/1.35 var(--body);color:var(--ink-3)}
+.ticks{display:flex;flex-direction:column;gap:9px}
+.tick{display:flex;gap:10px;align-items:flex-start;font:400 14px/1.5 var(--body);color:var(--ink-2)}
+.tick b{color:var(--ink);font-weight:600}
+.tick i{width:20px;height:20px;border-radius:50%;background:var(--good);color:#fff;display:grid;place-items:center;flex:none;margin-top:1px}
+.tick i svg{width:12px;height:12px}
+.tick.lim i{background:var(--warn)}
+.tick.next i{background:var(--cobalt)}
+.sdg{width:84px;height:84px;border-radius:20px;background:var(--ink);color:var(--bg);display:grid;place-items:center;font:800 46px/1 var(--display);flex:none}
+.sdgrow{display:flex;gap:20px;align-items:flex-start}
+.target{padding:14px;border-radius:var(--r-tile);background:var(--surface-2);border:1px solid var(--line);font:400 14px/1.5 var(--body);color:var(--ink-2)}
+.target b{display:block;color:var(--ink);font:700 15px var(--body);margin-bottom:3px}
+.sum{display:flex;flex-direction:column}
+.sum .kv{font-size:14px;gap:16px}
+.sum .kv .v{white-space:nowrap}
+.sum .kv.total .k,.sum .kv.total .v{color:var(--ink);font-weight:700}
+.sample.show{display:inline-flex !important}
+@media (max-width:1100px){.team{grid-template-columns:repeat(3,minmax(0,1fr))}.out{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:720px){
+  .sec{padding:18px}
+  .stats,.two,.three{grid-template-columns:1fr}
+  .team{grid-template-columns:1fr 1fr;gap:8px}
+  .out .o:first-child,.out .o:last-child{grid-column:1 / -1}
+  .lead{font-size:16px}
+  .fr-row.head{display:none}
+  .fr-row{grid-template-columns:44px 1fr;gap:6px 10px}
+  .fr-row:nth-child(2){border-top:0;padding-top:0}
+  .fr-row .where,.fr-row .st{grid-column:2}
+  .sdgrow{flex-direction:column}
+  .sdg{width:64px;height:64px;border-radius:16px;font-size:36px}
+  .tchip{min-width:0;flex:1 1 28%}
+  .ctl input[type=range]{flex-basis:100%}
+}
+</style></head><body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><div class="mark"><svg viewBox="0 -1.300 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.300 16.200A8.300 8.300 0 0 1 16.900 6.300"/><path d="M19.900 12.300a8.300 8.300 0 0 1-.6 3.900"/><path d="m8 12.600 3 3 8.400-9.700"/></svg></div><span>Wi-Fight</span></div>
+    <a class="navitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span>Dashboard</span></a>
+    <a class="navitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 20V10M12 20V4M19 20v-7"/></svg><span>History</span></a>
+    <a class="navitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg><span>Report</span></a>
+    <a class="navitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 6.500C16 5 14.300 4.500 12 4.500c-2.800 0-4.500 1.300-4.500 3.400 0 4.800 10 2.400 10 7.600 0 2.200-2 3.500-5.500 3.500-2.500 0-4.500-.8-5.500-2.500"/></svg><span>Plans</span></a>
+    <div class="navsep">Proof AI</div>
+    <a class="navitem ai"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.900 5.600a3 3 0 0 0 1.900 1.900L21.400 11.400l-5.600 1.900a3 3 0 0 0-1.900 1.900L12 20.800l-1.900-5.600a3 3 0 0 0-1.900-1.900L2.600 11.400l5.600-1.900a3 3 0 0 0 1.900-1.900z"/></svg><span>Ask Proof AI</span></a>
+    <a class="navitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h4l3-8 4 16 3-8h6"/></svg><span>Diagnosis</span></a>
+    <div class="navsep">Account</div>
+    <a class="navitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4.500 6v6c0 4.500 3.200 7.600 7.500 9 4.300-1.400 7.500-4.500 7.500-9V6z"/><path d="m9 12 2 2 4-4"/></svg><span>Privacy &amp; data</span></a>
+    <div class="sidefoot col gap8">
+      <span class="badge lock" style="align-self:flex-start"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2.500"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Encrypted</span>
+      <div class="small" style="color:var(--ink-2)">Your data stays yours. Nothing is sent without your approval.</div>
+    </div>
+  </aside>
+
+    <main class="main">
+    <div class="topbar">
+      <div class="col gap8">
+        <div class="eyebrow">Team DiJITZ · CS 410 · Alabama A&amp;M University</div>
+        <h1 class="h1">About this prototype</h1>
+      </div>
+      <div class="row gap12"><a class="btn primary sm" href="dashboard.html">Open the app</a></div>
+    </div>
+
+    <div class="g">
+      <!-- 1 HEADER -->
+      <section class="card span-12 sec" id="team">
+        <p class="lead">Wi-Fight checks whether you get the internet speed you pay for, and gives you proof.</p>
+        <p class="body">This page shows how the working prototype answers each line of the project rubric. Everything on it describes the code as it runs today, including what is a demo and what is not built yet.</p>
+        <div class="team">
+          <div class="member"><b>Jordan Barnes</b><span>Team Lead</span></div>
+          <div class="member"><b>Thabo Ibrahim Traore</b><span>Co-Lead</span></div>
+          <div class="member"><b>Zizwe Mtonga</b><span>Feature Analyst</span></div>
+          <div class="member"><b>Daniel Lambo</b><span>Researcher</span></div>
+          <div class="member"><b>Tapiwa Musinga</b><span>Team Member</span></div>
+        </div>
+      </section>
+
+      <!-- 2 PROBLEM -->
+      <section class="card span-12 sec" id="problem">
+        <div class="sechead"><span class="secnum">1</span><h2 class="h2">The problem</h2></div>
+        <p class="lead">Households pay for an internet speed. They cannot tell if they get it. And if they do not, they cannot prove it.</p>
+        <p class="body">Wi-Fight is built for <b>students, renters, and families in Huntsville, Alabama</b>. These are people who pay the bill but have no easy way to check it.</p>
+        <div class="stats">
+          <div class="stat"><div class="num">68%</div><p>of U.S. households had home Wi-Fi problems in the past year.</p><cite>TechSee, 2025</cite></div>
+          <div class="stat"><div class="num">21%</div><p>of U.S. broadband subscribers are neutral or dissatisfied.</p><cite>S&amp;P Global</cite></div>
+          <div class="stat"><div class="num">$81 to $98</div><p>The average internet bill rose from $81 at sign-up to $98.</p><cite>U.S. News survey of 2,500 adults, 2024</cite></div>
+        </div>
+      </section>
+
+      <!-- 3 WHAT WORKS -->
+      <section class="card span-12 sec" id="works">
+        <div class="sechead"><span class="secnum">2</span><h2 class="h2">What works in this prototype</h2></div>
+        <p class="body">The team set five functional requirements. Each one maps to pages you can open now.</p>
+        <div class="fr">
+          <div class="fr-row head"><span>Req.</span><span>What it asks for</span><span>Where to see it</span><span>Status</span></div>
+          <div class="fr-row"><span class="id">FR1</span><span class="what">Consent first, then secure sign-in.</span><span class="where"><a class="link" href="onboarding-consent.html">Consent</a><a class="link" href="onboarding-signin.html">Sign in</a></span><span class="st"><span class="badge warn"><span class="dot"></span>Working, with a limit</span><span>Consent is enforced in code. Sign-in is a demo, because there is no email server.</span></span></div>
+          <div class="fr-row"><span class="id">FR2</span><span class="what">Pick your provider and plan from its label.</span><span class="where"><a class="link" href="onboarding-plan.html">Your plan</a></span><span class="st"><span class="badge warn"><span class="dot"></span>Working, with a limit</span><span>The providers and plans are fictional sample values.</span></span></div>
+          <div class="fr-row"><span class="id">FR3</span><span class="what">Run M-Lab speed tests.</span><span class="where"><a class="link" href="test.html">Live test</a></span><span class="st"><span class="badge warn"><span class="dot"></span>Working, with a limit</span><span>Tests run when the app is open, not in the background.</span></span></div>
+          <div class="fr-row"><span class="id">FR4</span><span class="what">Compare results to the label and flag repeated shortfalls.</span><span class="where"><a class="link" href="dashboard.html">Dashboard</a><a class="link" href="history.html">History</a><a class="link" href="diagnosis.html">Diagnosis</a></span><span class="st"><span class="badge good"><span class="dot"></span>Working</span><span>Every number is computed from the stored tests.</span></span></div>
+          <div class="fr-row"><span class="id">FR5</span><span class="what">A plain verdict and a shareable report.</span><span class="where"><a class="link" href="verdict.html">Verdict</a><a class="link" href="report.html">Report</a></span><span class="st"><span class="badge warn"><span class="dot"></span>Working, with a limit</span><span>The report is sent from your own email app. Wi-Fight does not send it.</span></span></div>
+        </div>
+        <p class="small">These pages need consent, sign-in, and a plan. If you have not set those up, the link takes you to the first missing step.</p>
+      </section>
+
+      <!-- 4 PROOF AI -->
+      <section class="ai-card span-12 sec" id="ai">
+        <div class="sechead"><span class="ai-tag"><svg viewBox="0 0 24 24" fill="#8B5CF6"><path d="M12 2l1.900 5.600a3 3 0 0 0 1.900 1.900L21.400 11.400l-5.600 1.900a3 3 0 0 0-1.900 1.900L12 20.800l-1.900-5.600a3 3 0 0 0-1.900-1.900L2.600 11.400l5.600-1.900a3 3 0 0 0 1.900-1.900z"/></svg>PROOF AI</span></div>
+        <div class="sechead"><span class="secnum">3</span><h2 class="h2">How Proof AI works</h2></div>
+        <p class="lead">Proof AI has two layers. The numbers come from statistics that run on your device. The words come from a large language model, or from a built-in writer when no AI key is set.</p>
+        <div class="statusline" id="aiStatus"><span class="dot"></span><span><span data-b="aiStatus">Checking Proof AI status.</span> <small data-b="aiStatusNote"></small></span></div>
+
+        <div class="two">
+          <div class="box">
+            <div class="eyebrow">Layer 1 · On this device</div>
+            <div class="h3">Real statistics</div>
+            <div class="method">
+              <div class="m"><b>Daily median.</b> Each day's result is the middle value of that day's tests, so one odd test cannot swing the day. <code>median</code>, <code>summarize</code></div>
+              <div class="m"><b>The fair line.</b> <span data-b="fairPct">80</span>% of the download speed on the plan's label. A day under it counts as a low day. <code>FAIR</code></div>
+              <div class="m"><b>The rule of <span data-b="streak">3</span> days in a row.</b> A shortfall is flagged only when the daily median stays under the fair line for <span data-b="streak">3</span> days running. <code>STREAK</code></div>
+              <div class="m"><b>One-off dip detection.</b> Each test is compared with the tests in the 36 hours before and after it. The app computes a robust z-score from their median and their median absolute deviation. A test is ignored as a one-off only if the score is under -3.5 and the speed is under 60% of the local median. A slow stretch is not ignored, because its neighbours are slow too. <code>flagOutliers</code></div>
+              <div class="m"><b>Wi-Fi or provider evidence score.</b> The score starts at 50/50 and moves with each piece of evidence: the paired router check (one test next to the router, one in a far room), evening against daytime speed, the number of devices per person, and how long the problem has lasted. Each piece is shown to the user. <code>diagnose</code></div>
+              <div class="m"><b>Plan scoring rule.</b> The app estimates the speed a household needs from its size and uses, adds up each plan's cost over 24 months with any price jump, and picks the cheapest plan that fits. <code>recommend</code></div>
+            </div>
+            <div class="small">All in <code>js/engine.js</code>. No network call is involved.</div>
+          </div>
+          <div class="box">
+            <div class="eyebrow">Layer 2 · Through the local server</div>
+            <div class="h3">Language and vision by Claude</div>
+            <div class="method">
+              <div class="m"><b>What the model writes.</b> The explanation on the dashboard and verdict, chat answers grounded in the user's own numbers, the report draft, and the reading of a bill photo. <code>AI.insight</code> <code>AI.verdict</code> <code>AI.answer</code> <code>AI.draft</code> <code>AI.readBill</code></div>
+              <div class="m"><b>The key stays on the server.</b> The browser calls <code>/api/ai</code> on this computer. Only the server holds the AI key and talks to Claude. The key is never in the browser.</div>
+              <div class="m"><b>Only a trimmed set of facts is sent.</b> The model gets a summary: first name, plan, median, days below the fair line, the dips that were ignored, the diagnosis, and bill figures if a bill was added. It does not get the email address or the raw test list. Chat also sends the question and the recent conversation. <code>slim</code></div>
+              <div class="m"><b>The model is told to stay inside the facts.</b> Its instructions say to use only the numbers the app gives it, and to never claim that something was sent.</div>
+            </div>
+            <div class="eyebrow" style="margin-top:6px">Offline mode</div>
+            <div class="m" style="padding:0"><b>No key, no problem.</b> When no AI key is set, a built-in writer produces the wording from the same computed numbers, and the interface says so under every AI block. One thing needs the model: reading a real bill photo. In offline mode that step shows labelled sample values to edit.</div>
+          </div>
+        </div>
+
+        <!-- interactive demo -->
+        <div class="demo" id="demo">
+          <div class="row between" style="gap:12px;flex-wrap:wrap">
+            <div><div class="h3">Try it: is this test a one-off dip?</div><div class="small">This runs <code>flagOutliers</code> from the real engine, in this page, each time you move the slider.</div></div>
+            <span class="sample" id="demoSample">Sample data</span>
+          </div>
+          <p class="body" data-b="demoIntro"></p>
+          <div class="tchips" id="demoChips"></div>
+          <div class="ctl">
+            <label class="small" for="dipRange" style="color:var(--ink-2)">Change the low test</label>
+            <input type="range" id="dipRange" min="50" max="450" step="1" value="96" aria-label="Speed of the low test in Mbps">
+            <input type="number" id="dipNum" min="50" max="450" step="1" value="96" aria-label="Speed of the low test in Mbps">
+            <span class="small">Mbps</span>
+            <button class="btn ghost sm" id="dipReset" type="button">Reset</button>
+          </div>
+          <div class="out">
+            <div class="o"><div class="eyebrow">Result</div><div id="demoVerdict"></div><div class="n" id="demoVerdictNote"></div></div>
+            <div class="o"><div class="eyebrow">Robust z-score</div><div class="v" id="demoZ"></div><div class="n" id="demoZNote"></div></div>
+            <div class="o"><div class="eyebrow">Local median</div><div class="v" id="demoMed"></div><div class="n" id="demoMedNote"></div></div>
+            <div class="o"><div class="eyebrow">That day's median</div><div class="v" id="demoDay"></div><div class="n" id="demoDayNote"></div></div>
+          </div>
+          <div class="ai-note">Computed on this device by the engine. No AI service is called for this.</div>
+        </div>
+
+        <div class="box">
+          <div class="h3">Responsible AI</div>
+          <div class="ticks">
+            <div class="tick"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.500 4.500 4.500L19 7.500"/></svg></i><span><b>It shows its evidence.</b> Every AI block lists the tests, days, and method behind it.</span></div>
+            <div class="tick"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.500 4.500 4.500L19 7.500"/></svg></i><span><b>It shows a confidence level.</b> Low, medium, or high, with the percent.</span></div>
+            <div class="tick"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.500 4.500 4.500L19 7.500"/></svg></i><span><b>It can be wrong, and it says so.</b> Each AI block carries a note to check the evidence.</span></div>
+            <div class="tick"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.500 4.500 4.500L19 7.500"/></svg></i><span><b>It suggests and never acts.</b> Nothing is sent or changed without the user's approval.</span></div>
+            <div class="tick"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.500 4.500 4.500L19 7.500"/></svg></i><span><b>It can be switched off.</b> The AI settings are in <a class="link" href="privacy.html">Privacy</a>.</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5 SECURITY -->
+      <section class="card span-12 sec" id="security">
+        <div class="sechead"><span class="secnum">4</span><h2 class="h2">Security and privacy</h2><span class="badge lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.400" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2.500"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Real, not decorative</span></div>
+        <div class="statusline" id="encStatus"><span class="dot"></span><span><span data-b="encStatus">Checking encryption status.</span> <small data-b="encStatusNote"></small></span></div>
+        <div class="two">
+          <div class="ticks">
+            <div class="tick"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.500 4.500 4.500L19 7.500"/></svg></i><span><b>Consent before any test.</b> The test code checks for consent first and refuses to run without it. This covers the practice test too.</span></div>
+            <div class="tick"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.500 4.500 4.500L19 7.500"/></svg></i><span><b>Encrypted at rest.</b> App data is saved in the browser with AES-GCM 256. The key is non-extractable, so scripts can use it but cannot read it out.</span></div>
+            <div class="tick"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.500 4.500 4.500L19 7.500"/></svg></i><span><b>Report fingerprint.</b> The report carries a SHA-256 fingerprint of its content, so any later change can be detected.</span></div>
+            <div class="tick"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.500 4.500 4.500L19 7.500"/></svg></i><span><b>Approve before send.</b> The user reads the report and approves it before it can leave the device.</span></div>
+          </div>
+          <div class="ticks">
+            <div class="tick"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.500 4.500 4.500L19 7.500"/></svg></i><span><b>AI key kept server side.</b> The key lives in the server's settings and is never sent to the browser.</span></div>
+            <div class="tick"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.500 4.500 4.500L19 7.500"/></svg></i><span><b>Data minimisation.</b> Bill photos are never stored. Only the numbers read from the bill are kept.</span></div>
+            <div class="tick"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.500 4.500 4.500L19 7.500"/></svg></i><span><b>Download and delete everything.</b> The user can download all stored data as one file, or delete it all. Deleting also destroys the encryption key. See <a class="link" href="privacy.html">Privacy</a>.</span></div>
+          </div>
+        </div>
+        <div class="box">
+          <div class="h3">The limits, stated plainly</div>
+          <p class="body">This is a single-device prototype with no account server. So sign-in is a demo, and there is no sync across devices. Your data lives only in this browser.</p>
+        </div>
+      </section>
+
+      <!-- 6 SDG -->
+      <section class="card span-6 sec" id="sdg">
+        <div class="sechead"><span class="secnum">5</span><h2 class="h2">UN Sustainable Development Goal 9</h2></div>
+        <div class="sdgrow">
+          <div class="sdg" aria-label="Goal 9">9</div>
+          <div class="col gap8 grow">
+            <div class="eyebrow">Industry, innovation and infrastructure</div>
+            <div class="target"><b>Target 9.c</b>"Universal and affordable access to the Internet."</div>
+            <div class="target"><b>Target 9.1</b>Reliable infrastructure, with affordable and equitable access for all.</div>
+          </div>
+        </div>
+        <p class="body">A plan is only affordable if you get what you pay for. A household that pays for 500 Mbps and gets less is paying more per unit of speed than the label says. Wi-Fight measures that gap and gives the household proof, so "affordable" can be checked instead of assumed.</p>
+      </section>
+
+      <!-- 7 IMPACT -->
+      <section class="card span-6 sec" id="impact">
+        <div class="sechead"><span class="secnum">6</span><h2 class="h2">Impact</h2></div>
+        <div class="ticks">
+          <div class="tick"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.500 4.500 4.500L19 7.500"/></svg></i><span><b>Households.</b> Proof of what they got, and leverage when they ask for a fix or a credit.</span></div>
+          <div class="tick next"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></i><span><b>Huntsville.</b> A picture of real performance, if households choose to share anonymized results. This is a future step and is not built.</span></div>
+          <div class="tick"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.500 4.500 4.500L19 7.500"/></svg></i><span><b>Infrastructure.</b> Providers are held to what they advertise.</span></div>
+        </div>
+        <div class="box">
+          <div class="row between" style="gap:10px;flex-wrap:wrap"><div class="h3">Up to about $260 a year per household</div><span class="badge warn"><span class="dot"></span>Estimate</span></div>
+          <div class="sum">
+            <div class="kv"><span class="k">One junk fee cut. Consumer Reports found fees of $2.49 to $9.95 a month.</span><span class="v">$30 to $120 a year</span></div>
+            <div class="kv"><span class="k">An example plan switch that saves $12 a month.</span><span class="v">$144 a year</span></div>
+            <div class="kv total"><span class="k">Both together, at the high end</span><span class="v">about $260 a year</span></div>
+          </div>
+          <p class="small">This is an estimate, not a measured result. Many households will save less, and some will save nothing.</p>
+        </div>
+      </section>
+
+      <!-- 8 LIMITATIONS -->
+      <section class="card span-7 sec" id="limits">
+        <div class="sechead"><span class="secnum">7</span><h2 class="h2">Limitations</h2></div>
+        <div class="ticks">
+          <div class="tick lim"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 6v7M12 17.500v.500"/></svg></i><span><b>Tests run only while the app is open.</b> Phones do not allow reliable background tests for web apps.</span></div>
+          <div class="tick lim"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 6v7M12 17.500v.500"/></svg></i><span><b>The practice test is not a real measurement.</b> It exists for networks that block M-Lab, and it is always labelled.</span></div>
+          <div class="tick lim"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 6v7M12 17.500v.500"/></svg></i><span><b>Provider and plan values are fictional sample values.</b> Real label data must be entered by hand, because there is no public feed.</span></div>
+          <div class="tick lim"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 6v7M12 17.500v.500"/></svg></i><span><b>Slow home Wi-Fi can look like a slow provider.</b> The paired router check is what tells them apart. Without it the app says the cause is not clear.</span></div>
+          <div class="tick lim"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 6v7M12 17.500v.500"/></svg></i><span><b>The diagnosis is an evidence score, not a certainty.</b></span></div>
+          <div class="tick lim"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 6v7M12 17.500v.500"/></svg></i><span><b>There is no email server.</b> So sign-in and sending are demos.</span></div>
+          <div class="tick lim"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 6v7M12 17.500v.500"/></svg></i><span><b>The pilot is small and still planned.</b> 15 student households over 4 weeks. The success measure is "12 of 15 households get a clear answer".</span></div>
+          <div class="tick lim"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 6v7M12 17.500v.500"/></svg></i><span><b>M-Lab publishes test results and IP addresses.</b> The consent page says this before any real test.</span></div>
+        </div>
+      </section>
+
+      <!-- 9 NEXT STEPS -->
+      <section class="card span-5 sec" id="next">
+        <div class="sechead"><span class="secnum">8</span><h2 class="h2">Next steps</h2></div>
+        <div class="ticks">
+          <div class="tick next"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></i><span>Real accounts and sync, with row-level security.</span></div>
+          <div class="tick next"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></i><span>Hand-checked label data for Huntsville providers.</span></div>
+          <div class="tick next"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></i><span>Reminders, or a small always-on helper, for scheduled tests.</span></div>
+          <div class="tick next"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></i><span>Run the pilot with 15 student households.</span></div>
+          <div class="tick next"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></i><span>An anonymized community map.</span></div>
+          <div class="tick next"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></i><span>FCC complaint pre-fill.</span></div>
+          <div class="tick next"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></i><span>An accessibility review.</span></div>
+        </div>
+      </section>
+
+      <!-- 10 CREDITS -->
+      <section class="card span-12 sec" id="credits">
+        <div class="sechead"><span class="secnum">9</span><h2 class="h2">Credits</h2></div>
+        <div class="three">
+          <div class="target"><b>Speed tests</b>Measurement Lab (M-Lab) ndt7. Apache-2.0 license.</div>
+          <div class="target"><b>AI</b>Anthropic's Claude, when a key is set. A built-in writer when it is not.</div>
+          <div class="target"><b>Design and type</b>Design references studied from Mobbin. Fonts: Bricolage Grotesque and Inter.</div>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<nav class="tabbar">
+  <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Home</div>
+  <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 20V10M12 20V4M19 20v-7"/></svg>History</div>
+  <div class="fab"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 4 14h6l-1 8 9-12h-6z"/></svg></div>
+  <div class="tab"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.900 5.600a3 3 0 0 0 1.900 1.900L21.400 11.400l-5.600 1.900a3 3 0 0 0-1.900 1.900L12 20.800l-1.900-5.600a3 3 0 0 0-1.900-1.900L2.600 11.400l5.600-1.900a3 3 0 0 0 1.900-1.900z"/></svg>Proof AI</div>
+  <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg>Report</div>
+</nav>
+<script type="module" src="js/pages/about.js"></script>
+</body></html>

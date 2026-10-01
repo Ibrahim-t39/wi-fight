@@ -1,0 +1,250 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Wi-Fight · Diagnosis</title><link rel="stylesheet" href="css/ds.css">
+<style>
+.sample{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 10px;border-radius:999px;border:1px dashed var(--ink-3);font:600 12px var(--body);color:var(--ink-2);white-space:nowrap}
+.titlerow{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.aipill{display:inline-flex;align-items:center;height:28px;padding:0 11px;border-radius:999px;border:1.5px solid transparent;background:linear-gradient(var(--surface),var(--surface)) padding-box,var(--ai-grad) border-box}
+
+/* verdict */
+.verdict{padding:28px;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:40px;align-items:center}
+.verdict .big{font:700 72px/1 var(--display);letter-spacing:-.035em;margin-top:12px}
+.verdict .sub{font:600 20px/1.3 var(--body);color:var(--ink-2);margin-top:10px;display:flex;align-items:center;gap:8px}
+.verdict .sub svg{width:20px;height:20px;color:var(--ink-3)}
+.conf{border-radius:18px;background:var(--surface-2);border:1px solid var(--line);padding:18px}
+.conf .lab{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.conf .lab .t{font:600 15px var(--body)}
+.conf .lab .p{font-size:30px;line-height:1}
+.meter{position:relative;height:14px;border-radius:7px;background:var(--line);margin-top:14px}
+.meter i{position:absolute;left:0;top:0;bottom:0;border-radius:7px;background:var(--cobalt)}
+.meter b{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--surface-2)}
+.meter em{position:absolute;top:50%;width:22px;height:22px;margin:-11px 0 0 -11px;border-radius:50%;background:#fff;border:4px solid var(--cobalt);box-shadow:0 2px 6px rgba(11,15,26,.2)}
+.zones{display:grid;grid-template-columns:50% 25% 25%;margin-top:8px;font:600 11px var(--body);color:var(--ink-3);text-align:center}
+.zones .on{color:var(--cobalt);font-weight:700}
+
+/* balance */
+.balance{display:grid;grid-template-columns:1fr auto 1fr;gap:14px;align-items:stretch}
+.opt{border-radius:18px;border:1.5px solid var(--line);padding:16px;display:flex;flex-direction:column;gap:12px}
+.opt.win{border-color:var(--cobalt);background:var(--cobalt-50)}
+.opt .name{font:700 19px var(--display);letter-spacing:-.01em}
+.opt .pct{font-size:26px;line-height:1}
+.like{height:10px;border-radius:5px;background:var(--line);position:relative}
+.like i{position:absolute;left:0;top:0;bottom:0;border-radius:5px;background:var(--ink-3)}
+.opt.win .like{background:#fff}.opt.win .like i{background:var(--cobalt)}
+.vs{align-self:center;width:36px;height:36px;border-radius:50%;background:var(--surface-2);border:1px solid var(--line);display:grid;place-items:center;font:700 11px var(--body);color:var(--ink-3)}
+.badge.mute{background:var(--surface-2);color:var(--ink-2);border:1px solid var(--line)}
+.badge.pick{background:var(--cobalt);color:#fff}
+
+/* evidence rows */
+.ev{border-radius:18px;border:1px solid var(--line);background:var(--surface)}
+.ev + .ev{margin-top:10px}
+.ev summary{list-style:none;display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer}
+.ev summary::-webkit-details-marker{display:none}
+.ev summary .q{font:600 16px/1.3 var(--body);flex:1}
+.ev summary .n{font:700 11px var(--body);color:var(--ink-3);letter-spacing:.06em}
+.ev summary .chev{width:28px;height:28px;border-radius:50%;background:var(--surface-2);display:grid;place-items:center;color:var(--ink-2);flex:none}
+.ev summary .chev svg{width:15px;height:15px;transform:rotate(90deg)}
+.ev[open] summary .chev svg{transform:rotate(-90deg)}
+.ev[open]{background:var(--surface-2)}
+.ev[open] summary .chev{background:var(--surface)}
+.evbody{padding:4px 16px 18px 64px}
+.evbody p{font:500 14px/1.45 var(--body);color:var(--ink-2)}
+.evbody p b{color:var(--ink);font-weight:600}
+/* range bar with markers */
+.range{position:relative;height:74px;margin:6px 14px 4px}
+.range .rail{position:absolute;left:-14px;right:-14px;top:32px;height:10px;border-radius:5px;background:var(--line)}
+.range .gap{position:absolute;top:32px;height:10px;background:var(--cobalt-100)}
+.range .fair{position:absolute;top:22px;height:30px;border-left:1.5px dashed var(--ink-3)}
+.range .fair span{position:absolute;top:34px;left:0;transform:translateX(-50%);font:700 11px var(--body);color:var(--ink-3);white-space:nowrap}
+.range .pt{position:absolute;top:28px;width:18px;height:18px;margin-left:-9px;border-radius:50%;background:var(--bad);border:3px solid var(--surface-2);box-shadow:0 0 0 1px var(--bad)}
+.range .pt span{position:absolute;bottom:22px;left:50%;transform:translateX(-50%);white-space:nowrap;font:700 13px var(--body);color:var(--ink)}
+.range .pt span small{display:block;font:600 11px var(--body);color:var(--ink-3);text-align:center}
+.range .pt.r span{transform:none;left:-4px}.range .pt.r span small{text-align:left}
+.range .pt.l span{transform:none;left:auto;right:-4px}.range .pt.l span small{text-align:right}
+.range .band{position:absolute;top:32px;height:10px;background:var(--good);opacity:.28}
+.range .pt.ok{background:var(--good);box-shadow:0 0 0 1px var(--good)}
+.ends{display:flex;justify-content:space-between;font:600 11px var(--body);color:var(--ink-3);margin-top:0}
+/* compare bars */
+.cmp{display:flex;flex-direction:column;gap:12px;margin:8px 0 12px}
+.cmp .r{display:grid;grid-template-columns:92px 1fr 84px;gap:12px;align-items:center;font:600 13px var(--body);color:var(--ink-2)}
+.cmp .t{position:relative;height:12px;border-radius:6px;background:var(--line)}
+.cmp .t i{position:absolute;left:0;top:0;bottom:0;border-radius:6px;background:var(--cobalt)}
+.cmp .t.low i{background:var(--bad)}
+.cmp .t::after{content:"";position:absolute;left:80%;top:-5px;bottom:-5px;border-left:1.5px dashed var(--ink-3)}
+.cmp .v{font:700 16px var(--display);color:var(--ink);text-align:right}
+.cmp .v small{font:600 11px var(--body);color:var(--ink-3);margin-left:3px}
+.days3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:8px 0 12px}
+.d3{border-radius:14px;background:var(--surface);border:1px solid var(--line);padding:12px}
+.d3 .k{font:600 12px var(--body);color:var(--ink-3)}
+.d3 .v{font-size:22px;color:var(--bad);margin-top:4px}
+.d3 .u{font:600 11px var(--body);color:var(--ink-3);margin-top:2px}
+.devs{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0 12px;align-items:center}
+.devs i{width:22px;height:22px;border-radius:7px;background:var(--good-bg);border:1.5px solid var(--good)}
+.devs span{font:600 13px var(--body);color:var(--ink-2);margin-left:6px}
+
+/* rail */
+.steps{counter-reset:s;display:flex;flex-direction:column;gap:14px}
+.steps div{display:flex;gap:12px;font:500 14px/1.4 var(--body);color:var(--ink-2)}
+.steps div::before{counter-increment:s;content:counter(s);flex:none;width:24px;height:24px;border-radius:50%;background:var(--surface-2);border:1px solid var(--line);display:grid;place-items:center;font:700 12px var(--body);color:var(--ink)}
+.steps b{color:var(--ink);font-weight:600}
+.rail .kv{padding:11px 0;font-size:14px}
+.rail .kv .v{text-align:right}
+
+/* next */
+.next{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.act{border-radius:18px;border:1px solid var(--line);padding:18px;display:flex;flex-direction:column;gap:12px;align-items:flex-start}
+.act .btn{align-self:stretch}
+.act .t{font:600 16px var(--body)}
+.act.ai{border:1.5px solid transparent;background:linear-gradient(var(--surface),var(--surface)) padding-box,var(--ai-grad) border-box}
+.btn.aibtn{background:var(--surface);color:var(--ink);border:1px solid var(--line)}
+.btn.aibtn svg{color:var(--ai-b)}
+
+@media (max-width:1100px){.verdict{grid-template-columns:1fr;gap:22px}}
+@media (max-width:720px){
+  .verdict{padding:20px}
+  .verdict .big{font-size:52px}
+  .verdict .sub{font-size:17px}
+  .balance{grid-template-columns:1fr;gap:8px}
+  .vs{justify-self:center;margin:-2px 0}
+  .ev summary{padding:14px 12px;gap:10px}
+  .ev summary .q{font-size:15px}
+  .ev summary .n{display:none}
+  .evbody{padding:2px 14px 16px}
+  .cmp .r{grid-template-columns:64px 1fr 76px;gap:8px}
+  .days3{gap:6px}.d3{padding:10px}.d3 .v{font-size:20px}
+  .next{grid-template-columns:1fr}
+  .devs{gap:5px}.devs i{width:18px;height:18px;border-radius:6px}
+}
+
+/* working prototype additions */
+.ev summary .q{display:flex;flex-direction:column;align-items:flex-start;gap:6px}
+.ev summary:focus-visible{outline:2px solid var(--cobalt);outline-offset:2px;border-radius:18px}
+.badge.way{height:22px;font-size:11px}
+.badge.pick.way{background:var(--cobalt-50);color:var(--cobalt)}
+.conf.calm{background:var(--good-bg);border-color:transparent}
+.conf p b{color:var(--ink)}
+.devs.many i{background:var(--warn-bg);border-color:var(--warn)}
+.card.need{border:2px solid var(--cobalt);order:-1}
+.score{border-radius:14px;background:var(--surface-2);border:1px solid var(--line);padding:12px;display:flex;flex-direction:column;gap:4px}
+.score b{font:700 15px/1.3 var(--display);color:var(--ink)}
+</style></head><body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><div class="mark"><svg viewBox="0 -1.300 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.300 16.200A8.300 8.300 0 0 1 16.900 6.300"/><path d="M19.900 12.300a8.300 8.300 0 0 1-.6 3.900"/><path d="m8 12.600 3 3 8.400-9.700"/></svg></div><span>Wi-Fight</span></div>
+    <a class="navitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span>Dashboard</span></a>
+    <a class="navitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 20V10M12 20V4M19 20v-7"/></svg><span>History</span></a>
+    <a class="navitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg><span>Report</span></a>
+    <a class="navitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 6.500C16 5 14.300 4.500 12 4.500c-2.800 0-4.500 1.300-4.500 3.400 0 4.800 10 2.400 10 7.600 0 2.200-2 3.500-5.500 3.500-2.500 0-4.500-.8-5.500-2.500"/></svg><span>Plans</span></a>
+    <div class="navsep">Proof AI</div>
+    <a class="navitem ai"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.900 5.600a3 3 0 0 0 1.900 1.900L21.400 11.400l-5.600 1.900a3 3 0 0 0-1.900 1.900L12 20.800l-1.900-5.600a3 3 0 0 0-1.900-1.900L2.600 11.400l5.600-1.900a3 3 0 0 0 1.900-1.900z"/></svg><span>Ask Proof AI</span></a>
+    <a class="navitem on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h4l3-8 4 16 3-8h6"/></svg><span>Diagnosis</span></a>
+    <div class="navsep">Account</div>
+    <a class="navitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4.500 6v6c0 4.500 3.200 7.600 7.500 9 4.300-1.400 7.500-4.500 7.500-9V6z"/><path d="m9 12 2 2 4-4"/></svg><span>Privacy &amp; data</span></a>
+    <div class="sidefoot col gap8">
+      <span class="badge lock" style="align-self:flex-start"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2.500"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Encrypted</span>
+      <div class="small" style="color:var(--ink-2)">Your data stays yours. Nothing is sent without your approval.</div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div class="col gap8">
+        <div class="eyebrow">Why is my internet slow?</div>
+        <div class="titlerow">
+          <h1 class="h1">Diagnosis</h1>
+          <span class="aipill"><span class="ai-tag"><svg viewBox="0 0 24 24" fill="#8B5CF6"><path d="M12 2l1.900 5.600a3 3 0 0 0 1.900 1.900L21.400 11.400l-5.600 1.900a3 3 0 0 0-1.900 1.900L12 20.800l-1.900-5.600a3 3 0 0 0-1.900-1.900L2.600 11.400l5.600-1.900a3 3 0 0 0 1.900-1.900z"/></svg>Proof AI</span></span>
+        </div>
+      </div>
+      <div class="row gap8"><span class="sample">Sample data</span><span class="chip only-desktop" data-b="updated"></span></div>
+    </div>
+
+    <div class="empty" id="empty" hidden><div class="h2" style="margin-bottom:8px">Nothing to diagnose yet</div><p class="body" style="max-width:480px;margin:0 auto 16px">Proof AI needs your own speed tests before it can say whether a slowdown comes from your home Wi-Fi or from your provider. Run a test, or load two weeks of labelled sample data for a demo.</p><div class="row gap12" style="justify-content:center;flex-wrap:wrap"><button class="btn primary" data-href="test.html">Run a test</button><button class="btn ghost" data-demo>Load sample data</button></div></div>
+
+    <div class="g" id="grid" data-wait>
+      <!-- VERDICT -->
+      <section class="ai-card span-12 verdict">
+        <div>
+          <div class="eyebrow">Most likely cause</div>
+          <div class="big" data-b="title"></div>
+          <div class="sub"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2.5 9a14 14 0 0 1 19 0M6 12.5a9 9 0 0 1 12 0M9.2 16a4.5 4.5 0 0 1 5.6 0"/><circle cx="12" cy="19.5" r="1" fill="currentColor"/></svg><span data-b="sub"></span></div>
+          <div class="row gap8" style="flex-wrap:wrap;margin-top:18px" data-b="chipsHtml"></div>
+        </div>
+        <div class="conf" id="conf"></div>
+      </section>
+
+      <!-- LEFT COLUMN -->
+      <div class="span-8 col gap20">
+        <section class="card col gap16" id="compareCard">
+          <div><div class="h3">How the two causes compare</div><div class="small">Proof AI weighed both against your test results</div></div>
+          <div class="balance" id="balance"></div>
+        </section>
+
+        <section class="card col gap16" id="evidenceCard">
+          <div class="row between"><div><div class="h3" data-b="evTitle">The evidence</div><div class="small" data-b="evSub"></div></div></div>
+          <div id="evidence"></div>
+        </section>
+      </div>
+
+      <!-- RIGHT RAIL -->
+      <div class="span-4 col gap20 rail">
+        <section class="card col gap8">
+          <div class="row between"><div class="h3">What Proof AI used</div><span class="badge lock"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span data-b="lock"></span></span></div>
+          <div>
+            <div class="kv"><span class="k">Speed tests</span><span class="v" data-b="usedTests"></span></div>
+            <div class="kv"><span class="k">Time span</span><span class="v" data-b="usedDays"></span></div>
+            <div class="kv"><span class="k">Paired near and far tests</span><span class="v" data-b="usedPairs"></span></div>
+            <div class="kv"><span class="k">Plan label</span><span class="v" data-b="usedPlanHtml"></span></div>
+          </div>
+          <div class="small">Only your own results. Nothing else about your home was read.</div>
+        </section>
+
+        <section class="card col gap16">
+          <div class="h3">How it decided</div>
+          <div class="steps">
+            <div><span><b>Compared two spots.</b> A test next to the router and one in a far room.</span></div>
+            <div><span><b>Compared the clock.</b> Evening tests against daytime tests.</span></div>
+            <div><span><b>Ruled out a busy home.</b> Counted devices, then checked how many days it lasted.</span></div>
+          </div>
+          <div class="small" style="color:var(--ink-2)">This is a transparent evidence score, computed on your device. Each finding above adds to or subtracts from it.</div>
+          <div class="score" id="score" hidden></div>
+        </section>
+
+        <section class="card col gap12" id="checkCard">
+          <div class="h3" data-b="checkTitle">Not sure? Run a quick check</div>
+          <p class="body" style="font-size:14px" data-b="checkText">Stand next to your router and run one test. It takes about 20 seconds and makes this diagnosis stronger.</p>
+          <button class="btn ghost sm" id="checkBtn" data-href="test.html?location=near"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 4 14h6l-1 8 9-12h-6z"/></svg>Run a near-router test</button>
+        </section>
+      </div>
+
+      <!-- NEXT -->
+      <section class="card span-12 col gap16">
+        <div class="h3">What to do next</div>
+        <div class="next">
+          <div class="act">
+            <div class="t" data-b="reportTitle">Send the evidence to your provider</div>
+            <p class="body" style="font-size:14px">Proof AI writes a first draft from these findings. You review, edit, and approve it. Nothing is sent without your approval.</p>
+            <button class="btn primary" data-href="report.html"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg>Draft my report</button>
+          </div>
+          <div class="act ai">
+            <div class="t">Still have questions?</div>
+            <p class="body" style="font-size:14px">Ask in your own words, like "Would a new router help?" Answers use your test results and say which ones.</p>
+            <button class="btn aibtn" data-href="chat.html?q=Why%20is%20my%20internet%20slow%20at%20night%3F"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.900 5.600a3 3 0 0 0 1.900 1.900L21.400 11.400l-5.600 1.900a3 3 0 0 0-1.900 1.900L12 20.800l-1.900-5.600a3 3 0 0 0-1.900-1.900L2.600 11.400l5.600-1.900a3 3 0 0 0 1.900-1.900z"/></svg>Ask Proof AI about this</button>
+          </div>
+        </div>
+        <div class="row between gap12" style="flex-wrap:wrap">
+          <span class="ai-note">Computed on this device from your own test results. It can be wrong, so check the evidence.</span>
+          <span class="ai-note" data-b="stamp"></span>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<nav class="tabbar">
+  <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Home</div>
+  <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 20V10M12 20V4M19 20v-7"/></svg>History</div>
+  <div class="fab"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 4 14h6l-1 8 9-12h-6z"/></svg></div>
+  <div class="tab on"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.900 5.600a3 3 0 0 0 1.900 1.900L21.400 11.400l-5.600 1.900a3 3 0 0 0-1.900 1.900L12 20.800l-1.900-5.600a3 3 0 0 0-1.900-1.900L2.600 11.400l5.600-1.900a3 3 0 0 0 1.900-1.900z"/></svg>Proof AI</div>
+  <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg>Report</div>
+</nav>
+<script type="module" src="js/pages/diagnosis.js"></script>
+</body></html>

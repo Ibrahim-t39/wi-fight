@@ -1,0 +1,11 @@
+// Calls the real language model through the app server for each Proof AI task. Run with the server up.
+import { summarize } from '../public/js/engine.js';
+import { buildSample, SAMPLE_PLAN, SAMPLE_BILL } from '../public/js/sample.js';
+const mk = (days) => { const s = buildSample(days); const state = { plan: { ...SAMPLE_PLAN }, bill: SAMPLE_BILL, tests: s.tests, startedAt: s.startedAt, clock: s.clock, sample: true, household: { people: 3, devices: 9 }, settings: {}, user: { name: 'Jordan' } }; const f = summarize(state);
+  return { userFirstName: 'Jordan', plan: { name: f.plan.name, typicalDownloadMbps: f.plan.down, pricePerMonth: f.plan.price }, fairLineMbps: f.fairLine, dayNumber: f.dayNumber, totalDays: 14, checkComplete: f.complete, testsCount: f.testsCount, headline: { medianMbps: f.headline.mbps, percentOfPlan: f.headline.pct, status: f.headline.statusWord, basedOn: f.headline.basis }, daysBelowFairLine: f.daysBelow, daysMeasured: f.daysDone, longestRunBelowFairLine: f.streak.len, oneOffDipsIgnored: f.ignored.map((x) => ({ when: x.when, mbps: x.down })), eveningAverageMbps: f.evening.avg, daytimeAverageMbps: f.daytime.avg, routerCheck: { nearRouterMbps: f.router.near, farRoomMbps: f.router.far }, diagnosis: { likelyCause: f.diagnosis.title, confidencePercent: f.diagnosis.confidence, confidenceLevel: f.diagnosis.level }, money: { paidForNotReceivedPerMonth: f.money.lostMonth, percentOfBill: f.money.pctLost }, sampleData: true }; };
+const call = async (body) => { const t0 = Date.now(); const r = await fetch('http://localhost:4810/api/ai', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }); const j = await r.json(); console.log(`\n=== ${body.task}${body.tone ? ' (' + body.tone + ')' : ''}: HTTP ${r.status}, ${Date.now() - t0} ms`); console.log(JSON.stringify(j.result || j, null, 1).slice(0, 1300)); return j; };
+console.log(await (await fetch('http://localhost:4810/api/status')).json());
+await call({ task: 'insight', facts: mk(9) }); // expect 409 use-writer on a local model
+await call({ task: 'verdict', facts: mk(14) });
+await call({ task: 'draft', tone: 'polite', facts: mk(14) });
+await call({ task: 'draft', tone: 'firm', facts: mk(14) });

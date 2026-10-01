@@ -1,0 +1,228 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Wi-Fight · Ask Proof AI</title><link rel="stylesheet" href="css/ds.css">
+<style>
+.badge svg{width:12px;height:12px;flex:none}.chip svg{width:14px;height:14px;flex:none}.btn svg{width:16px;height:16px;flex:none}
+html,body{overflow-x:hidden}
+button{color:inherit}
+
+/* three columns: saved chats, the conversation, what Proof AI can see */
+.chatmain{max-width:none;margin:0;padding:0;height:100vh;height:100dvh;display:grid;grid-template-columns:240px minmax(0,1fr) 304px;overflow:hidden}
+.chatmain.nopanel{grid-template-columns:240px minmax(0,1fr)}
+.chatmain.nopanel .scopecol{display:none}
+
+.chats{display:flex;flex-direction:column;gap:14px;padding:24px 12px 16px;border-right:1px solid var(--line);min-height:0;min-width:0}
+.chats .btn{width:100%}
+.chatlist{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:2px}
+.listhead{padding:0 10px}
+.crow{display:flex;align-items:center;gap:2px;border-radius:12px;min-width:0}
+.crow:hover{background:var(--surface)}
+.crow.on{background:var(--cobalt-50)}
+.copen{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px;align-items:flex-start;text-align:left;background:none;border:0;padding:9px 4px 9px 10px;border-radius:12px}
+.copen .ct{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:600 13.5px/1.25 var(--body);color:var(--ink)}
+.crow.on .ct{color:var(--cobalt)}
+.copen .cd{font:500 11.5px var(--body);color:var(--ink-3)}
+.cdel{flex:none;width:32px;height:32px;margin-right:4px;border-radius:9px;border:0;background:none;color:var(--ink-3);display:grid;place-items:center;opacity:0}
+.cdel svg{width:15px;height:15px}
+.crow:hover .cdel,.crow.on .cdel,.cdel:focus-visible,.sheet .cdel{opacity:1}
+.cdel:hover{background:var(--bad-bg);color:var(--bad)}
+.crow.ask{flex-direction:column;align-items:stretch;gap:8px;padding:10px;background:var(--bad-bg)}
+.crow.ask .q{font:600 13px/1.3 var(--body);color:var(--ink)}
+.crow.ask .row{gap:6px}
+.mini{height:30px;padding:0 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);font:600 12.5px var(--body);color:var(--ink)}
+.mini.danger{background:var(--bad);border-color:var(--bad);color:#fff}
+.nochats{padding:8px 10px;font:500 12.5px/1.4 var(--body);color:var(--ink-3)}
+
+.convo{display:flex;flex-direction:column;min-height:0;min-width:0;position:relative}
+.chead{display:flex;align-items:center;gap:10px;padding:22px 28px 12px;max-width:816px;width:100%;margin:0 auto}
+.chead .tt{flex:1;min-width:0;display:flex;flex-direction:column;gap:7px}
+.chead .ctitle{font:700 22px/1.15 var(--display);letter-spacing:-.01em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hbtn{flex:none;width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;color:var(--ink)}
+.hbtn svg{width:18px;height:18px}
+.narrow{display:none}
+.showpanel{display:none}
+.chatmain.nopanel .showpanel{display:inline-flex}
+.scopechip{display:none}
+
+.msgs{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain}
+.thread{max-width:816px;margin:0 auto;padding:8px 28px 28px;display:flex;flex-direction:column;gap:22px}
+.turn.me{display:flex;justify-content:flex-end}
+.bubble.me{max-width:82%;font:500 15.5px/1.45 var(--body);padding:11px 16px;white-space:pre-wrap;overflow-wrap:anywhere}
+.turn.ai{display:flex;flex-direction:column;gap:10px;min-width:0}
+.who{display:flex;align-items:center;gap:9px}
+.avatar{width:26px;height:26px;border-radius:9px;background:var(--ai-grad);display:grid;place-items:center;flex:none;color:#fff}
+.avatar svg{width:14px;height:14px}
+.mbody{font:400 15.5px/1.62 var(--body);color:var(--ink);overflow-wrap:anywhere;display:flex;flex-direction:column;gap:11px}
+.mbody b{font-weight:700}
+.mbody ul{list-style:none;display:flex;flex-direction:column;gap:6px}
+.mbody li{position:relative;padding-left:18px}
+.mbody li::before{content:"";position:absolute;left:4px;top:.68em;width:5px;height:5px;border-radius:50%;background:var(--ai-b)}
+.streaming .mbody > p:last-child::after,.streaming .mbody > ul:last-child > li:last-child::after{content:"";display:inline-block;width:7px;height:1.05em;margin-left:3px;border-radius:2px;background:var(--cobalt);vertical-align:-.18em;animation:blink 1s steps(2,start) infinite}
+@keyframes blink{50%{opacity:0}}
+.thinking{display:flex;align-items:center;gap:10px;font:500 14px var(--body);color:var(--ink-2)}
+.dots{display:inline-flex;gap:4px}
+.dots i{width:7px;height:7px;border-radius:50%;background:var(--ai-b);animation:pulse 1.1s ease-in-out infinite}
+.dots i:nth-child(2){animation-delay:.18s}.dots i:nth-child(3){animation-delay:.36s}
+@keyframes pulse{0%,80%,100%{opacity:.25;transform:scale(.8)}40%{opacity:1;transform:scale(1)}}
+.ground{display:flex;gap:10px;align-items:flex-start;border-radius:14px;background:var(--warn-bg);padding:11px 13px;font:500 13.5px/1.45 var(--body);color:var(--ink)}
+.ground svg{width:17px;height:17px;flex:none;margin-top:1px;color:var(--warn)}
+.ground b{font-weight:700}
+.mfoot{display:flex;flex-direction:column;gap:4px}
+.mmeta{font:500 12px/1.45 var(--body);color:var(--ink-3)}
+.stopmark{display:inline-flex;align-items:center;gap:6px;align-self:flex-start;height:24px;padding:0 9px;border-radius:999px;background:var(--surface);border:1px solid var(--line);font:700 12px var(--body);color:var(--ink-2)}
+.stopmark i{width:8px;height:8px;border-radius:2px;background:var(--ink-3)}
+.acts{display:flex;gap:2px;margin-left:-8px}
+.act{width:32px;height:32px;border-radius:9px;display:grid;place-items:center;color:var(--ink-3);background:transparent;border:0}
+.act svg{width:16px;height:16px}
+.act:hover{background:var(--surface);color:var(--ink)}
+.act.on{color:var(--cobalt);background:var(--cobalt-50)}
+.errbox{display:flex;align-items:center;gap:12px;justify-content:space-between;flex-wrap:wrap;border-radius:14px;background:var(--bad-bg);padding:11px 13px;font:500 13.5px/1.45 var(--body);color:var(--ink)}
+.errbox span{flex:1;min-width:180px}
+.follow{display:flex;gap:8px;flex-wrap:wrap}
+.follow .chip{max-width:100%;overflow:hidden;text-overflow:ellipsis;display:inline-block;line-height:32px;color:var(--ink)}
+.follow .chip:hover,.sgcard:hover{border-color:var(--cobalt)}
+
+/* empty state */
+.hello{display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;padding:5vh 0 0}
+.hello .avatar{width:44px;height:44px;border-radius:14px}
+.hello .avatar svg{width:22px;height:22px}
+.hello h2{font:700 28px/1.15 var(--display);letter-spacing:-.02em;max-width:520px}
+.hello p{font:400 15px/1.5 var(--body);color:var(--ink-2);max-width:520px}
+.sgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;width:100%;margin-top:14px}
+.sgcard{text-align:left;border-radius:var(--r-tile);background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);padding:14px 16px;font:600 14.5px/1.35 var(--body);color:var(--ink)}
+.sgcard:disabled,.follow .chip:disabled{opacity:.5;cursor:not-allowed}
+
+/* composer */
+.dock{position:relative;max-width:816px;width:100%;margin:0 auto;padding:0 28px 14px;display:flex;flex-direction:column;gap:8px}
+.jump{position:absolute;left:50%;top:-46px;transform:translateX(-50%);height:34px;padding:0 14px;border-radius:999px;border:1px solid var(--line);background:var(--surface);box-shadow:var(--shadow);font:600 13px var(--body);color:var(--ink);display:inline-flex;align-items:center;gap:6px;white-space:nowrap;z-index:4}
+.jump svg{width:14px;height:14px}
+.composer{height:auto;min-height:54px;border-radius:27px;align-items:flex-end;padding:7px 7px 7px 20px}
+.composer textarea{flex:1;min-width:0;border:0;outline:0;resize:none;background:transparent;font:500 15.5px/22px var(--body);color:var(--ink);padding:9px 0;height:40px;max-height:150px;overflow-y:hidden}
+.composer textarea::placeholder{color:var(--ink-3)}
+.composer:focus-within{border-color:var(--cobalt)}
+.composer.off{opacity:.6}
+button.send{border:0;flex:none;margin-left:0}
+button.send:disabled{background:var(--line);color:var(--ink-3);cursor:not-allowed}
+button.send.stop{background:var(--ink)}
+.docknote{text-align:center}
+.offnote{display:flex;align-items:center;gap:12px;justify-content:space-between;flex-wrap:wrap;border-radius:var(--r-tile);background:var(--warn-bg);padding:12px 14px;font:500 13.5px/1.45 var(--body);color:var(--ink)}
+.offnote span{flex:1;min-width:200px}
+
+/* what Proof AI can see */
+.scopecol{padding:24px 24px 24px 0;overflow-y:auto;min-height:0;min-width:0}
+.scope{padding:20px}
+.scope .lrow,.scope-sheet .lrow{padding:11px 0;align-items:flex-start}
+.scope .lrow .t,.scope-sheet .lrow .t{font:600 14px/1.3 var(--body);color:var(--ink)}
+.scope .lrow .s,.scope-sheet .lrow .s{font:500 12.5px/1.35 var(--body);color:var(--ink-3);margin-top:2px}
+.cant{border-radius:14px;background:var(--surface-2);border:1px solid var(--line);padding:12px;display:flex;gap:10px;align-items:flex-start;font:600 13px/1.4 var(--body);color:var(--ink)}
+.cant svg{width:16px;height:16px;flex:none;margin-top:1px;color:var(--cobalt)}
+.modelline{display:flex;gap:10px;align-items:flex-start;font:500 12.5px/1.45 var(--body);color:var(--ink-2)}
+.modelline .avatar{width:22px;height:22px;border-radius:7px}
+.modelline .avatar svg{width:12px;height:12px}
+.consent{display:flex;align-items:center;gap:10px;justify-content:space-between}
+.scopehead{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.hidepanel{flex:none;height:28px;padding:0 10px;border-radius:999px;border:1px solid var(--line);background:var(--surface);font:600 12px var(--body);color:var(--ink-2)}
+.sheet .hidepanel{display:none}
+button.switch{border:0;padding:0;cursor:pointer}
+.sheet .chatlist{max-height:52vh;margin-top:12px}
+.sheet .crow:hover{background:none}.sheet .crow.on,.sheet .crow.on:hover{background:var(--cobalt-50)}.sheet .crow.ask,.sheet .crow.ask:hover{background:var(--bad-bg)}
+:is(.switch,.act,.chip,.send,.hbtn,.copen,.cdel,.sgcard,.mini,.jump,.hidepanel,.scopechip):focus-visible{outline:2px solid var(--cobalt);outline-offset:2px}
+
+@media (max-width:1100px){
+  .chatmain,.chatmain.nopanel{grid-template-columns:240px minmax(0,1fr)}
+  .scopecol,.chatmain.nopanel .showpanel{display:none}
+  .scopechip{display:inline-flex;align-items:center;gap:7px;height:34px;padding:0 13px;border-radius:999px;background:var(--surface);border:1px solid var(--line);font:600 13px var(--body);color:var(--ink-2);white-space:nowrap;max-width:100%;overflow:hidden}
+  .scopechip svg{width:14px;height:14px;color:var(--cobalt);flex:none}
+  .scopechip b{color:var(--cobalt);font-weight:700}
+  .chiprow{max-width:816px;width:100%;margin:0 auto;padding:0 28px 10px;display:flex}
+}
+@media (max-width:900px){
+  .chatmain,.chatmain.nopanel{grid-template-columns:minmax(0,1fr)}
+  .chats{display:none}
+  .narrow{display:grid}
+}
+@media (max-width:720px){
+  .chatmain{padding:0 0 102px}
+  .chead{padding:14px 16px 10px}
+  .chead .eyebrow{display:none}
+  .chead .ctitle{font-size:18px}
+  .chiprow{padding:0 16px 8px}
+  .thread{padding:6px 16px 20px;gap:18px}
+  .bubble.me{max-width:88%}
+  .dock{padding:0 16px 0;gap:6px}
+  .composer textarea{font-size:16px}
+  .hello{padding-top:8px;gap:8px}
+  .hello h2{font-size:23px}
+  .hello p{font-size:14px}
+  .sgcard{padding:12px 13px;font-size:13.5px}
+  .docknote{font-size:10.5px}
+}
+</style></head><body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><div class="mark"><svg viewBox="0 -1.300 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.300 16.200A8.300 8.300 0 0 1 16.900 6.300"/><path d="M19.900 12.300a8.300 8.300 0 0 1-.6 3.900"/><path d="m8 12.600 3 3 8.400-9.700"/></svg></div><span>Wi-Fight</span></div>
+    <a class="navitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span>Dashboard</span></a>
+    <a class="navitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 20V10M12 20V4M19 20v-7"/></svg><span>History</span></a>
+    <a class="navitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg><span>Report</span></a>
+    <a class="navitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 6.500C16 5 14.300 4.500 12 4.500c-2.800 0-4.500 1.300-4.500 3.400 0 4.800 10 2.400 10 7.600 0 2.200-2 3.500-5.500 3.500-2.500 0-4.500-.8-5.500-2.500"/></svg><span>Plans</span></a>
+    <div class="navsep">Proof AI</div>
+    <a class="navitem ai on"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.900 5.600a3 3 0 0 0 1.900 1.900L21.400 11.400l-5.600 1.900a3 3 0 0 0-1.900 1.900L12 20.800l-1.900-5.600a3 3 0 0 0-1.900-1.900L2.600 11.400l5.600-1.900a3 3 0 0 0 1.900-1.900z"/></svg><span>Ask Proof AI</span></a>
+    <a class="navitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h4l3-8 4 16 3-8h6"/></svg><span>Diagnosis</span></a>
+    <div class="navsep">Account</div>
+    <a class="navitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4.500 6v6c0 4.500 3.200 7.600 7.500 9 4.300-1.400 7.500-4.500 7.500-9V6z"/><path d="m9 12 2 2 4-4"/></svg><span>Privacy &amp; data</span></a>
+    <div class="sidefoot col gap8">
+      <span class="badge lock" style="align-self:flex-start"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2.500"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Encrypted</span>
+      <div class="small" style="color:var(--ink-2)">Your data stays yours. Nothing is sent without your approval.</div>
+    </div>
+  </aside>
+
+<main class="main chatmain" data-wait>
+    <aside class="chats" aria-label="Your chats">
+      <button type="button" class="btn primary sm" data-newchat><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>New chat</button>
+      <div class="eyebrow listhead">Your chats</div>
+      <div class="chatlist" id="chatlist" data-chatlist></div>
+    </aside>
+
+    <section class="convo" aria-label="Conversation">
+      <header class="chead">
+        <button type="button" class="hbtn narrow" id="openlist" aria-label="Open your chats" aria-haspopup="dialog"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h10"/></svg></button>
+        <div class="tt">
+          <div class="eyebrow" id="eyebrow">Ask Proof AI</div>
+          <h1 class="ctitle" id="ctitle">New chat</h1>
+        </div>
+        <span class="sample">Sample data</span>
+        <button type="button" class="chip showpanel" id="showpanel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>What Proof AI can see</button>
+        <button type="button" class="hbtn narrow" data-newchat aria-label="New chat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
+      </header>
+      <div class="chiprow"><button type="button" class="scopechip" id="scopechip" aria-haspopup="dialog"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span id="scopechip-text"></span></button></div>
+
+      <div class="msgs" id="msgs" tabindex="-1">
+        <div class="thread" id="thread" aria-live="polite"></div>
+      </div>
+
+      <div class="dock">
+        <button type="button" class="jump" id="jump" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M6 13l6 6 6-6"/></svg>Jump to latest</button>
+        <div class="offnote" id="offnote" hidden>
+          <span><b>Proof AI is off.</b> It is not reading your results, and nothing you type is sent anywhere. To ask a question, turn on "Let Proof AI use my data".</span>
+          <button type="button" class="btn sm" data-ai-on>Turn it on</button>
+        </div>
+        <form class="composer" id="composer" autocomplete="off">
+          <textarea id="q" rows="1" maxlength="2000" placeholder="Ask about your internet" aria-label="Ask Proof AI about your internet" enterkeyhint="send"></textarea>
+          <button class="send" id="send" type="button" aria-label="Send question" disabled></button>
+        </form>
+        <div class="ai-note docknote">Proof AI can make mistakes. It answers from your own results and general knowledge about internet service.</div>
+      </div>
+    </section>
+
+    <div class="scopecol"><aside class="card scope col gap16" id="scope" aria-label="What Proof AI can see"></aside></div>
+  </main>
+</div>
+
+<nav class="tabbar">
+  <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Home</div>
+  <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 20V10M12 20V4M19 20v-7"/></svg>History</div>
+  <div class="fab"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 4 14h6l-1 8 9-12h-6z"/></svg></div>
+  <div class="tab on"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.900 5.600a3 3 0 0 0 1.900 1.900L21.400 11.400l-5.600 1.900a3 3 0 0 0-1.900 1.900L12 20.800l-1.900-5.600a3 3 0 0 0-1.900-1.900L2.600 11.400l5.600-1.900a3 3 0 0 0 1.900-1.900z"/></svg>Proof AI</div>
+  <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg>Report</div>
+</nav>
+<script type="module" src="js/pages/chat.js"></script>
+</body></html>

@@ -1,0 +1,22 @@
+{
+  "note": "Fictional providers and plan values for the class demo. A real build uses hand-checked values from each provider's broadband label.",
+  "providers": [
+    {"id": "northstar", "name": "Northstar Fiber", "plans": [
+      {"id": "ns300", "name": "Northstar Fiber 300", "down": 300, "up": 20, "latency": 30, "price": 55, "promoMonths": 0, "afterPromo": 55, "equipmentFee": 10},
+      {"id": "ns500", "name": "Northstar Fiber 500", "down": 500, "up": 20, "latency": 30, "price": 80, "promoMonths": 0, "afterPromo": 80, "equipmentFee": 10},
+      {"id": "ns1000", "name": "Northstar Fiber 1 Gig", "down": 1000, "up": 20, "latency": 30, "price": 110, "promoMonths": 0, "afterPromo": 110, "equipmentFee": 10}
+    ]},
+    {"id": "valleylink", "name": "ValleyLink", "plans": [
+      {"id": "vl500", "name": "ValleyLink 500", "down": 500, "up": 500, "latency": 20, "price": 60, "promoMonths": 0, "afterPromo": 60, "equipmentFee": 0},
+      {"id": "vl1000", "name": "ValleyLink 1 Gig", "down": 1000, "up": 1000, "latency": 20, "price": 70, "promoMonths": 0, "afterPromo": 70, "equipmentFee": 0}
+    ]},
+    {"id": "pinecrest", "name": "Pinecrest", "plans": [
+      {"id": "pc300", "name": "Pinecrest Internet 300", "down": 300, "up": 10, "latency": 35, "price": 50, "promoMonths": 12, "afterPromo": 75, "equipmentFee": 0},
+      {"id": "pc500", "name": "Pinecrest Internet 500", "down": 500, "up": 20, "latency": 35, "price": 65, "promoMonths": 12, "afterPromo": 90, "equipmentFee": 0}
+    ]},
+    {"id": "redstone", "name": "Redstone", "plans": [
+      {"id": "rs600", "name": "Redstone 600", "down": 600, "up": 35, "latency": 32, "price": 60, "promoMonths": 0, "afterPromo": 60, "equipmentFee": 0}
+    ]}
+  ],
+  "compare": ["vl1000", "ns500", "pc500", "rs600"]
+}

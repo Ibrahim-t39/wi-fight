@@ -1,0 +1,187 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Wi-Fight · History</title><link rel="stylesheet" href="css/ds.css">
+<style>
+.sample{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 10px;border-radius:999px;border:1px dashed var(--ink-3);font:600 12px var(--body);color:var(--ink-2);white-space:nowrap}
+.headline{font:700 26px/1.2 var(--display);letter-spacing:-.015em;max-width:560px}
+.headline .g{display:inline;color:var(--good)}.headline .b{color:var(--bad)}
+.hl-good{color:var(--good)}.hl-bad{color:var(--bad)}
+.chart{padding-top:6px;flex:1;display:flex;flex-direction:column}
+.chart .bars{height:auto;flex:1;min-height:250px;gap:10px;align-items:stretch}
+.chart .bar{height:auto}
+.chart .bar .val{left:50%;right:auto;top:9px;transform:translateX(-50%);color:#fff;font-size:12px}
+.chart .bar.empty .ghost{background:transparent}
+.chart .xlabels span{line-height:1.35}
+.chart .xlabels span b{display:block;font-weight:700;color:var(--ink-2)}
+.chart .xlabels span.today b{color:var(--cobalt)}
+.chart .xlabels span.today{color:var(--cobalt)}
+.chart .xlabels em{font-style:normal}
+.marks14{display:grid;grid-template-columns:repeat(14,minmax(0,1fr));column-gap:10px;margin-top:10px;align-items:start}
+.aidot{justify-self:center;width:12px;height:12px;border-radius:50%;border:2.5px solid transparent;background:linear-gradient(var(--surface),var(--surface)) padding-box,var(--ai-grad) border-box}
+.bracket{border-top:2px solid var(--bad);border-radius:2px;padding-top:5px;text-align:center;font:700 11px var(--body);color:var(--bad);white-space:nowrap;display:flex;justify-content:center}
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;font:500 13px var(--body);color:var(--ink-2)}
+.legend span{display:inline-flex;align-items:center;gap:7px}
+.sw{width:12px;height:12px;border-radius:4px;background:var(--cobalt)}.sw.bad{background:var(--bad)}.sw.ghost{background:var(--surface-2);border:1px dashed var(--ink-3)}
+
+.counts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.count{border-radius:16px;padding:14px;background:var(--surface-2);border:1px solid var(--line);display:flex;flex-direction:column;gap:6px}
+.count .n{font-size:40px;line-height:1}
+.count .t{font:600 13px/1.3 var(--body);color:var(--ink-2)}
+.count.kept .n{color:var(--bad)}
+.badge.ign{background:var(--surface-2);color:var(--ink-2);border:1px dashed var(--ink-3)}
+.badge.ign svg{width:11px;height:11px;color:var(--ai-b)}
+.dip{display:flex;gap:12px;padding:12px 0;align-items:flex-start}
+.dip + .dip{border-top:1px solid var(--line)}
+.dip .top{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.dip .when{font:600 15px var(--body)}
+.dip .why{font:500 13px/1.4 var(--body);color:var(--ink-3);margin-top:4px}
+.strike{color:var(--ink-3);text-decoration:line-through;text-decoration-thickness:1.5px}
+
+.todgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.todt{border-radius:18px;border:1px solid var(--line);padding:16px;display:flex;flex-direction:column;gap:12px;align-items:flex-start}
+.todt.low{border-color:var(--bad);background:var(--bad-bg)}
+.todt .name{font:600 15px var(--body)}.todt .name small{display:block;font:500 12px var(--body);color:var(--ink-3);margin-top:3px}
+.todt .v{font-size:34px;line-height:1}.todt.low .v{color:var(--bad)}
+.todt .track{align-self:stretch}.todt.low .track{background:#fff}
+.todrow .top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:7px}
+.todrow .name{font:600 15px var(--body)}
+.todrow .name small{font:500 12px var(--body);color:var(--ink-3);margin-left:6px}
+.todrow .v{font-size:18px}
+.track{position:relative;height:12px;border-radius:6px;background:var(--surface-2);border:1px dashed var(--line)}
+.track i{position:absolute;left:-1px;top:-1px;bottom:-1px;border-radius:6px;background:var(--cobalt)}
+.track.low i{background:var(--bad)}
+.track::after{content:"";position:absolute;left:80%;top:-5px;bottom:-5px;border-left:1.5px dashed var(--ink-3)}
+.todrow .st{margin-top:7px;font:600 12px var(--body);color:var(--good)}
+
+.tt{width:100%}
+.tr{display:grid;grid-template-columns:1.5fr 1fr .8fr 1fr 1.35fr;align-items:center;gap:12px;padding:13px 0;font:500 15px var(--body)}
+.tr + .tr{border-top:1px solid var(--line)}
+.tr.head{padding:0 0 10px;font:600 11px var(--body);letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3)}
+.tr .when b{font-weight:600}.tr .when span{color:var(--ink-3);margin-left:6px}
+.tr .n{font:700 16px var(--display);font-variant-numeric:tabular-nums}
+.tr .n small{font:600 11px var(--body);color:var(--ink-3);margin-left:3px}
+.tr .lbl{display:none}
+.tr .stat{justify-self:end}
+.tr.head .stat{justify-self:end}
+.tr.sep{display:block;padding:14px 0 6px;font:600 11px var(--body);letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3)}
+.tr.ignored .n.dl{color:var(--ink-3);text-decoration:line-through;text-decoration-thickness:1.5px}
+.tr.ignored{background:linear-gradient(90deg,rgba(139,92,246,.06),transparent 70%);margin:0 -18px;padding-left:18px;padding-right:18px}
+.todt.none .v{font:600 15px/34px var(--body);color:var(--ink-3);letter-spacing:0}
+.badge.none{background:var(--surface-2);color:var(--ink-3);border:1px solid var(--line)}
+.tag{display:inline-flex;align-items:center;height:20px;padding:0 7px;margin-left:8px;border-radius:999px;border:1px solid var(--line);background:var(--surface-2);font:700 10.5px var(--body);color:var(--ink-2);white-space:nowrap;vertical-align:1px}
+.tag.practice{border-style:dashed;border-color:var(--warn);color:var(--warn);background:var(--warn-bg)}
+.marks14 .aidot{grid-row:1}.marks14 .bracket{grid-row:2}
+@media (max-width:720px){
+  .headline{font-size:22px}
+  .chart .bars{min-height:190px;gap:5px}.chart .xlabels{gap:5px}.marks14{column-gap:5px}
+  .chart .bar .val{font-size:9px;top:6px;letter-spacing:-.03em}
+  .chart .bar .fill,.chart .bar .ghost{border-radius:6px 6px 3px 3px}
+  .chart .xlabels span{font-size:11px}.chart .xlabels em{display:none}
+  .bracket{font-size:10px}
+  .tr.head{display:none}
+  .todgrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.todt{padding:14px;gap:10px}.todt .v{font-size:28px}
+  .tr{grid-template-columns:1fr 1fr 1fr;gap:10px 8px;padding:14px 0}
+  .tr .when{grid-column:1/3}.tr .stat{grid-column:3;grid-row:1}
+  .tr .lbl{display:block;font:600 10px var(--body);letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);margin-bottom:3px;text-decoration:none}
+  .tr.ignored{margin:0 -16px;padding-left:16px;padding-right:16px}
+  .tr.ignored .n.dl{text-decoration:none}.tr.ignored .n.dl s{text-decoration-thickness:1.5px}
+}
+</style></head><body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><div class="mark"><svg viewBox="0 -1.300 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.300 16.200A8.300 8.300 0 0 1 16.900 6.300"/><path d="M19.900 12.300a8.300 8.300 0 0 1-.6 3.900"/><path d="m8 12.600 3 3 8.400-9.700"/></svg></div><span>Wi-Fight</span></div>
+    <a class="navitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span>Dashboard</span></a>
+    <a class="navitem on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 20V10M12 20V4M19 20v-7"/></svg><span>History</span></a>
+    <a class="navitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg><span>Report</span></a>
+    <a class="navitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 6.500C16 5 14.300 4.500 12 4.500c-2.800 0-4.500 1.300-4.500 3.400 0 4.800 10 2.400 10 7.600 0 2.200-2 3.500-5.500 3.500-2.500 0-4.500-.8-5.500-2.500"/></svg><span>Plans</span></a>
+    <div class="navsep">Proof AI</div>
+    <a class="navitem ai"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.900 5.600a3 3 0 0 0 1.900 1.900L21.400 11.400l-5.600 1.900a3 3 0 0 0-1.900 1.900L12 20.800l-1.900-5.600a3 3 0 0 0-1.900-1.900L2.600 11.400l5.600-1.900a3 3 0 0 0 1.900-1.900z"/></svg><span>Ask Proof AI</span></a>
+    <a class="navitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h4l3-8 4 16 3-8h6"/></svg><span>Diagnosis</span></a>
+    <div class="navsep">Account</div>
+    <a class="navitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4.500 6v6c0 4.500 3.200 7.600 7.500 9 4.300-1.400 7.500-4.500 7.500-9V6z"/><path d="m9 12 2 2 4-4"/></svg><span>Privacy &amp; data</span></a>
+    <div class="sidefoot col gap8">
+      <span class="badge lock" style="align-self:flex-start"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2.500"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Encrypted</span>
+      <div class="small" style="color:var(--ink-2)">Your data stays yours. Nothing is sent without your approval.</div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div class="col gap8">
+        <div class="eyebrow" data-b="eyebrow"></div>
+        <h1 class="h1">History</h1>
+      </div>
+      <div class="row gap8" style="flex-wrap:wrap">
+        <span class="sample">Sample data</span>
+        <span class="chip" data-range="7">7 days</span><span class="chip on" data-range="14">14 days</span>
+        <button class="btn primary sm" data-href="test.html"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 4 14h6l-1 8 9-12h-6z"/></svg>Run a test</button>
+      </div>
+    </div>
+
+    <div class="empty" id="empty" hidden><div class="h2" style="margin-bottom:8px">No tests yet</div><p class="body" style="max-width:460px;margin:0 auto 16px">Your history fills in as you run speed tests. Run your first test, or load two weeks of labelled sample data for a demo.</p><div class="row gap12" style="justify-content:center;flex-wrap:wrap"><button class="btn primary" data-href="test.html">Run my first test</button><button class="btn ghost" data-demo>Load sample data</button></div></div>
+
+    <div class="g" id="grid" data-wait>
+      <!-- 14-DAY CHART -->
+      <section class="card span-8 col gap16">
+        <div class="col gap8">
+          <div class="eyebrow">Daily median download speed</div>
+          <p class="headline" data-b="headlineHtml"></p>
+        </div>
+        <div class="chart">
+          <div class="bars" id="bars"></div>
+          <div class="xlabels" id="xlabels"></div>
+          <div class="marks14" id="marks"></div>
+        </div>
+        <div class="divider"></div>
+        <div class="legend">
+          <span><i class="sw"></i>At or above the fair line</span>
+          <span><i class="sw bad"></i>Below the fair line</span>
+          <span><i class="sw ghost"></i><span data-b="planLegend"></span></span>
+          <span><i class="aidot"></i>Proof AI ignored a one-off dip that day</span>
+        </div>
+      </section>
+
+      <!-- AI ANOMALY CARD -->
+      <section class="ai-card span-4 col gap16">
+        <div class="row between">
+          <span class="ai-tag"><svg viewBox="0 0 24 24" fill="#8B5CF6"><path d="M12 2l1.900 5.600a3 3 0 0 0 1.900 1.900L21.400 11.400l-5.600 1.900a3 3 0 0 0-1.900 1.900L12 20.800l-1.900-5.600a3 3 0 0 0-1.900-1.900L2.600 11.400l5.600-1.900a3 3 0 0 0 1.900-1.900z"/></svg>PROOF AI</span>
+          <span class="ai-meta">Computed on this device</span>
+        </div>
+        <h2 class="h2">What Proof AI kept and what it ignored</h2>
+        <div class="counts">
+          <div class="count kept" id="keptCount"><div class="num n" data-b="keptN"></div><div class="t" data-b="keptLabel"></div></div>
+          <div class="count"><div class="num n" data-b="ignoredN"></div><div class="t" data-b="ignoredLabel"></div></div>
+        </div>
+        <div>
+          <div class="eyebrow" style="margin-bottom:4px" data-b="dipsTitle"></div>
+          <div id="dips"></div>
+        </div>
+        <p class="body" style="font-size:14px" data-b="keptHtml"></p>
+        <div class="row gap8" style="flex-wrap:wrap" data-b="chipsHtml"></div>
+        <div class="ai-note">Computed on this device with a median and outlier check. No data left your device.</div>
+      </section>
+
+      <!-- TIME OF DAY -->
+      <section class="card span-12 col gap16">
+        <div class="row between" style="flex-wrap:wrap;gap:6px"><div><div class="h3">Time of day</div><div class="small" data-b="todSub"></div></div><div class="small" data-b="todNote"></div></div>
+        <div class="todgrid" id="tod"></div>
+      </section>
+
+      <!-- RECENT TESTS -->
+      <section class="card span-12 col gap16">
+        <div class="row between" style="gap:10px"><div><div class="h3" data-b="tableTitle">Recent tests</div><div class="small">Each test measures download, upload, and response time</div></div><button class="chip" id="allBtn" style="cursor:pointer"></button></div>
+        <div class="tt" id="table"></div>
+        <div class="small">Ignored tests stay in your history. They are left out of the daily median so one bad moment cannot decide your result. Practice tests and router checks are labelled.</div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<nav class="tabbar">
+  <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Home</div>
+  <div class="tab on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 20V10M12 20V4M19 20v-7"/></svg>History</div>
+  <div class="fab"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 4 14h6l-1 8 9-12h-6z"/></svg></div>
+  <div class="tab"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.900 5.600a3 3 0 0 0 1.900 1.900L21.400 11.400l-5.600 1.900a3 3 0 0 0-1.900 1.900L12 20.800l-1.900-5.600a3 3 0 0 0-1.900-1.900L2.600 11.400l5.600-1.900a3 3 0 0 0 1.900-1.900z"/></svg>Proof AI</div>
+  <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg>Report</div>
+</nav>
+<script type="module" src="js/pages/history.js"></script>
+</body></html>

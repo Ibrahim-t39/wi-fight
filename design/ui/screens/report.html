@@ -1,0 +1,302 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Wi-Fight · Report</title><link rel="stylesheet" href="../ds.css">
+<style>
+.badge svg{width:12px;height:12px;flex:none}.chip svg{width:14px;height:14px;flex:none}.btn svg{width:16px;height:16px;flex:none}.ic16{display:inline-grid}.ic16 svg{width:16px;height:16px}
+.viewer{padding:0;overflow:hidden;display:flex;flex-direction:column}
+.vbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;border-bottom:1px solid var(--line)}
+.vbar .fn{display:flex;align-items:center;gap:9px;font:600 14px var(--body);min-width:0}
+.vbar .fn svg{width:18px;height:18px;color:var(--ink-3);flex:none}
+.pager{display:inline-flex;align-items:center;gap:4px;font:600 13px var(--body);color:var(--ink-2);white-space:nowrap}
+.pager i{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;border:1px solid var(--line);background:var(--surface);color:var(--ink-2)}
+.pager i.off{color:var(--line)}
+.pager i svg{width:14px;height:14px}
+.pager span{padding:0 6px}
+.canvas{background:#E9EBF0;padding:28px;display:flex;flex-direction:column;align-items:center;gap:24px;flex:1 1 0;min-height:820px;overflow:hidden;position:relative}
+.canvas::after{content:"";position:absolute;left:0;right:0;bottom:0;height:70px;background:linear-gradient(rgba(233,235,240,0),#E9EBF0)}
+.sheet{flex:none}
+.p2grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
+.p2box{border:1px solid var(--line);border-radius:10px;padding:12px 14px;background:var(--surface-2)}
+.p2box span{display:block;font:600 9.5px var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+.p2box b{display:block;font:700 20px/1.2 var(--display);margin-top:6px}
+.p2box b small{font:600 11px var(--body);color:var(--ink-2)}
+.p2box em{display:block;font:500 11px/1.4 var(--body);font-style:normal;color:var(--ink-2);margin-top:4px}
+.p2t{width:100%;border-collapse:collapse;margin-top:8px}
+.p2t th{font:600 9.5px var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);text-align:left;padding:6px 0;border-bottom:1px solid #0B0F1A}
+.p2t td{font:500 12px var(--body);padding:8px 0;border-bottom:1px solid var(--line)}
+.p2t td.lo{color:var(--bad);font-weight:700}
+.vfoot svg{width:14px;height:14px}
+.sheet{background:#fff;width:100%;max-width:600px;padding:40px 44px 36px;border-radius:3px;box-shadow:0 1px 2px rgba(11,15,26,.08),0 14px 34px rgba(11,15,26,.13);color:#0B0F1A;display:flex;flex-direction:column}
+.sh-head{display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:14px;border-bottom:2px solid #0B0F1A}
+.sh-brand{display:flex;align-items:center;gap:8px;font:700 15px var(--display)}
+.sh-mark{width:24px;height:24px;border-radius:7px;background:var(--cobalt);color:#fff;display:grid;place-items:center}
+.sh-mark svg{width:16px;height:16px}
+.sh-meta{font:500 10.5px/1.5 var(--body);color:var(--ink-3);text-align:right}
+.sh-title{font:700 28px/1.1 var(--display);letter-spacing:-.02em;margin-top:24px}
+.sh-info{display:grid;grid-template-columns:auto auto 1fr;gap:6px 26px;margin-top:16px}
+.sh-info span{display:block;font:600 9.5px var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin-bottom:3px}
+.sh-info b{font:600 12.5px/1.3 var(--body)}
+.sh-sum{margin-top:22px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);padding:14px 16px}
+.sh-sumhead{display:flex;justify-content:space-between;align-items:center;font:700 10px var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+.sh-sumhead em{font:700 11px var(--body);font-style:normal;letter-spacing:0;text-transform:none;color:var(--bad);background:var(--bad-bg);padding:3px 8px;border-radius:999px}
+.sh-stats{display:grid;grid-template-columns:.8fr 1.3fr 1.1fr;gap:14px;margin-top:10px}
+.sh-stats b{display:block;font:700 26px/1.05 var(--display);letter-spacing:-.02em;white-space:nowrap}
+.sh-stats b small{font:600 11px var(--body);color:var(--ink-2);letter-spacing:0}
+.sh-stats span{display:block;font:500 11px/1.3 var(--body);color:var(--ink-2);margin-top:4px}
+.sh-stats > div + div{border-left:1px solid var(--line);padding-left:14px}
+.sh-h{font:700 12.5px var(--body);margin-top:22px}
+.sh-chart{position:relative;height:104px;display:flex;align-items:flex-end;gap:6px;margin-top:22px;border-bottom:1px solid #0B0F1A;border-top:1px dashed var(--line)}
+.sh-chart i{flex:1;background:var(--cobalt);border-radius:3px 3px 0 0;opacity:.9}
+.sh-chart i.low{background:#0B0F1A}
+.sh-line{position:absolute;left:0;right:0;bottom:80%;border-top:1.5px dashed var(--bad);z-index:2}
+.sh-line span{position:absolute;right:0;top:-17px;font:700 9.5px var(--body);color:var(--bad);background:#fff;padding:0 0 0 4px}
+.sh-x{display:flex;gap:6px;margin-top:4px}
+.sh-x span{flex:1;text-align:center;font:600 9px var(--body);color:var(--ink-3)}
+.sh-cap{font:500 10.5px/1.4 var(--body);color:var(--ink-3);margin-top:6px}
+.sh-p{font:400 12px/1.6 var(--body);color:var(--ink-2);margin-top:6px}
+.sh-sign{margin-top:24px;padding-top:14px;border-top:1px solid var(--line);display:flex;gap:10px;align-items:center}
+.sh-seal{width:32px;height:32px;border-radius:50%;background:var(--cobalt-50);color:var(--cobalt);display:grid;place-items:center;flex:none}
+.sh-seal svg{width:17px;height:17px}
+.sh-sign b{display:block;font:600 11.5px/1.35 var(--body)}
+.sh-sign code{display:block;font:600 10.5px ui-monospace,Menlo,monospace;color:var(--ink-3);margin-top:3px}
+.vfoot{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 18px;border-top:1px solid var(--line);flex-wrap:wrap}
+
+.draftmsg{border-radius:var(--r-tile);background:var(--surface-2);border:1px solid var(--line);padding:16px;font:400 14.5px/1.6 var(--body);color:var(--ink)}
+.draftmsg p + p{margin-top:10px}
+.draftmsg .subj{font:600 13px var(--body);color:var(--ink-2);padding-bottom:10px;margin-bottom:12px;border-bottom:1px solid var(--line)}
+.draftmsg .subj b{color:var(--ink)}
+.tonerow{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.tonerow .chip{height:32px}
+.ctl{display:grid;grid-template-columns:1.25fr 1fr 1.25fr;gap:8px}
+.ctl .btn{padding:0 10px;height:46px;font-size:14.5px}
+.ctl .btn svg{width:16px;height:16px;flex:none}
+.rrow{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 0}
+.rrow .l{font:700 14.5px/1.3 var(--body)}
+.rrow .v{font:400 14px/1.4 var(--body);color:var(--ink-2);margin-top:2px}
+.editpill{height:30px;padding:0 14px;border-radius:999px;background:#ECEEF2;border:0;font:700 13px var(--body);color:var(--ink);flex:none}
+.agree{display:flex;align-items:center;gap:12px;padding:14px;border-radius:var(--r-tile);border:1.5px solid var(--line);background:var(--surface-2);font:600 14.5px/1.35 var(--body);cursor:pointer}
+.agree input{position:absolute;opacity:0;pointer-events:none}
+.agree .box{width:24px;height:24px;border-radius:7px;border:2px solid var(--ink-3);background:var(--surface);display:grid;place-items:center;flex:none;color:transparent}
+.agree .box svg{width:15px;height:15px}
+.agree input:checked + .box{background:var(--ink);border-color:var(--ink);color:#fff}
+.btn.sendbtn:disabled{background:#E1E4EB;color:var(--ink-3);cursor:not-allowed}
+.btn.sendbtn svg{width:17px;height:17px}
+.nosend{display:flex;align-items:center;gap:8px;font:600 13px/1.35 var(--body);color:var(--ink-2)}
+.nosend svg{width:15px;height:15px;color:var(--cobalt);flex:none}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.two .btn svg{width:16px;height:16px}
+.thumb{display:none}
+.stickybar{display:none}
+@media (max-width:1100px){.canvas{padding:20px}}
+@media (max-width:720px){
+  .reportmain{padding-bottom:250px}
+  .viewer{display:none}
+  .thumb{display:flex;gap:14px;align-items:stretch}
+  .thumbpage{width:112px;height:146px;flex:none;border-radius:8px;background:#E9EBF0;overflow:hidden;position:relative;border:1px solid var(--line)}
+  .thumbpage .sheet{position:absolute;left:8px;top:8px;width:600px;max-width:none;transform:scale(.16);transform-origin:0 0;box-shadow:0 2px 14px rgba(11,15,26,.25)}
+  .ctl .btn{font-size:14px;gap:6px}
+  .stickybar{display:flex;flex-direction:column;gap:10px;position:fixed;left:0;right:0;bottom:0;z-index:5;background:var(--surface);border-top:1px solid var(--line);border-radius:26px 26px 0 0;padding:14px 16px 98px;box-shadow:0 -8px 30px rgba(11,15,26,.10)}
+  .stickybar .btn{height:50px}
+  .stickybar .nosend{justify-content:center;font-size:12.5px}
+  .sendcard .sendbtn{display:none}
+}
+</style></head><body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><div class="mark"><svg viewBox="0 -1.300 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.300 16.200A8.300 8.300 0 0 1 16.900 6.300"/><path d="M19.900 12.300a8.300 8.300 0 0 1-.6 3.900"/><path d="m8 12.600 3 3 8.400-9.700"/></svg></div><span>Wi-Fight</span></div>
+    <a class="navitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span>Dashboard</span></a>
+    <a class="navitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 20V10M12 20V4M19 20v-7"/></svg><span>History</span></a>
+    <a class="navitem on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg><span>Report</span></a>
+    <a class="navitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 6.500C16 5 14.300 4.500 12 4.500c-2.800 0-4.500 1.300-4.500 3.400 0 4.800 10 2.400 10 7.600 0 2.200-2 3.500-5.500 3.500-2.500 0-4.500-.8-5.500-2.500"/></svg><span>Plans</span></a>
+    <div class="navsep">Proof AI</div>
+    <a class="navitem ai"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.900 5.600a3 3 0 0 0 1.900 1.900L21.400 11.400l-5.600 1.900a3 3 0 0 0-1.900 1.900L12 20.800l-1.900-5.600a3 3 0 0 0-1.900-1.900L2.600 11.400l5.600-1.900a3 3 0 0 0 1.900-1.900z"/></svg><span>Ask Proof AI</span></a>
+    <a class="navitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h4l3-8 4 16 3-8h6"/></svg><span>Diagnosis</span></a>
+    <div class="navsep">Account</div>
+    <a class="navitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4.500 6v6c0 4.500 3.200 7.600 7.500 9 4.300-1.400 7.500-4.500 7.500-9V6z"/><path d="m9 12 2 2 4-4"/></svg><span>Privacy &amp; data</span></a>
+    <div class="sidefoot col gap8">
+      <span class="badge lock" style="align-self:flex-start"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2.500"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Encrypted</span>
+      <div class="small" style="color:var(--ink-2)">Your data stays yours. Nothing is sent without your approval.</div>
+    </div>
+  </aside>
+
+<main class="main reportmain">
+    <div class="topbar">
+      <div class="col gap8">
+        <div class="eyebrow">Two-week check · Sep 22 to Oct 5</div>
+        <div class="row gap12" style="flex-wrap:wrap"><h1 class="h1">Your report</h1><span class="badge warn"><span class="dot"></span>Draft, not sent</span></div>
+      </div>
+      <div class="row gap8">
+        <span class="chip">Sample data</span>
+        <span class="badge lock only-desktop" style="height:34px;padding:0 13px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Nothing is sent until you approve it</span>
+      </div>
+    </div>
+
+    <div class="g">
+      <!-- PHONE: thumbnail -->
+      <section class="card span-12 thumb">
+        <div class="thumbpage">
+          <div class="sheet ">
+            <div class="sh-head">
+              <div class="sh-brand"><span class="sh-mark"><svg viewBox="0 -1.300 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.300 16.200A8.300 8.300 0 0 1 16.900 6.300"/><path d="M19.900 12.300a8.300 8.300 0 0 1-.6 3.900"/><path d="m8 12.600 3 3 8.400-9.700"/></svg></span>Wi-Fight</div>
+              <div class="sh-meta">Report WF-2026-0930<br>Page 1 of 2</div>
+            </div>
+            <div class="sh-title">Wi-Fight speed report</div>
+            <div class="sh-info">
+              <div><span>Prepared for</span><b>Jordan</b></div>
+              <div><span>Plan</span><b>Northstar Fiber 500, $80 a month</b></div>
+              <div><span>Dates</span><b>Sep 22 to Oct 5, 2026</b></div>
+            </div>
+            <div class="sh-sum">
+              <div class="sh-sumhead"><span>Summary</span><em>Below plan</em></div>
+              <div class="sh-stats">
+                <div><b>78%</b><span>of plan speed</span></div>
+                <div><b>389 <small>vs. 500 Mbps</small></b><span>measured vs. on the label</span></div>
+                <div><b>9 <small>of 14 days</small></b><span>below the fair line</span></div>
+              </div>
+            </div>
+            <div class="sh-h">Daily median download speed</div>
+            <div class="sh-chart">
+              <div class="sh-line"><span>Fair line 400 Mbps</span></div>
+              <i class="" style="height:92.2%"></i><i class="" style="height:89.4%"></i><i class="" style="height:90.4%"></i><i class="" style="height:86.2%"></i><i class="" style="height:83.6%"></i><i class="low" style="height:77.8%"></i><i class="low" style="height:74.4%"></i><i class="low" style="height:76.2%"></i><i class="low" style="height:73.2%"></i><i class="low" style="height:78.8%"></i><i class="low" style="height:77.8%"></i><i class="low" style="height:76.8%"></i><i class="low" style="height:75.4%"></i><i class="low" style="height:73.8%"></i>
+            </div>
+            <div class="sh-x"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span></div>
+            <div class="sh-cap">Each bar is one day. Dark bars fell below the fair line. The top of the chart is the 500 Mbps plan.</div>
+            <div class="sh-h">How this was measured</div>
+            <p class="sh-p">Wi-Fight ran 56 tests over 14 days, 4 a day, using the M-Lab open speed test. Each day is scored by its daily median, so one bad test cannot decide a day. The fair line is set at 80% of the speed on the plan label, which is 400 Mbps for this plan.</p>
+            <div class="sh-sign">
+              <span class="sh-seal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4.5 6v6c0 4.5 3.2 7.6 7.5 9 4.3-1.4 7.5-4.5 7.5-9V6z"/><path d="m9 12 2 2 4-4"/></svg></span>
+              <div><b>Signed and time-stamped by Wi-Fight so it cannot be altered</b><code>sha256 · 9f2c…a71e</code></div>
+            </div>
+          </div></div>
+        <div class="col grow" style="justify-content:space-between;gap:10px;min-width:0">
+          <div class="col gap4">
+            <div class="h3">Wi-Fight speed report</div>
+            <div class="small">PDF, 2 pages · Sep 22 to Oct 5</div>
+            <div class="small" style="color:var(--ink-2)">78% of plan · 9 of 14 days below the fair line</div>
+          </div>
+          <button class="btn ghost sm" style="align-self:flex-start">Open preview</button>
+        </div>
+      </section>
+
+      <!-- DESKTOP: document preview -->
+      <section class="card span-7 viewer">
+        <div class="vbar">
+          <div class="fn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg><span>wi-fight-speed-report.pdf</span></div>
+          <div class="pager"><i class="off"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"/></svg></i><span>Page 1 of 2</span><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></i></div>
+        </div>
+        <div class="canvas">
+          <div class="sheet ">
+            <div class="sh-head">
+              <div class="sh-brand"><span class="sh-mark"><svg viewBox="0 -1.300 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.300 16.200A8.300 8.300 0 0 1 16.900 6.300"/><path d="M19.900 12.300a8.300 8.300 0 0 1-.6 3.900"/><path d="m8 12.600 3 3 8.400-9.700"/></svg></span>Wi-Fight</div>
+              <div class="sh-meta">Report WF-2026-0930<br>Page 1 of 2</div>
+            </div>
+            <div class="sh-title">Wi-Fight speed report</div>
+            <div class="sh-info">
+              <div><span>Prepared for</span><b>Jordan</b></div>
+              <div><span>Plan</span><b>Northstar Fiber 500, $80 a month</b></div>
+              <div><span>Dates</span><b>Sep 22 to Oct 5, 2026</b></div>
+            </div>
+            <div class="sh-sum">
+              <div class="sh-sumhead"><span>Summary</span><em>Below plan</em></div>
+              <div class="sh-stats">
+                <div><b>78%</b><span>of plan speed</span></div>
+                <div><b>389 <small>vs. 500 Mbps</small></b><span>measured vs. on the label</span></div>
+                <div><b>9 <small>of 14 days</small></b><span>below the fair line</span></div>
+              </div>
+            </div>
+            <div class="sh-h">Daily median download speed</div>
+            <div class="sh-chart">
+              <div class="sh-line"><span>Fair line 400 Mbps</span></div>
+              <i class="" style="height:92.2%"></i><i class="" style="height:89.4%"></i><i class="" style="height:90.4%"></i><i class="" style="height:86.2%"></i><i class="" style="height:83.6%"></i><i class="low" style="height:77.8%"></i><i class="low" style="height:74.4%"></i><i class="low" style="height:76.2%"></i><i class="low" style="height:73.2%"></i><i class="low" style="height:78.8%"></i><i class="low" style="height:77.8%"></i><i class="low" style="height:76.8%"></i><i class="low" style="height:75.4%"></i><i class="low" style="height:73.8%"></i>
+            </div>
+            <div class="sh-x"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span></div>
+            <div class="sh-cap">Each bar is one day. Dark bars fell below the fair line. The top of the chart is the 500 Mbps plan.</div>
+            <div class="sh-h">How this was measured</div>
+            <p class="sh-p">Wi-Fight ran 56 tests over 14 days, 4 a day, using the M-Lab open speed test. Each day is scored by its daily median, so one bad test cannot decide a day. The fair line is set at 80% of the speed on the plan label, which is 400 Mbps for this plan.</p>
+            <div class="sh-sign">
+              <span class="sh-seal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4.5 6v6c0 4.5 3.2 7.6 7.5 9 4.3-1.4 7.5-4.5 7.5-9V6z"/><path d="m9 12 2 2 4-4"/></svg></span>
+              <div><b>Signed and time-stamped by Wi-Fight so it cannot be altered</b><code>sha256 · 9f2c…a71e</code></div>
+            </div>
+          </div>
+          <div class="sheet">
+            <div class="sh-head">
+              <div class="sh-brand"><span class="sh-mark"><svg viewBox="0 -1.300 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.300 16.200A8.300 8.300 0 0 1 16.900 6.300"/><path d="M19.900 12.300a8.300 8.300 0 0 1-.6 3.900"/><path d="m8 12.600 3 3 8.400-9.700"/></svg></span>Wi-Fight</div>
+              <div class="sh-meta">Report WF-2026-0930<br>Page 2 of 2</div>
+            </div>
+            <div class="sh-h" style="margin-top:20px">Where the slowdown comes from</div>
+            <div class="p2grid">
+              <div class="p2box"><span>Router check</span><b>392 <small>near</small> · 371 <small>far, Mbps</small></b><em>Small gap, so Wi-Fi is not the cause.</em></div>
+              <div class="p2box"><span>Time of day</span><b>352 <small>evening</small> · 441 <small>day, Mbps</small></b><em>Speeds drop between 7 and 11 PM.</em></div>
+            </div>
+            <div class="sh-h">Daily results</div>
+            <table class="p2t"><tr><th>Day</th><th>Date</th><th>Daily median</th><th>Result</th></tr><tr><td>Day 1</td><td>Tue, Sep 22</td><td>461 Mbps</td><td class="">On plan</td></tr><tr><td>Day 2</td><td>Wed, Sep 23</td><td>447 Mbps</td><td class="">On plan</td></tr><tr><td>Day 3</td><td>Thu, Sep 24</td><td>452 Mbps</td><td class="">On plan</td></tr><tr><td>Day 4</td><td>Fri, Sep 25</td><td>431 Mbps</td><td class="">On plan</td></tr><tr><td>Day 5</td><td>Sat, Sep 26</td><td>418 Mbps</td><td class="">On plan</td></tr><tr><td>Day 6</td><td>Sun, Sep 27</td><td>389 Mbps</td><td class="lo">Below fair line</td></tr><tr><td>Day 7</td><td>Mon, Sep 28</td><td>372 Mbps</td><td class="lo">Below fair line</td></tr><tr><td>Day 8</td><td>Tue, Sep 29</td><td>381 Mbps</td><td class="lo">Below fair line</td></tr><tr><td>Day 9</td><td>Wed, Sep 30</td><td>366 Mbps</td><td class="lo">Below fair line</td></tr><tr><td>Day 10</td><td>Thu, Oct 1</td><td>394 Mbps</td><td class="lo">Below fair line</td></tr><tr><td>Day 11</td><td>Fri, Oct 2</td><td>389 Mbps</td><td class="lo">Below fair line</td></tr><tr><td>Day 12</td><td>Sat, Oct 3</td><td>384 Mbps</td><td class="lo">Below fair line</td></tr><tr><td>Day 13</td><td>Sun, Oct 4</td><td>377 Mbps</td><td class="lo">Below fair line</td></tr><tr><td>Day 14</td><td>Mon, Oct 5</td><td>369 Mbps</td><td class="lo">Below fair line</td></tr></table>
+          </div></div>
+        <div class="vfoot">
+          <span class="small">This is exactly what your provider will receive.</span>
+          <span class="small row gap4" style="color:var(--cobalt);font-weight:700;white-space:nowrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4.5 6v6c0 4.5 3.2 7.6 7.5 9 4.3-1.4 7.5-4.5 7.5-9V6z"/><path d="m9 12 2 2 4-4"/></svg><span>Signed · sha256 · 9f2c…a71e</span></span>
+        </div>
+      </section>
+
+      <div class="span-5 col gap20" style="min-width:0">
+        <!-- AI DRAFT -->
+        <section class="ai-card col gap16">
+          <div class="row between" style="gap:10px;flex-wrap:wrap">
+            <span class="ai-tag"><svg viewBox="0 0 24 24" fill="#8B5CF6"><path d="M12 2l1.9 5.6a3 3 0 0 0 1.9 1.9L21.4 11.4l-5.6 1.9a3 3 0 0 0-1.9 1.9L12 20.8l-1.9-5.6a3 3 0 0 0-1.9-1.9L2.600 11.4l5.6-1.9a3 3 0 0 0 1.9-1.9z"/></svg>PROOF AI · DRAFT</span>
+            <span class="ai-meta">Drafted 2 min ago</span>
+          </div>
+          <p class="ai-text" style="font-size:18px;font-weight:600">Proof AI drafted your message to your provider</p>
+          <div class="draftmsg">
+            <div class="subj">Subject: <b>Speeds below my plan, Fiber 500</b></div>
+            <p>Hello Northstar support,</p>
+            <p>I am on the Fiber 500 plan, which lists a typical download speed of 500 Mbps for $80 a month. Over 14 days I ran 56 independent speed tests, and my median speed was 389 Mbps, which is 78% of the plan. On 9 of the 14 days my speed was below 400 Mbps. Tests next to my router were low as well, so my Wi-Fi does not appear to be the cause. Could you please fix this, or apply a credit to my bill for the speed I did not receive?</p>
+            <p>The full report is attached. Thank you,<br>Jordan</p>
+          </div>
+          <div class="tonerow"><span class="small" style="margin-right:2px">Tone</span><span class="chip on">Polite</span><span class="chip">Firm</span><span class="chip">Short</span>
+            <span class="pager" style="margin-left:auto"><i class="off"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"/></svg></i><span>Draft 1 of 2</span><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></i></span></div>
+          <div class="row gap8" style="flex-wrap:wrap"><span class="evidence">56 tests</span><span class="evidence">14 days</span><span class="evidence">Your plan label</span><span class="evidence">Router check</span></div>
+          <div class="ctl">
+            <button class="btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Approve</button>
+            <button class="btn ghost"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16zM13.500 6.500l4 4"/></svg>Edit</button>
+            <button class="btn ghost"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 0 0-14.3-4.500L4 8M4 4v4h4M4 13a8 8 0 0 0 14.300 4.500L20 16M20 20v-4h-4"/></svg>Regenerate</button>
+          </div>
+          <div class="ai-note">Generated by AI from your own test results. It can make mistakes, so read it before you approve. Approving the draft does not send it.</div>
+        </section>
+
+        <!-- REVIEW -->
+        <section class="card col gap16 sendcard">
+          <div class="col gap4"><div class="h2">Review before sending</div><div class="small">Check each line. You can change any of them.</div></div>
+          <div>
+            <div class="rrow"><div><div class="l">Send to</div><div class="v">Northstar support</div></div><button class="editpill">Edit</button></div>
+            <div class="rrow"><div><div class="l">Also send to the FCC</div><div class="v">Off</div></div><button class="editpill">Edit</button></div>
+            <div class="rrow"><div><div class="l">Attach</div><div class="v">PDF report, 2 pages</div></div><button class="editpill">Edit</button></div>
+            <div class="rrow"><div><div class="l">Includes</div><div class="v">Speed results and plan. No address, no browsing.</div></div><button class="editpill">Edit</button></div>
+          </div>
+          <label class="agree"><input type="checkbox" class="approvechk"><span class="box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span><span>I have read this and I approve sending it</span></label>
+          <button class="btn primary sendbtn" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Approve and send</button>
+          <div class="nosend"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span>Nothing is sent until you approve it.</span></div>
+          <div class="divider"></div>
+          <div class="two">
+            <button class="btn ghost sm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v13M6 12l6 6 6-6M5 21h14"/></svg>Download PDF</button>
+            <button class="btn ghost sm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg>Share</button>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <div class="stickybar">
+    <div class="nosend"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span>Nothing is sent until you approve it.</span></div>
+    <button class="btn primary sendbtn" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Approve and send</button>
+  </div>
+</div>
+
+<nav class="tabbar">
+  <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Home</div>
+  <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 20V10M12 20V4M19 20v-7"/></svg>History</div>
+  <div class="fab"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 4 14h6l-1 8 9-12h-6z"/></svg></div>
+  <div class="tab"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.900 5.600a3 3 0 0 0 1.900 1.900L21.400 11.400l-5.600 1.900a3 3 0 0 0-1.900 1.900L12 20.800l-1.900-5.600a3 3 0 0 0-1.900-1.900L2.600 11.400l5.600-1.900a3 3 0 0 0 1.900-1.900z"/></svg>Proof AI</div>
+  <div class="tab on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg>Report</div>
+</nav>
+<script>
+document.querySelector('.approvechk').addEventListener('change',function(e){document.querySelectorAll('.sendbtn').forEach(function(b){b.disabled=!e.target.checked})});
+</script>
+</body></html>
