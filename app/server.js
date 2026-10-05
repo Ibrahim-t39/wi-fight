@@ -40,7 +40,7 @@ const GROQ_URL = (process.env.GROQ_BASE_URL || 'https://api.groq.com/openai/v1')
 // Preferred Groq models, best first. Groq retires models over time, so the server asks Groq which ones
 // exist and uses the first match. GROQ_MODEL / GROQ_VISION_MODEL in .env go to the front of the list.
 const TEXT_PREFS = [process.env.GROQ_MODEL, 'llama-3.3-70b-versatile', 'openai/gpt-oss-120b', 'moonshotai/kimi-k2-instruct', 'qwen/qwen3-32b', 'openai/gpt-oss-20b', 'llama-3.1-8b-instant'].filter(Boolean);
-const VISION_PREFS = [process.env.GROQ_VISION_MODEL, 'meta-llama/llama-4-scout-17b-16e-instruct', 'meta-llama/llama-4-maverick-17b-128e-instruct'].filter(Boolean);
+const VISION_PREFS = [process.env.GROQ_VISION_MODEL, 'qwen/qwen3.8-27b', 'qwen/qwen3.6-27b', 'meta-llama/llama-4-scout-17b-16e-instruct', 'meta-llama/llama-4-maverick-17b-128e-instruct'].filter(Boolean);
 let GROQ_MODEL = TEXT_PREFS[0];
 let GROQ_VISION_MODEL = VISION_PREFS[0];
 let groqChecked = 0;
@@ -56,7 +56,7 @@ async function groqPick(force = false) {
     GROQ_IDS = ids;
     const chatty = (id) => !/guard|whisper|tts|speech|embed|safeguard|compound/i.test(id);
     GROQ_MODEL = TEXT_PREFS.find((m) => ids.includes(m)) || ids.find((id) => chatty(id) && /70b|120b|kimi|qwen/i.test(id)) || ids.find(chatty) || GROQ_MODEL;
-    GROQ_VISION_MODEL = VISION_PREFS.find((m) => ids.includes(m)) || ids.find((id) => /llama-4|vision/i.test(id)) || GROQ_VISION_MODEL;
+    GROQ_VISION_MODEL = VISION_PREFS.find((m) => ids.includes(m)) || ids.find((id) => /qwen3|llama-4|vision/i.test(id)) || GROQ_VISION_MODEL;
   } catch { /* keep the current choice */ }
 }
 // Force one backend with WIFIGHT_PROVIDER=claude|groq|local|none. Default: the first one available.
