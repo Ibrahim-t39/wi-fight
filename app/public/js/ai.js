@@ -259,7 +259,7 @@ export const AI = {
     const l = await live('bill', { image: dataUrl });
     // the model says when the photo is not a bill; an empty reading counts as that too
     if (l && (l.isBill === false || (l.planPrice == null && l.total == null && !(l.fees || []).length))) return { fields: { planPrice: null, equipment: null, fees: [], total: null, promoEnds: null, provider: null, plan: null }, confidence: 'low', mode: 'live', notBill: true };
-    if (l) return { fields: { planPrice: l.planPrice, equipment: l.equipment, fees: l.fees, total: l.total, promoEnds: l.promoEnds, provider: l.provider, plan: l.plan }, confidence: l.confidence, mode: 'live' };
+    if (l) return { fields: { planPrice: l.planPrice, equipment: l.equipment, fees: l.fees, total: l.total, promoEnds: l.promoEnds, provider: l.provider, plan: l.plan }, confidence: l.confidence, mode: 'live', model: l.model };
     if (known) return { fields: JSON.parse(JSON.stringify(known)), confidence: 'known', mode: 'offline', note: 'Offline mode: no AI model is connected, so these are the known values of this bundled sample bill, not an AI reading.' };
     return { fields: { planPrice: 65, equipment: 10, fees: [{ name: 'Network enhancement fee', amount: 5, junk: true, why: 'A company fee, not a government tax.' }], total: 80, promoEnds: 'Jan 2027' }, confidence: 'sample', mode: 'offline', note: 'Offline mode cannot read a real photo. These are sample values so you can see how the step works. Edit them to match your bill.' };
   },

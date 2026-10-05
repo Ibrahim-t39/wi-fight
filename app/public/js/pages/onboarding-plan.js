@@ -287,11 +287,13 @@ async function runScan({ src, getDataUrl, sample }) {
   const hit = live || sample ? planFor(sample) : null;
   const use = $('#usePlan');
   if (hit) { use.dataset.plan = hit.id; use.textContent = `Use this plan: ${hit.name}`; use.disabled = false; use.hidden = false; }
-  const chips = live ? [`Confidence: ${res.confidence}`, status.model ? `Model: ${status.model}` : null, sample ? 'Based on 1 sample bill' : 'Based on 1 photo', `${found} fields found`]
+  const chips = live ? [`Confidence: ${res.confidence}`, (res.model || status.model) ? `Model: ${res.model || status.model}` : null, sample ? 'Based on 1 sample bill' : 'Based on 1 photo', `${found} fields found`]
     : sample ? ['Confidence: none, not an AI reading', 'Known sample values', `${found} fields filled`]
       : ['Confidence: none, sample values', 'Not read from your photo', `${found} fields filled`];
   $('#scanChips').innerHTML = chips.filter(Boolean).map((c) => `<span class="evidence">${esc(c)}</span>`).join('');
-  $('#scanNote').textContent = `${AI.note(res.mode)} ${sample ? 'The outlines mark where each value sits on this sample bill. ' : ''}Check each field before you continue.`;
+  // a photo can be read by a different model than the one that writes text, so name the one that read it
+  const readNote = res.mode === 'live' && res.model && res.model !== status.model ? `Read by AI (${res.model}). It can make mistakes, so check each value.` : AI.note(res.mode);
+  $('#scanNote').textContent = `${readNote} ${sample ? 'The outlines mark where each value sits on this sample bill. ' : ''}Check each field before you continue.`;
   $('#scanActions').hidden = false; $('#billOk').hidden = false; $('#billEdit').hidden = false; $('#billOk').disabled = false; $('#billOk span').textContent = 'Looks right';
   $('#scan').dataset.mode = res.mode;
   scanState = 'done';
