@@ -52,7 +52,7 @@ Shortcuts for a live demo, all labelled in the app:
 - "Simulate the two weeks" (after a test, or under Demo in the sidebar) fast-forwards with sample data.
 - In the chat, asking for a person offers a handoff to a support agent. The agent is simulated and says so. The case summary it opens with is built from your own results.
 
-The speed test in the demo is the practice test. It is labelled as not a real measurement. The real M-Lab test is on the same page.
+"Start test" runs a simulated test, labelled as not a real measurement, so a demo never uses the presenter's real connection. "Use the real M-Lab test" on the same page runs a real one.
 
 The practice bills are in `demo-files/` at the top of the repo, not on the website. They are fictional. Upload one on the plan step like any photo. Proof AI reads it from the image. If the file is one of those exact files, the page recognizes it, outlines each line, and checks the AI's answer against the known values. `tools/make-samples.py` draws them.
 

@@ -53,7 +53,7 @@ with sync_playwright() as p:
 
     # 2. a practice test
     page.goto(BASE + 'test.html'); page.wait_for_timeout(600)
-    page.get_by_role('button', name=re.compile('Practice test')).first.click()
+    page.get_by_role('button', name=re.compile('Start test')).first.click()
     page.wait_for_function("document.body.innerText.toLowerCase().includes('not a real measurement') && !document.body.innerText.includes('Measuring')", timeout=25000); page.wait_for_timeout(900)
     st = state()
     ok('practice test saved and labelled', len(st['tests']) == 1 and st['tests'][0]['source'] == 'practice' and 'not a real measurement' in page.inner_text('body').lower())

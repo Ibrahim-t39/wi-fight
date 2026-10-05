@@ -1,5 +1,6 @@
 // Live speed test page. Three states: ready, running, done.
-// "Start test" runs the real M-Lab test. "Practice test" runs the labelled practice test.
+// "Start test" runs the simulated (practice) test, so a demo never touches the presenter's real connection.
+// "Use the real M-Lab test" is the opt-in for a real measurement.
 import { boot, bind, $, $$, go, chipsHTML, Store, AI, summarize, esc } from '../shell.js';
 import { FAIR, CHECK_DAYS, SCHEDULE, now, fmtDate, fmtTime } from '../engine.js';
 import { runSpeedTest, ConsentError } from '../speedtest.js';
@@ -136,7 +137,7 @@ async function runOnce(practice) {
   $('#big').classList.remove('idle'); $('#big').textContent = '0';
   $('#cap').textContent = 'Mbps download';
   $('#statusWord').textContent = PHASES.locate;
-  $('#foot').textContent = practice ? 'Practice test. Nothing is sent to M-Lab and nothing is published.' : "Runs on M-Lab's open test. This test's result and IP address are published by M-Lab.";
+  $('#foot').textContent = practice ? 'Simulated test. Nothing is sent to M-Lab and nothing is published.' : "Runs on M-Lab's open test. This test's result and IP address are published by M-Lab.";
   ring('locate');
   slot('Down', waitHTML('waiting'), 'Up next');
   slot('Up', waitHTML('waiting'), 'Up next');
@@ -175,7 +176,7 @@ async function runOnce(practice) {
       if (stale()) return;
       fellBack = true; realFailed = true;
       alertReal('The real test could not run here', 'A practice test is running in its place. It is not a real measurement.', false);
-      $('#foot').textContent = 'Practice test. Nothing is sent to M-Lab and nothing is published.';
+      $('#foot').textContent = 'Simulated test. Nothing is sent to M-Lab and nothing is published.';
     },
   };
   let r;
@@ -199,8 +200,8 @@ async function runOnce(practice) {
   await finish(r, fellBack || (practice && realFailed));
 }
 
-$('#start').onclick = () => run(false);
-$('#practice').onclick = () => run(true);
+$('#start').onclick = () => run(true);
+$('#practice').onclick = () => run(false);
 // The guided demo's "Do it for me": always the practice test, never the real one. Waits until it has finished.
 // Safe to call twice: a run in progress is awaited, and a finished test is not run again.
 window.wfDemoFill = async () => {
@@ -210,10 +211,10 @@ window.wfDemoFill = async () => {
   if (running) { if (!$('#fallback').hidden && !$('#usePractice').hidden) $('#usePractice').click(); await current; return; }
   if (isPaused()) { $('#resume').click(); await pause(600); }
   await pause(500);
-  $('#practice').click();
+  $('#start').click();
   await current;
 };
-// While the guided demo is running, remind the presenter which button is safe.
+$('#presenting').hidden = false;
 try { const tour = JSON.parse(localStorage.getItem('wf.tour.v1') || 'null'); $('#presenting').hidden = !(tour && tour.on); } catch { $('#presenting').hidden = true; }
 // Cancel leaves the page. Nothing is saved, because saving only happens in finish().
 $('#cancel').onclick = () => { cancelled = true; go('dashboard.html'); };
@@ -255,7 +256,7 @@ async function finish(r, fellBack) {
   // Proof AI live read: computed on this device from the saved test and the refreshed facts
   const read = AI.liveRead(saved, f);
   const chips = read.chips.slice();
-  if (isPractice) chips.push('Practice test');
+  if (isPractice) chips.push('Simulated test');
   if (saved.location !== 'normal') chips.push(LOCS[saved.location]);
   bind({ readHtml: AI.html(read.text), readChipsHtml: chipsHTML(chips) });
   $('#read').hidden = false;

@@ -14,6 +14,7 @@ const ICON = {
   verdict: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4.5 6v6c0 4.5 3.2 7.6 7.5 9 4.3-1.4 7.5-4.5 7.5-9V6z"/><path d="m9 12 2 2 4-4"/></svg>',
   about: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7.5v.5"/></svg>',
   more: '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>',
+  logout: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3"/><path d="M10 8l-4 4 4 4M6 12h10"/></svg>',
   flask: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6M10 3v6L4.5 19a1.500 1.500 0 0 0 1.300 2h12.400a1.500 1.500 0 0 0 1.300-2L14 9V3"/><path d="M7.500 14h9"/></svg>',
 };
 const here = () => (location.pathname.split('/').pop() || 'index.html');
@@ -57,7 +58,8 @@ function wireNav(state, facts, ai) {
     if (foot) foot.innerHTML = `<span class="badge lock" style="align-self:flex-start"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2.500"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>${Store.isEncrypted() ? 'Encrypted on this device' : 'Stored on this device'}</span>
       <div class="small" style="color:var(--ink-2)">Nothing is sent without your approval.</div>
       <div class="small" data-ai-mode>${ai.provider === 'local' ? 'Proof AI: live, on this computer' : ai.live ? 'Proof AI: live (' + esc(ai.label || 'AI') + ')' : 'Proof AI: offline mode'}</div>
-      <button class="btn ghost sm" data-demo style="align-self:stretch">${ICON.flask}Demo</button>`;
+      <button class="btn ghost sm" data-demo style="align-self:stretch">${ICON.flask}Demo</button>
+      <button class="btn ghost sm" data-logout style="align-self:stretch">${ICON.logout}Log out</button>`;
   }
   // phone tab bar: Home, History, [Run test], Proof AI, More
   const bar = $('.tabbar');
@@ -70,7 +72,8 @@ function wireNav(state, facts, ai) {
   }
   document.addEventListener('click', (e) => {
     const h = e.target.closest('[data-href]'); if (h) { e.preventDefault(); go(h.dataset.href); return; }
-    if (e.target.closest('[data-demo]')) { e.preventDefault(); openDemo(); }
+    if (e.target.closest('[data-demo]')) { e.preventDefault(); openDemo(); return; }
+    if (e.target.closest('[data-logout]')) { e.preventDefault(); openLogout(); }
   });
 }
 
@@ -88,8 +91,28 @@ export function closeSheet() { const w = $('.sheet-wrap'); if (w) w.remove(); }
 function openMore() {
   const facts = summarize(Store.get());
   const items = [['Report', 'report.html'], ['Diagnosis', 'diagnosis.html'], ['Plans', 'plans.html'], ...(facts.complete ? [['Verdict', 'verdict.html']] : []), ['Privacy & data', 'privacy.html'], ['About', 'about.html']];
-  const w = sheet(`<div class="h3" style="margin-bottom:8px">More</div>${items.map(([n, r]) => `<a class="lrow" href="${r}" style="text-decoration:none;color:inherit"><span class="grow" style="font-weight:600">${n}</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></a>`).join('')}<button class="btn ghost sm" data-demo style="margin-top:14px;width:100%">${ICON.flask}Demo data</button>`);
+  const w = sheet(`<div class="h3" style="margin-bottom:8px">More</div>${items.map(([n, r]) => `<a class="lrow" href="${r}" style="text-decoration:none;color:inherit"><span class="grow" style="font-weight:600">${n}</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></a>`).join('')}<button class="btn ghost sm" data-demo style="margin-top:14px;width:100%">${ICON.flask}Demo data</button><button class="btn ghost sm" data-logout style="margin-top:8px;width:100%">${ICON.logout}Log out</button>`);
   return w;
+}
+
+/** Log out. This prototype keeps everything in this browser, so logging out clears it all, including the
+ *  encryption key, and returns to the first page. That also makes it the way to restart a demo. */
+export function openLogout() {
+  closeSheet();
+  const u = (Store.get() && Store.get().user) || {};
+  const who = u.email ? `You are signed in as ${esc(u.email)}. ` : '';
+  const w = sheet(`<div class="h3">Log out?</div>
+    <p class="small" style="margin:6px 0 14px;color:var(--ink-2)">${who}Wi-Fight keeps your data only in this browser. Logging out deletes it here, with its encryption key, and takes you back to the start.</p>
+    <div class="col gap8">
+      <button class="btn primary" data-logout-yes>Log out and start over</button>
+      <button class="btn ghost" data-logout-no>Stay signed in</button>
+    </div>`);
+  $('[data-logout-no]', w).onclick = closeSheet;
+  $('[data-logout-yes]', w).onclick = async () => {
+    await Store.wipe();
+    try { localStorage.removeItem('wf.tour.v1'); sessionStorage.clear(); } catch { /* storage may be blocked */ }
+    location.href = 'index.html';
+  };
 }
 
 /** Demo data controls: load the labelled sample two weeks, or clear back to an empty check. */
