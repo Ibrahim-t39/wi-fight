@@ -445,7 +445,12 @@ async function runAI(body) {
   const t = make(body);
   const p = await provider();
   if (p === 'local') return runLocal(body, t);
-  if (p === 'groq') return runGroq(body, t);
+  if (p === 'groq') {
+    // A hosted model sometimes returns a broken answer or drops the connection. One quiet second try fixes most of those.
+    let out = await runGroq(body, t);
+    if (out.status === 502 || out.status === 422) { console.warn('Groq answer failed, trying once more', body.task, out.status, out.json && out.json.error); out = await runGroq(body, t); }
+    return out;
+  }
   if (!p) return { status: 503, json: { error: 'offline' } };
   const content = [];
   if (body.task === 'bill') {
