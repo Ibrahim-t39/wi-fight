@@ -44,6 +44,8 @@ const VISION_PREFS = [process.env.GROQ_VISION_MODEL, 'meta-llama/llama-4-scout-1
 let GROQ_MODEL = TEXT_PREFS[0];
 let GROQ_VISION_MODEL = VISION_PREFS[0];
 let groqChecked = 0;
+let GROQ_IDS = [];      // model names this key can use, from Groq's own list
+let groqVisionOk = null; // the model that last read a photo without an error
 async function groqPick(force = false) {
   if (!force && Date.now() - groqChecked < 10 * 60 * 1000) return;
   groqChecked = Date.now();
@@ -51,6 +53,7 @@ async function groqPick(force = false) {
     const r = await fetch(`${GROQ_URL}/models`, { headers: { Authorization: `Bearer ${GROQ_KEY}` }, signal: AbortSignal.timeout(6000) });
     if (!r.ok) return;
     const ids = ((await r.json()).data || []).filter((m) => m.active !== false).map((m) => m.id);
+    GROQ_IDS = ids;
     const chatty = (id) => !/guard|whisper|tts|speech|embed|safeguard|compound/i.test(id);
     GROQ_MODEL = TEXT_PREFS.find((m) => ids.includes(m)) || ids.find((id) => chatty(id) && /70b|120b|kimi|qwen/i.test(id)) || ids.find(chatty) || GROQ_MODEL;
     GROQ_VISION_MODEL = VISION_PREFS.find((m) => ids.includes(m)) || ids.find((id) => /llama-4|vision/i.test(id)) || GROQ_VISION_MODEL;
@@ -332,6 +335,24 @@ async function runGroq(body, t) {
     }
     const payload = { model, temperature: 0.2, max_tokens: 900, response_format: { type: 'json_object' }, messages: [{ role: 'system', content: system }, { role: 'user', content: user }] };
     let r = await groqFetch(payload);
+    if (body.task === 'bill' && (r.status === 400 || r.status === 404)) {
+      // The photo model may have been retired or may not take images. Try the other models on this key, most likely first.
+      console.warn('Groq photo model failed', model, r.status, (await r.text()).slice(0, 200));
+      await groqPick(true);
+      const likely = (id) => (/llama-4|scout|maverick|vision|llava|pixtral|gemma-3|qwen.*vl|-vl\b|gpt-4o|gpt-4\.1|gpt-5|o4/i.test(id) ? 0 : 1);
+      const tryList = [model, groqVisionOk, ...GROQ_IDS.filter((id) => !/guard|whisper|tts|speech|embed|safeguard|compound|orpheus|allam/i.test(id)).sort((x, y) => likely(x) - likely(y))].filter((id, i, all) => id && all.indexOf(id) === i).slice(0, 9);
+      for (const id of tryList) {
+        for (const json of [true, false]) {
+          const p2 = { ...payload, model: id }; if (json) p2.response_format = { type: 'json_object' }; else delete p2.response_format;
+          r = await groqFetch(p2);
+          if (r.ok || (r.status !== 400 && r.status !== 404)) break;
+          console.warn('Groq photo try failed', id, r.status, (await r.text()).slice(0, 160));
+        }
+        if (r.ok) { model = id; groqVisionOk = id; GROQ_VISION_MODEL = id; break; }
+        if (r.status !== 400 && r.status !== 404) break;
+      }
+      if (!r.ok && (r.status === 400 || r.status === 404)) return { status: 502, json: { error: 'No model on this Groq key could read a photo.', tried: tryList } };
+    } else
     if (r.status === 400) { // some models do not accept JSON mode (for example with an image): ask again in plain mode
       console.warn('Groq 400, retrying without JSON mode', (await r.text()).slice(0, 200));
       delete payload.response_format; r = await groqFetch(payload);
@@ -463,6 +484,8 @@ const allow = () => { if (Date.now() - windowStart > 60000) { windowStart = Date
 
 http.createServer(async (req, res) => {
   const url = new URL(req.url, `http://${req.headers.host}`);
+  // Which models the Groq key can use and which ones this server picked. Model names only, never the key.
+  if (url.pathname === '/api/models') { if (GROQ_KEY) await groqPick(); return send(res, 200, JSON.stringify({ text: GROQ_KEY ? GROQ_MODEL : null, photo: GROQ_KEY ? GROQ_VISION_MODEL : null, available: GROQ_IDS })); }
   if (url.pathname === '/api/status') return send(res, 200, JSON.stringify(describe(await provider())));
   if (url.pathname === '/api/ai') {
     if (req.method !== 'POST') return send(res, 405, JSON.stringify({ error: 'POST only' }));
