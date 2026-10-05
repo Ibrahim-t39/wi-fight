@@ -171,6 +171,90 @@ function listHTML() {
 }
 function paintList() { $$('[data-chatlist]').forEach((el) => { el.innerHTML = listHTML(); }); }
 
+/* ---------- handoff to a person (simulated) ---------- */
+// When someone asks for a person, when Proof AI cannot answer, or when an answer gets a thumbs down, the chat offers
+// a live support agent. There is no real agent in this prototype: "Maya" is written by the app from the same facts,
+// and every one of her messages is labelled as simulated. What is real is the handoff itself: the case summary the
+// agent opens with is built from the user's own results, so they never have to repeat themselves.
+const WANT_HUMAN = /\b(agent|human|real person|live (chat|person|support|agent)|representative|customer (service|support|care)|support team|operator|speak (to|with) (a|an|some)|talk (to|with) (a|an|some)\w*)\b/i;
+const AGENT = { name: 'Maya', role: 'Wi-Fight support' };
+const caseId = (conv) => { if (!conv.caseId) { let h = 0; for (const ch of conv.id) h = (h * 31 + ch.charCodeAt(0)) % 90000; conv.caseId = 'WF-' + String(10000 + h); } return conv.caseId; };
+const note = (kind, text, extra = {}) => ({ role: 'note', kind, text, t: iso(), ...extra });
+let handing = false;
+
+function offerHuman(conv, why) {
+  if (conv.agent || handing) return false;
+  const last = conv.messages[conv.messages.length - 1];
+  if (last && last.role === 'note' && last.kind === 'offer') return false;
+  conv.messages.push(note('offer', why || 'I can connect you to a live support agent. I will pass along your results so you do not have to explain again.'));
+  return true;
+}
+
+function caseSummary() {
+  if (!H || !facts.headline) return 'They have not run a speed test yet, so there are no results to pass along.';
+  const h = facts.headline, d = facts.diagnosis;
+  const bits = [`${facts.plan.name}, $${facts.plan.price} a month`, `getting ${h.mbps} of ${facts.plan.down} Mbps (${h.pct}%)`, `below the fair line on ${facts.daysBelow} of ${plural(facts.daysDone, 'day')}`];
+  if (d && d.title) bits.push(`most likely cause: ${d.title.toLowerCase()}`);
+  return bits.join('; ') + '.';
+}
+
+function agentReply(text) {
+  const q = text.toLowerCase(), id = caseId(cur);
+  const money = facts.money && facts.money.lostMonth ? `about $${facts.money.lostMonth} a month` : 'the part of the bill that paid for missing speed';
+  if (/credit|refund|money back|discount|compensat/.test(q)) return `I have added a bill credit request to case ${id}, for ${money}. The strongest way to back it up is your Wi-Fight report, because it shows every test. You can send it from the Report page after you approve it.`;
+  if (/cancel|switch|another provider|different provider|better plan|cheaper/.test(q)) return `Understood. Before you cancel, check the Plans page. It compares plans near you against what you actually use. I have noted on case ${id} that you are thinking about switching.`;
+  if (/technician|visit|engineer|fix|repair|router|modem|outage/.test(q)) return `I have asked for a line check on case ${id}. Your results show the speed is low next to the router too, so a technician should check the line into your home, not your Wi-Fi.`;
+  if (/thank|bye|that is all|that's all|nothing else|all good|^no\b/.test(q)) return `You are welcome. Case ${id} stays open with your results attached. You can go back to Proof AI any time.`;
+  return `Thanks, I have added that to case ${id}. Is there anything else you want me to note for your provider?`;
+}
+
+async function connectHuman(conv) {
+  if (handing || conv.agent) return;
+  handing = true;
+  const say = async (m, wait) => { conv.messages.push(m); await persist(conv); if (cur === conv) { stick = true; render(); } await pause(wait); };
+  // drop a pending offer card: the user has answered it
+  conv.messages = conv.messages.filter((m) => !(m.role === 'note' && m.kind === 'offer'));
+  await say(note('status', 'Connecting you to a support agent...'), 1500);
+  await say(note('status', `Sending your case summary: ${caseSummary()}`), 1900);
+  conv.agent = true;
+  await say(note('status', `${AGENT.name} from ${AGENT.role} joined the chat.`), 900);
+  conv.typing = true; if (cur === conv) render(); await pause(1700); conv.typing = false;
+  const who = (S().user && S().user.name) ? `Hi ${S().user.name}` : 'Hi';
+  const open = H && facts.headline
+    ? `${who}, I am ${AGENT.name}. Proof AI sent me your results, so you do not need to repeat anything. I can see you pay for ${facts.plan.down} Mbps and get ${facts.headline.mbps}. I opened case ${caseId(conv)} for you. What would you like me to do?`
+    : `${who}, I am ${AGENT.name}. I opened case ${caseId(conv)} for you. You have no speed tests yet, so the first step is to run one. What can I help with?`;
+  await say(note('agent', open), 0);
+  handing = false;
+  if (cur === conv) { render(); input.focus({ preventScroll: true }); }
+}
+
+async function toAgent(conv, text) {
+  handing = true; conv.typing = true; stick = true; render();
+  await pause(1300 + Math.min(1200, text.length * 12));
+  conv.typing = false;
+  conv.messages.push(note('agent', agentReply(text)));
+  await persist(conv);
+  handing = false;
+  if (cur === conv) render();
+}
+
+async function leaveHuman(conv) {
+  if (!conv.agent) return;
+  conv.agent = false;
+  conv.messages.push(note('status', `${AGENT.name} left the chat. You are back with Proof AI.`));
+  await persist(conv); if (cur === conv) render();
+}
+
+const SIM = '<span class="simtag">Simulated for this demo</span>';
+function noteHTML(m, i, isLast) {
+  if (m.kind === 'status') return `<div class="hstatus" data-i="${i}"><span>${esc(m.text)}</span></div>`;
+  if (m.kind === 'offer') return `<div class="hoffer" data-i="${i}"><div class="ht"><b>Want to talk to a person?</b><span>${esc(m.text)}</span></div>${isLast && !cur.agent ? '<div class="row gap8" style="flex-wrap:wrap"><button type="button" class="btn primary sm" data-human-yes>Connect me to an agent</button><button type="button" class="btn ghost sm" data-human-no>No thanks</button></div>' : ''}<div class="mmeta">This prototype has no real support team. The agent is simulated.</div></div>`;
+  return `<article class="turn ai agent" data-i="${i}"><div class="who"><span class="avatar agentav" aria-hidden="true">${esc(AGENT.name[0])}</span><span class="agentname">${esc(AGENT.name)} · ${esc(AGENT.role)}</span>${SIM}</div>
+    <div class="mbody"><p>${esc(m.text)}</p></div>
+    <div class="mfoot"><div class="mmeta">Not a real person. Written by the app from your own results. ${esc(fmtTime(m.t))}</div></div></article>`;
+}
+const agentTypingHTML = () => `<article class="turn ai agent"><div class="who"><span class="avatar agentav" aria-hidden="true">${esc(AGENT.name[0])}</span><span class="agentname">${esc(AGENT.name)} · ${esc(AGENT.role)}</span>${SIM}</div><div class="thinking" role="status"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span>${esc(AGENT.name)} is typing...</span></div></article>`;
+
 /* ---------- messages ---------- */
 const whoHTML = `<div class="who"><span class="avatar" aria-hidden="true">${IC.spark}</span><span class="ai-tag">PROOF AI</span></div>`;
 function aiHTML(m, i, isLast) {
@@ -209,15 +293,18 @@ function render() {
   if (!ms.length && !streaming) html = emptyHTML();
   else {
     const lastI = ms.length - 1;
-    html = ms.map((m, i) => (m.role === 'user' ? `<div class="turn me" data-i="${i}"><div class="bubble me">${esc(m.text)}</div></div>` : aiHTML(m, i, i === lastI && !streaming))).join('');
+    html = ms.map((m, i) => (m.role === 'user' ? `<div class="turn me" data-i="${i}"><div class="bubble me">${esc(m.text)}</div></div>` : m.role === 'note' ? noteHTML(m, i, i === lastI) : aiHTML(m, i, i === lastI && !streaming))).join('');
     if (streaming) html += liveHTML(busy.text);
+    else if (cur.typing) html += agentTypingHTML();
+    else if (cur.agent || handing) { /* the agent answers, or is connecting */ }
     else if (ms[lastI].role === 'user') {
-      html += `<div class="errbox" id="retry" role="alert"><span>${failed === cur.id ? 'Proof AI could not answer just now.' : 'This question does not have an answer yet.'}</span><button type="button" class="btn sm" data-retry${on ? '' : ' disabled'}>Try again</button></div>`;
+      html += `<div class="errbox" id="retry" role="alert"><span>${failed === cur.id ? 'Proof AI could not answer just now.' : 'This question does not have an answer yet.'}</span><button type="button" class="btn sm" data-retry${on ? '' : ' disabled'}>Try again</button><button type="button" class="btn sm" data-human>Talk to a person</button></div>`;
     } else {
       const ups = followupsFor(cur);
       if (ups.length) html += `<div class="follow" id="follow" aria-label="Suggested next questions">${ups.map((u) => `<button type="button" class="chip" data-ask="${esc(u)}"${on ? '' : ' disabled'}>${esc(u)}</button>`).join('')}</div>`;
     }
   }
+  if (cur.agent && !handing) html += `<div class="hbar"><span>You are chatting with ${esc(AGENT.name)}, a simulated support agent.</span><button type="button" class="btn sm" data-human-end>Back to Proof AI</button></div>`;
   thread.innerHTML = html;
   $('#ctitle').textContent = cur.title || 'New chat';
   document.title = `Wi-Fight · ${cur.title || 'Ask Proof AI'}`;
@@ -241,9 +328,9 @@ function grow() {
   input.style.overflowY = input.scrollHeight > max ? 'auto' : 'hidden';
 }
 function paintComposer() {
-  const on = aiOn(), streaming = !!busy;
+  const on = aiOn() || !!cur.agent, streaming = !!busy;
   input.disabled = !on;
-  input.placeholder = on ? 'Ask about your internet' : 'Proof AI is off';
+  input.placeholder = cur.agent ? `Message ${AGENT.name}` : on ? 'Ask about your internet' : 'Proof AI is off';
   form.classList.toggle('off', !on);
   $('#offnote').hidden = on;
   sendBtn.classList.toggle('stop', streaming);
@@ -273,8 +360,8 @@ function stop() { if (busy) busy.ctrl.abort(); }
 
 /** Send a question in the current conversation. again: answer the last question once more (regenerate or retry). */
 async function send(text, { again = false } = {}) {
-  if (busy) return;
-  if (!aiOn()) { toast('Proof AI is off. Turn it on to ask.'); return; } // enforced here, not only by the disabled box
+  if (busy || handing) return;
+  if (!aiOn() && !cur.agent) { toast('Proof AI is off. Turn it on to ask.'); return; } // enforced here, not only by the disabled box
   const conv = cur;
   if (again) {
     const last = conv.messages[conv.messages.length - 1];
@@ -286,6 +373,9 @@ async function send(text, { again = false } = {}) {
     conv.messages.push({ role: 'user', text, t: iso() });
     if (!conv.title) conv.title = titleOf(text);
     input.value = ''; grow();
+    // With an agent in the chat the message goes to the agent. Asking for a person brings up the offer instead of an AI answer.
+    if (conv.agent) { stick = true; setUrl(conv.id); await persist(conv); await toAgent(conv, text); return; }
+    if (WANT_HUMAN.test(text)) { offerHuman(conv); stick = true; setUrl(conv.id); await persist(conv); render(); return; }
   }
   failed = null;
   const job = busy = { conv, ctrl: new AbortController(), text: '', timedOut: false };
@@ -298,7 +388,7 @@ async function send(text, { again = false } = {}) {
   paintList();
 
   // The model gets the whole conversation, so "what would I say?" can refer back to earlier turns.
-  const messages = conv.messages.filter((m) => m.text && m.text.trim()).map((m) => ({ role: m.role, content: m.text }));
+  const messages = conv.messages.filter((m) => (m.role === 'user' || m.role === 'assistant') && m.text && m.text.trim()).map((m) => ({ role: m.role, content: m.text }));
   let watchdog, painter = 0;
   const arm = () => { clearTimeout(watchdog); watchdog = setTimeout(() => { job.timedOut = true; job.ctrl.abort(); }, WAIT_MS); };
   const paint = () => {
@@ -378,6 +468,10 @@ document.addEventListener('click', async (e) => {
   const a = t.closest('[data-ask]');
   if (a) { if (!a.disabled) send(a.dataset.ask); return; }
   if (t.closest('[data-retry]')) { send('', { again: true }); return; }
+  if (t.closest('[data-human-yes]')) { connectHuman(cur); return; }
+  if (t.closest('[data-human-no]')) { cur.messages = cur.messages.filter((m) => !(m.role === 'note' && m.kind === 'offer')); cur.messages.push(note('status', 'No problem. Proof AI is still here.')); await persist(cur); render(); return; }
+  if (t.closest('[data-human-end]')) { leaveHuman(cur); return; }
+  if (t.closest('[data-human]')) { if (busy || handing) return; if (cur.agent) { toast('You are already with an agent'); return; } if (!cur.title) cur.title = 'Talk to a person'; if (offerHuman(cur)) { stick = true; setUrl(cur.id); await persist(cur); render(); } return; }
   if (t.closest('[data-newchat]')) { newChat(); return; }
   const op = t.closest('[data-open]'); if (op) { openChat(op.dataset.open); return; }
   const del = t.closest('[data-del]'); if (del) { confirmId = del.dataset.del; paintList(); const y = $('[data-del-yes]', del.closest('[data-chatlist]') || document); if (y) y.focus(); return; }
@@ -404,6 +498,7 @@ thread.addEventListener('click', async (e) => {
     $$('[data-act="up"], [data-act="down"]', card).forEach((x) => { const on = x.dataset.act === m.rating; x.classList.toggle('on', on); x.setAttribute('aria-pressed', on ? 'true' : 'false'); });
     await persist(cur); paintList();
     if (m.rating) toast('Thanks for the feedback');
+    if (m.rating === 'down' && offerHuman(cur, 'Sorry that answer missed. I can connect you to a live support agent and pass along your results.')) { await persist(cur); stick = true; render(); }
   } else if (kind === 'regen') send('', { again: true });
 });
 
@@ -415,7 +510,7 @@ const q0 = params.get('q'), c0 = params.get('c');
 // With no chat named in the address, reopen the conversation that was on screen last time.
 const want = q0 ? null : c0 || S().chatCurrent || null;
 const found = want ? saved().find((c) => c.id === want) : null;
-if (found) { cur = JSON.parse(JSON.stringify(found)); setUrl(cur.id); } else setUrl(null); // also removes ?q so a reload does not ask twice
+if (found) { cur = JSON.parse(JSON.stringify(found)); cur.typing = false; setUrl(cur.id); } else setUrl(null); // also removes ?q so a reload does not ask twice
 grow(); render();
 if (found && c0) await remember(cur.id);
 window.addEventListener('resize', () => { if (stick) toBottom(); paintJump(); });

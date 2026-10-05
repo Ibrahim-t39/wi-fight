@@ -39,11 +39,10 @@ with sync_playwright() as p:
     cont.click(); page.wait_for_url('**/onboarding-signin.html')
     page.locator('input[type=email]').fill('maya@example.com')
     page.get_by_role('button', name=re.compile('Email me a code')).click(); page.wait_for_timeout(400)
-    code = re.search(r'code is\s*(\d{6})', page.inner_text('body'))
-    ok('sign-in: demo code is shown and labelled as a demo', bool(code) and 'no email is sent' in page.inner_text('body').lower())
+    ok('sign-in: labelled as a demo that takes any 6 digits', 'no email is sent' in page.inner_text('body').lower() and 'any 6 digits' in page.inner_text('body').lower())
     boxes = page.locator('.otp input')
-    for i, ch in enumerate(code.group(1)): boxes.nth(i).fill(ch)
-    page.get_by_role('button', name=re.compile('Verify and continue')).click(); page.wait_for_url('**/onboarding-plan.html')
+    for i, ch in enumerate('135790'): boxes.nth(i).type(ch)
+    page.wait_for_url('**/onboarding-plan.html')
     page.get_by_text('Northstar Fiber 500', exact=True).first.click(); page.wait_for_timeout(200)
     page.get_by_role('button', name=re.compile('Start checking my internet')).click(); page.wait_for_url('**/dashboard.html'); page.wait_for_timeout(700)
     st = state()
@@ -63,7 +62,7 @@ with sync_playwright() as p:
     ok('dashboard now computes from the one test', 'day 1 of 14' in page.inner_text('body').lower() and page.locator('#grid').is_visible())
 
     # 3. demo data through the app's own Demo sheet
-    page.locator('[data-demo]').first.click(); page.get_by_role('button', name=re.compile('day 9 of 14')).click(); page.wait_for_url('**/dashboard.html'); page.wait_for_timeout(900)
+    page.locator('[data-demo]').first.click(); page.get_by_role('button', name=re.compile('skip to day 9')).click(); page.wait_for_timeout(4500); page.wait_for_url('**/dashboard.html', timeout=15000); page.wait_for_timeout(1200)
     t = page.inner_text('body')
     ok('sample day 9: 78% of plan, 389 Mbps, Below plan, sample chip shown', all(x in t for x in ['78', '389', 'Below plan', 'Sample data']))
     for name in PAGES:

@@ -99,7 +99,8 @@ const STEPS = ['Reading the photo', 'Finding prices and fees', 'Checking fee nam
 const REVEAL_GAP = 350;
 let thumbUrl = null, bill = null, runId = 0, scanState = 'idle', current = null, takeOn = false;
 const status = await AI.status();
-// Bundled sample bills. They are fictional, and the page says so wherever they appear.
+// Known values and line positions for the fictional demo bills in the repo's demo-files folder.
+// The images are not on the website. When someone uploads one of those exact files it is recognized by its SHA-256.
 let manifest = { bills: [] };
 try { manifest = await (await fetch('samples/manifest.json')).json(); } catch { manifest = { bills: [] }; }
 const show = (id) => { ['scanOff', 'scanIdle', 'scanWork'].forEach((k) => { $('#' + k).hidden = k !== id; }); $('#scan').classList.toggle('wide', id === 'scanWork'); };
@@ -178,7 +179,7 @@ $('#frows').addEventListener('input', (e) => {
   $('#billOk span').textContent = 'Looks right'; $('#billOk').disabled = false;
 });
 
-/* Comparing what the model read with the known values of a bundled sample. */
+/* Comparing what the model read with the known values of a recognized demo bill. */
 const norm = (x) => String(x == null ? '' : x).toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
 const MONTHS = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
 /** "March 2027", "Mar 2027", and "03/2027" all mean the same month. */
@@ -224,12 +225,12 @@ function addBox(sample, region, cls, tag) {
   boxes.appendChild(d);
 }
 
-/** One scan, the same for an uploaded photo and for a bundled sample. sample is the manifest entry, or null. */
+/** One scan, the same for any uploaded photo. sample is set when the file is one of the demo bills. sample is the manifest entry, or null. */
 async function runScan({ src, getDataUrl, sample }) {
   const my = ++runId; bill = null; current = sample || null; takeOn = false; scanState = 'working';
   thumb.src = src; thumb.alt = sample ? `${sample.title}, a fictional sample bill` : 'The bill photo you chose';
-  stage.classList.toggle('up', !sample); stage.classList.add('reading'); boxes.innerHTML = '';
-  $('#billcap').textContent = sample ? 'A fictional sample bill. Shown here only.' : 'Your bill photo. Shown here only.';
+  stage.classList.toggle('up', false); stage.classList.add('reading'); boxes.innerHTML = '';
+  $('#billcap').textContent = sample ? 'Recognized as a Wi-Fight demo bill (fictional). Shown here only.' : 'Your bill photo. Shown here only.';
   show('scanWork');
   $('#scanErr').hidden = true; $('#scanActions').hidden = true; $('#frows').innerHTML = ''; $('#scanChips').innerHTML = ''; $('#scanNote').textContent = '';
   $('#scanMatch').hidden = true; $('#scanOffNote').hidden = true; $('#usePlan').hidden = true; $('#take').hidden = false;
@@ -254,7 +255,7 @@ async function runScan({ src, getDataUrl, sample }) {
   $('#scanMeta').textContent = live ? 'Read just now · live' : sample ? 'Known sample values · offline mode' : 'Sample values · offline mode';
   $('#scanText').textContent = live ? 'Here is what Proof AI read.' : 'Filling in the fields.';
 
-  // Reveal one value at a time. On a bundled sample, each value also gets a box on its line of the bill.
+  // Reveal one value at a time. On a recognized demo bill, each value also gets a box on its line of the bill.
   // The box positions come with the sample (manifest regions). A photo you upload has none, so it gets no boxes.
   const lines = feeLines(bill.fees, sample ? sample.fields : null);
   const got = { plan: !!fl.plan, planPrice: fl.planPrice != null, equipment: fl.equipment != null, total: fl.total != null, promo: !!fl.promoEnds };
@@ -273,7 +274,7 @@ async function runScan({ src, getDataUrl, sample }) {
   // The takeaway, with honest labels.
   const found = 2 + bill.fees.length + 1 + (bill.promoEnds ? 1 : 0) + (bill.plan ? 1 : 0);
   if (live || sample) { takeOn = true; drawTake(); } else $('#scanText').innerHTML = AI.html(res.note || 'Offline mode cannot read a real photo. These are sample values.');
-  if (!live && sample) { $('#scanOffNote').textContent = res.note || 'Offline mode: no AI model is connected, so these are the known values of this bundled sample bill, not an AI reading.'; $('#scanOffNote').hidden = false; }
+  if (!live && sample) { $('#scanOffNote').textContent = res.note || 'Offline mode: no AI model is connected, so these are the known values of this demo bill, not an AI reading.'; $('#scanOffNote').hidden = false; }
   if (live && sample) {
     // Proof that the model really read the image: its values against the sample's known values, counted for real.
     const c = compare(fl, sample.fields, lines);
@@ -281,40 +282,36 @@ async function runScan({ src, getDataUrl, sample }) {
     bad.forEach((key) => { const fl2 = $(`#frows [data-k="${key}"] .fl`); if (fl2 && !$('.chk', fl2)) fl2.insertAdjacentHTML('beforeend', '<span class="chk">check this</span>'); });
     const m = $('#scanMatch'); m.classList.toggle('part', c.ok !== c.of || c.extra.length > 0);
     m.dataset.ok = c.ok; m.dataset.of = c.of;
-    m.innerHTML = `${c.ok === c.of && !c.extra.length ? OKMARK : ''}<span>Matches the sample's known values: ${c.ok} of ${c.of}</span>${c.checks.some((x) => x.key === 'missingFee') ? '<span class="q">A fee on the bill was not read.</span>' : ''}${c.extra.length ? '<span class="q">The model also listed a fee that is not on the sample.</span>' : ''}`;
+    m.innerHTML = `${c.ok === c.of && !c.extra.length ? OKMARK : ''}<span>Matches this demo bill's known values: ${c.ok} of ${c.of}</span>${c.checks.some((x) => x.key === 'missingFee') ? '<span class="q">A fee on the bill was not read.</span>' : ''}${c.extra.length ? '<span class="q">The model also listed a fee that is not on the sample.</span>' : ''}`;
     m.hidden = false;
   }
   const hit = live || sample ? planFor(sample) : null;
   const use = $('#usePlan');
   if (hit) { use.dataset.plan = hit.id; use.textContent = `Use this plan: ${hit.name}`; use.disabled = false; use.hidden = false; }
-  const chips = live ? [`Confidence: ${res.confidence}`, (res.model || status.model) ? `Model: ${res.model || status.model}` : null, sample ? 'Based on 1 sample bill' : 'Based on 1 photo', `${found} fields found`]
+  const chips = live ? [`Confidence: ${res.confidence}`, (res.model || status.model) ? `Model: ${res.model || status.model}` : null, sample ? 'Based on 1 photo' : 'Based on 1 photo', `${found} fields found`]
     : sample ? ['Confidence: none, not an AI reading', 'Known sample values', `${found} fields filled`]
       : ['Confidence: none, sample values', 'Not read from your photo', `${found} fields filled`];
   $('#scanChips').innerHTML = chips.filter(Boolean).map((c) => `<span class="evidence">${esc(c)}</span>`).join('');
   // a photo can be read by a different model than the one that writes text, so name the one that read it
   const readNote = res.mode === 'live' && res.model && res.model !== status.model ? `Read by AI (${res.model}). It can make mistakes, so check each value.` : AI.note(res.mode);
-  $('#scanNote').textContent = `${readNote} ${sample ? 'The outlines mark where each value sits on this sample bill. ' : ''}Check each field before you continue.`;
+  $('#scanNote').textContent = `${readNote} ${sample ? 'The outlines mark where each value sits on this demo bill. ' : ''}Check each field before you continue.`;
   $('#scanActions').hidden = false; $('#billOk').hidden = false; $('#billEdit').hidden = false; $('#billOk').disabled = false; $('#billOk span').textContent = 'Looks right';
   $('#scan').dataset.mode = res.mode;
   scanState = 'done';
 }
 
-function scan(f) {
+async function scan(f) {
   if (!f.type.startsWith('image/')) { toast('Choose a photo of your bill.'); file.value = ''; return; }
   if (thumbUrl) URL.revokeObjectURL(thumbUrl);
   thumbUrl = URL.createObjectURL(f);
-  return runScan({ src: thumbUrl, getDataUrl: () => toDataUrl(f), sample: null });
+  // Is this one of the demo bills? Then its known values are on hand to check the AI's reading and to outline each line.
+  let sample = null;
+  try {
+    const hex = [...new Uint8Array(await crypto.subtle.digest('SHA-256', await f.arrayBuffer()))].map((b) => b.toString(16).padStart(2, '0')).join('');
+    sample = manifest.bills.find((b) => b.sha256 === hex) || null;
+  } catch { sample = null; }
+  return runScan({ src: thumbUrl, getDataUrl: () => toDataUrl(f, sample ? 1400 : 1600), sample });
 }
-/** A bundled sample goes through the same scan as a photo: fetched, shrunk to a JPEG, and read. */
-function useSample(id) {
-  const b = manifest.bills.find((x) => x.id === id); if (!b || !state.consent.ai) return;
-  const src = 'samples/' + b.file;
-  return runScan({ src, getDataUrl: async () => toDataUrl(await (await fetch(src)).blob(), 1400), sample: b });
-}
-
-$('#samples').innerHTML = manifest.bills.map((b) => `<div class="scard"><span class="pic"><img src="samples/${esc(b.file)}" alt="${esc(b.title)}, a fictional sample" loading="lazy"></span><div class="sb"><div class="dt">${esc(b.title)}</div><div class="small">${esc(b.blurb)}</div><div class="sa"><button type="button" class="btn primary sm" data-sample="${esc(b.id)}">Use this bill</button><a class="dl" href="samples/${esc(b.file)}" download="${esc(b.file)}">Download</a></div></div></div>`).join('');
-$('#samplesBlock').hidden = !manifest.bills.length;
-$('#samples').addEventListener('click', (e) => { const b = e.target.closest('[data-sample]'); if (b) { useSample(b.dataset.sample); bring($('#scan')); } });
 $('#usePlan').addEventListener('click', () => {
   const use = $('#usePlan'); const hit = allPlans.find((p) => p.id === use.dataset.plan); if (!hit) return;
   choose(hit.id, 'bill'); use.textContent = `Selected: ${hit.name}`; use.disabled = true;
@@ -339,7 +336,7 @@ else {
   show('scanIdle');
   $('#photoHow').textContent = status.provider === 'local' ? `The photo stays in this page while you check the fields. It is read once by a language model running on this computer (${status.model}), so it does not leave this device, and it is gone when you leave this page.`
     : status.live ? `The photo stays in this page while you check the fields. It is sent once to ${status.label || 'the AI service'} to be read, and it is gone when you leave this page.`
-      : 'The photo stays in this page while you check the fields and is gone when you leave. Proof AI is in offline mode, so the photo is not sent anywhere and cannot be read. A bundled sample bill shows its known values. Your own photo gets sample values to edit.';
+      : 'The photo stays in this page while you check the fields and is gone when you leave. Proof AI is in offline mode, so the photo is not sent anywhere and cannot be read. A recognized demo bill shows its known values. Your own photo gets sample values to edit.';
 }
 window.addEventListener('pagehide', () => { if (thumbUrl) URL.revokeObjectURL(thumbUrl); });
 
@@ -350,19 +347,22 @@ window.wfDemoFill = async () => {
   if (filling) return; filling = true;
   try {
     if (state.consent.ai) {
-      const ready = () => scanState === 'done' && current && current.id === 'northstar-bill';
+      const ready = () => scanState === 'done';
       if (!ready()) {
         if (scanState !== 'working') {
           if (scanState !== 'idle') resetScan();
           bring($('#scan')); await sleep(900);
-          const b = $('[data-sample="northstar-bill"]'); if (b) b.click();
+          // Open the file picker so the presenter can choose a bill from the demo-files folder, then wait for the scan.
+          toast('Choose northstar-bill.png from the demo-files folder');
+          try { file.click(); } catch { /* the browser may block it; the presenter can press the button */ }
+          for (let i = 0; i < 600 && scanState !== 'working'; i++) await sleep(100);
         }
         for (let i = 0; i < 1100 && scanState === 'working'; i++) await sleep(100);
       }
       if (ready()) {
         await sleep(1100);
         if (!$('#billOk').disabled) { $('#billOk').click(); await sleep(900); }
-        const use = $('#usePlan'); if (!use.hidden && !use.disabled && use.dataset.plan === 'ns500') { use.click(); await sleep(900); }
+        const use = $('#usePlan'); if (!use.hidden && !use.disabled) { use.click(); await sleep(900); }
       }
     }
     if (!selected || selected.id !== 'ns500') {

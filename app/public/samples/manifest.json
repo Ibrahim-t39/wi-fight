@@ -1,5 +1,5 @@
 {
- "note": "Fictional sample documents for demos. Providers, accounts, and addresses are made up.",
+ "note": "Known values and line positions for the fictional demo bills in the demo-files folder of the repo. The images are not part of the website. An uploaded file is matched by its SHA-256.",
  "bills": [
   {
    "id": "northstar-bill",
@@ -67,7 +67,8 @@
      "w": 87.29,
      "h": 5.71
     }
-   }
+   },
+   "sha256": "5e6f90f67b707ed7893dfe93bfc7c18751785737deda0e565c2507961b0db05b"
   },
   {
    "id": "pinecrest-bill",
@@ -147,7 +148,8 @@
      "w": 87.29,
      "h": 5.71
     }
-   }
+   },
+   "sha256": "e93b4a3383e7fa22e962d5e011a464c6b0b8384a7843f8f2096845b00f39917f"
   }
  ],
  "label": {

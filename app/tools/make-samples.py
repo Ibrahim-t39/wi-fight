@@ -1,13 +1,14 @@
 """Builds the sample documents used in demos: two fictional internet bills and one broadband label.
 Everything here is made up. The providers do not exist. Each document says so in its footer.
 Run from the app folder:  /opt/homebrew/opt/python@3.13/bin/python3.13 tools/make-samples.py
-Writes PNG files and manifest.json into public/samples/. The manifest records what each bill says and
+Writes the PNG files into demo-files/ at the repo root (not part of the website) and manifest.json into public/samples/. The manifest records what each bill says and
 where each line sits on the image, so the app can highlight lines and check what the AI read.
 """
 import json, pathlib
 from playwright.sync_api import sync_playwright
 
-OUT = pathlib.Path(__file__).resolve().parent.parent / 'public' / 'samples'
+MAN = pathlib.Path(__file__).resolve().parent.parent / 'public' / 'samples'   # manifest only: known values and positions
+OUT = pathlib.Path(__file__).resolve().parent.parent.parent / 'demo-files'      # the images, kept out of the website
 FONT = "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap"
 
 BASE_CSS = """
@@ -107,7 +108,10 @@ def main():
         lp.set_content(LABEL_HTML, wait_until='networkidle'); lp.wait_for_timeout(400)
         lp.screenshot(path=str(OUT / 'northstar-label.png'), full_page=True)
         b.close()
-    (OUT / 'manifest.json').write_text(json.dumps(manifest, indent=1))
+    import hashlib
+    for b in manifest['bills']: b['sha256'] = hashlib.sha256((OUT / b['file']).read_bytes()).hexdigest()
+    MAN.mkdir(parents=True, exist_ok=True)
+    (MAN / 'manifest.json').write_text(json.dumps(manifest, indent=1))
     print('wrote manifest.json')
 
 if __name__ == '__main__':

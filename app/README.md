@@ -43,12 +43,18 @@ The app has a guided demo so a presenter never gets stuck.
 
 1. Open the site and press "Start the guided demo". Choose "Start from the beginning". You can also add `?tour=1` to any address.
 2. A bar in the corner shows what to say and what to press at each of the 13 stops. Right arrow is next, left arrow is back, H hides the bar.
-3. "Do it for me" on the bar does the step for you: it ticks consent, signs in, scans a sample bill, runs the practice test, asks the chat question, and runs the tamper test.
+3. "Do it for me" on the bar does the step for you: it ticks consent, signs in, opens the file picker for the bill, runs the practice test, asks the chat question, and runs the tamper test.
 4. The demo jumps ahead in time by loading sample data for day 9 and day 14. Sample data is labelled on every page.
+
+Shortcuts for a live demo, all labelled in the app:
+
+- Sign-in takes any email address and any 6 digits. No email is sent.
+- "Simulate the two weeks" (after a test, or under Demo in the sidebar) fast-forwards with sample data.
+- In the chat, asking for a person offers a handoff to a support agent. The agent is simulated and says so. The case summary it opens with is built from your own results.
 
 The speed test in the demo is the practice test. It is labelled as not a real measurement. The real M-Lab test is on the same page.
 
-The sample bills in `public/samples/` are fictional. `tools/make-samples.py` draws them. Proof AI reads them from the image like any other photo, and the page checks its answer against the known values of the sample.
+The practice bills are in `demo-files/` at the top of the repo, not on the website. They are fictional. Upload one on the plan step like any photo. Proof AI reads it from the image. If the file is one of those exact files, the page recognizes it, outlines each line, and checks the AI's answer against the known values. `tools/make-samples.py` draws them.
 
 ## Check the statistics
 
@@ -67,9 +73,8 @@ npm test
 | `public/js/speedtest.js` | M-Lab ndt7 speed test, with a labelled practice mode |
 | `public/js/shell.js` | Shared page setup, navigation, and render helpers |
 | `public/js/tour.js` | The guided demo bar |
-| `public/samples/` | Fictional sample bills for the bill scan, made by `tools/make-samples.py` |
 | `public/js/tour.js` | The guided demo bar |
-| `public/samples/` | Fictional sample bills for the bill scan, made by `tools/make-samples.py` |
+| `public/samples/manifest.json` | Known values and line positions of the practice bills in `../demo-files/` |
 | `public/js/pages/` | One small script per page |
 | `public/data/plans.json` | Fictional providers and plans for the demo |
 | `tests/` | Engine tests, an end-to-end browser check, and live model checks |

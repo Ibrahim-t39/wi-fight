@@ -93,13 +93,37 @@ function openMore() {
 }
 
 /** Demo data controls: load the labelled sample two weeks, or clear back to an empty check. */
+/** Fast-forward for demos. Shows the days ticking by, then loads the labelled sample data for that many days.
+ *  It keeps who is signed in and what they agreed to. Nothing is measured: the sample is marked on every page. */
+export async function simulate(days = 14) {
+  const ov = document.createElement('div');
+  ov.style.cssText = 'position:fixed;inset:0;z-index:120;background:#070A12;color:#F5F7FB;display:grid;place-items:center;text-align:center;padding:24px;font-family:var(--body,system-ui)';
+  ov.innerHTML = `<div style="max-width:520px;width:100%"><div style="font:600 12px/1 var(--body,system-ui);letter-spacing:.12em;text-transform:uppercase;color:#8FA4FF">Simulating a ${days === 14 ? 'two-week' : days + '-day'} check</div>
+    <div style="font:700 76px/1 var(--display,system-ui);letter-spacing:-.03em;margin:18px 0 6px">Day <span data-d>1</span></div>
+    <div style="font:500 16px/1.4 var(--body,system-ui);color:#AEB5C6"><span data-n>4</span> speed tests recorded</div>
+    <div style="height:8px;border-radius:99px;background:#1B2233;margin:26px 0 18px;overflow:hidden"><i data-b style="display:block;height:100%;width:0;background:#2747F5;border-radius:99px;transition:width .16s linear"></i></div>
+    <div style="font:500 13.5px/1.45 var(--body,system-ui);color:#7C859B">A real check runs 4 tests a day for 14 days. This skips the wait with sample data, which is labelled on every page.</div></div>`;
+  document.body.appendChild(ov);
+  const st = Store.get() || {};
+  const keepUser = st.user && st.user.method !== 'sample' ? { ...st.user } : null;
+  const keepConsent = st.consent ? { ...st.consent } : null;
+  const load = Store.loadSample(days).then(() => (keepUser || keepConsent ? Store.update((x) => { if (keepUser) x.user = keepUser; if (keepConsent) x.consent = keepConsent; }) : null));
+  for (let d = 1; d <= days; d++) {
+    ov.querySelector('[data-d]').textContent = d; ov.querySelector('[data-n]').textContent = d * 4; ov.querySelector('[data-b]').style.width = `${(d / days) * 100}%`;
+    await new Promise((r) => setTimeout(r, 170));
+  }
+  await load; await new Promise((r) => setTimeout(r, 450));
+  location.href = days >= 14 ? 'verdict.html' : 'dashboard.html';
+}
+document.addEventListener('click', (e) => { const b = e.target.closest('[data-simulate]'); if (b) { e.preventDefault(); simulate(Number(b.dataset.simulate) || 14); } });
+
 export function openDemo() {
   const w = sheet(`<div class="h3">Demo data</div>
-    <p class="small" style="margin:6px 0 14px;color:var(--ink-2)">A two-week check takes two weeks. For a demo, load a labelled sample so every page has results to show. Sample data is marked on every page.</p>
+    <p class="small" style="margin:6px 0 14px;color:var(--ink-2)">A real check takes two weeks. For a demo, simulate it with labelled sample data so every page has results to show. Sample data is marked on every page.</p>
     <div class="col gap8">
       <button class="btn primary" data-tour-start>Start the guided demo</button>
-      <button class="btn" data-s="9">Load sample: day 9 of 14</button>
-      <button class="btn" data-s="14">Load sample: finished check</button>
+      <button class="btn" data-simulate="9">Simulate: skip to day 9</button>
+      <button class="btn" data-simulate="14">Simulate the full two weeks</button>
       <button class="btn ghost" data-s="0">Clear tests and start fresh</button>
     </div>`);
   $$('[data-s]', w).forEach((b) => { b.onclick = async () => { const n = Number(b.dataset.s); if (n) await Store.loadSample(n); else await Store.clearTests(); location.href = n === 14 ? 'verdict.html' : 'dashboard.html'; }; });

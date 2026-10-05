@@ -1,5 +1,5 @@
 // Step 2: sign in. This prototype has no email server and no sign-in server, and the page says so.
-// The one-time code lives in this page's memory only. It is never written to the store.
+// For the class demo any 6 digits are accepted as the code, and the page says so. A real build would email a code and check it on a server.
 import { Store, $, $$, go, bind } from '../shell.js';
 
 const state = await Store.load();
@@ -8,8 +8,7 @@ if (!state.consent || !state.consent.mlab) { go('onboarding-consent.html'); awai
 const email = $('#email'), emailField = $('#emailfield'), emailErr = $('#emailerr');
 const card = $('#codecard'), boxes = $$('#otp input'), codeErr = $('#codeerr'), pkErr = $('#pkerr');
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-const CODE_LIFE = 10 * 60 * 1000;
-let pending = null; // { code, email, at }, memory only
+let pending = null; // { email }, memory only
 
 if (state.user && state.user.email) email.value = state.user.email;
 
@@ -23,16 +22,14 @@ const validEmail = () => {
   if (!ok) email.focus();
   return ok ? v : null;
 };
-const randomCode = () => String(crypto.getRandomValues(new Uint32Array(1))[0] % 1000000).padStart(6, '0');
 
 function issue() {
   const addr = validEmail(); if (!addr) return;
-  pending = { code: randomCode(), email: addr, at: Date.now() };
+  pending = { email: addr };
   card.hidden = false;
   bind({ email: addr });
   const note = $('#demonote');
-  note.textContent = 'Demo sign-in: no email is sent in this prototype. Your code is ';
-  const b = document.createElement('b'); b.id = 'democode'; b.textContent = pending.code; note.append(b, '.');
+  note.textContent = 'Demo sign-in: no email is sent in this prototype. Type any 6 digits.';
   boxes.forEach((i) => { i.value = ''; i.classList.remove('f'); });
   $('#otp').classList.remove('bad'); show(codeErr, '');
   boxes[0].focus();
@@ -47,6 +44,7 @@ const fill = (digits, from = 0) => {
   digits.slice(0, 6 - from).split('').forEach((d, k) => { boxes[from + k].value = d; });
   boxes.forEach((i) => i.classList.toggle('f', !!i.value));
   boxes[Math.min(5, from + digits.length)].focus();
+  if (boxes.every((b) => b.value)) verify();
 };
 boxes.forEach((box, i) => {
   box.addEventListener('input', () => {
@@ -56,6 +54,7 @@ boxes.forEach((box, i) => {
     if (d.length > 1) { fill(d, i); return; }
     box.classList.toggle('f', !!box.value);
     if (box.value && i < 5) boxes[i + 1].focus();
+    if (boxes.every((b) => b.value)) verify(); // six digits in: continue without another click
   });
   box.addEventListener('keydown', (e) => {
     if (e.key === 'Backspace' && !box.value && i > 0) { boxes[i - 1].value = ''; boxes[i - 1].classList.remove('f'); boxes[i - 1].focus(); e.preventDefault(); }
@@ -71,24 +70,26 @@ boxes.forEach((box, i) => {
   box.addEventListener('focus', () => box.select());
 });
 
+let verifying = false;
 async function verify() {
+  if (verifying) return;
   const typed = boxes.map((b) => b.value).join('');
   const fail = (msg) => { $('#otp').classList.add('bad'); show(codeErr, msg); };
   if (!pending) return fail('Ask for a code first.');
   if (typed.length < 6) return fail('Enter all 6 digits.');
-  if (Date.now() - pending.at > CODE_LIFE) return fail('That code has run out. Make a new code.');
-  if (typed !== pending.code) return fail('That code is not right. Check it and try again.');
+  if (!/^\d{6}$/.test(typed)) return fail('The code is 6 digits.');
+  verifying = true;
   const addr = pending.email; pending = null;
   await Store.update((s) => { s.user = { name: nameFrom(addr), email: addr, method: 'code' }; });
   go('onboarding-plan.html');
 }
 $('#verify').addEventListener('click', verify);
 
-// Presenter convenience: put the code shown in the notice into the six boxes, through the same input handlers as typing.
+// Presenter convenience: put a code into the six boxes, through the same input handlers as typing.
 const pause = (ms) => new Promise((r) => setTimeout(r, ms));
 async function typeCode(gap = 0) {
   if (!pending) return false;
-  const code = pending.code;
+  const code = '246810';
   boxes.forEach((b) => { b.value = ''; b.classList.remove('f'); });
   for (let i = 0; i < 6; i++) {
     boxes[i].focus(); boxes[i].value = code[i];
@@ -115,8 +116,6 @@ window.wfDemoFill = async () => {
       await pause(800);
     }
     await typeCode(140);
-    await pause(600);
-    $('#verify').click();
     await pause(1500);
   } finally { filling = false; }
 };
