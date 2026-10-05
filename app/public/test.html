@@ -71,6 +71,16 @@ html{background:#070A12}
 .samplerow{margin-top:8px;min-height:0}
 .slot .s.bad{color:var(--bad)}
 @media (max-width:720px){.ringbox{width:min(340px,100%);height:auto;aspect-ratio:1}}
+/* presenter-proof: a notice that cannot be missed when the real test does not run */
+.alertbox{width:100%;margin-top:18px;padding:18px;border-radius:20px;border:2px solid var(--warn);background:var(--warn-bg);display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center;box-shadow:0 0 0 6px rgba(255,194,75,.12),0 14px 40px rgba(255,194,75,.18);animation:alertin .45s cubic-bezier(.2,.9,.3,1.2)}
+.alertbox .ah{display:flex;align-items:center;gap:10px;font:700 20px/1.2 var(--display);color:var(--warn)}
+.alertbox .ah svg{width:26px;height:26px;flex:none}
+.alertbox p{font:500 14.5px/1.45 var(--body);color:var(--ink);max-width:420px}
+.alertbox .btn{width:100%;max-width:360px}
+@keyframes alertin{from{opacity:0;transform:translateY(10px) scale(.97)}}
+.presenting{width:100%;max-width:420px;padding:10px 14px;border-radius:14px;border:1px dashed var(--line);font:600 13px/1.45 var(--body);color:var(--ink-2);text-align:center}
+.actions .btn.lead{flex:0 0 100%}
+@media (prefers-reduced-motion:reduce){.alertbox{animation:none}}
 </style></head><body>
 <div class="stage dark">
   <div class="glow" id="glow"></div>
@@ -113,7 +123,11 @@ html{background:#070A12}
     <div class="status" id="status"><span class="live" id="livedot" hidden></span><span id="statusWord"></span></div>
     <p class="result" id="result" hidden></p>
     <div class="notice warn" id="practiceLabel" hidden>Practice test, not a real measurement</div>
-    <div class="notice warn" id="fallback" hidden>The real test could not run here, so this is a practice test.</div>
+    <div class="alertbox" id="fallback" role="alert" hidden>
+      <div class="ah"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2.500 20h19z"/><path d="M12 10v4.500M12 17.300v.2"/></svg><span id="fallbackTitle"></span></div>
+      <p id="fallbackText"></p>
+      <button class="btn primary" id="usePractice">Run a practice test instead</button>
+    </div>
 
     <div class="notice" id="paused" hidden>
       <div data-b="pausedText"></div>
@@ -133,6 +147,7 @@ html{background:#070A12}
       <button class="btn primary" id="start"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 4 14h6l-1 8 9-12h-6z"/></svg>Start test</button>
       <button class="textbtn" id="practice">Practice test</button>
       <p class="quiet">Use this if the network blocks the real test. It is not a real measurement.</p>
+      <p class="presenting" id="presenting" hidden>Presenting? The real test needs about 20 seconds and an open network. Practice test is the safe choice.</p>
     </div>
 
     <div class="slots" id="slots">
@@ -156,7 +171,7 @@ html{background:#070A12}
       <button class="btn ghost sm" id="addRouter">Add a router check</button>
     </div>
     <div class="actions" id="actions" hidden>
-      <button class="btn primary sm" data-href="dashboard.html">Back to dashboard</button>
+      <button class="btn primary lead" id="toDash" data-href="dashboard.html">See my dashboard</button>
       <button class="btn ghost sm" id="again">Run another</button>
     </div>
 
@@ -165,4 +180,5 @@ html{background:#070A12}
   </div>
 </div>
 <script type="module" src="js/pages/test.js"></script>
+<script type="module" src="js/tour.js"></script>
 </body></html>

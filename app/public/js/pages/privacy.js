@@ -1,18 +1,44 @@
 // Privacy and data: every line on this page is read from the store, and every control writes to it.
 import { boot, bind, $, $$, esc, go, toast, download, AI, Store } from '../shell.js';
 import { now, fmtDate, fmtTime, fmtWeekday, SCHEDULE } from '../engine.js';
-import { openSheet, paintSwitch } from './ui-sheet.js';
+import { openSheet, paintSwitch, pause, bringIntoView } from './ui-sheet.js';
 
 const { facts } = await boot({ need: 'plan' });
 const S = () => Store.get();
 const when = (t) => `${fmtWeekday(t)}, ${fmtDate(t)} at ${fmtTime(t)}`;
 const plural = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
 const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>';
+const CROSS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>';
+const DISK_CHARS = 200;
 const WARN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 6v7M12 17v.5"/></svg>';
+const kv = (k, v) => `<div class="kv"><span class="k">${esc(k)}</span><span class="v">${esc(v == null || v === '' ? 'None' : v)}</span></div>`;
 const isPaused = () => { const p = S().settings && S().settings.pausedUntil; return !!p && new Date(p) > now(S()); };
 // All messages across saved conversations (the chat page stores them in state.chats).
 const allMsgs = () => (S().chats || []).flatMap((c) => c.messages || []).concat(S().chat || []);
 const userMsgs = () => allMsgs().filter((m) => m.role === 'user').length;
+
+/** Security at a glance: five lines, each worked out from the store when the page is painted. */
+function glance() {
+  const st = S(), enc = Store.isEncrypted(), sent = (st.sent || []).length, set = st.settings || {};
+  const method = st.user && st.user.method;
+  const consentAt = st.consent && st.consent.at;
+  const aiOn = set.aiAnalyze !== false;
+  return [
+    { key: 'consent', title: 'Consent recorded', kind: consentAt ? 'ok' : 'warn', word: consentAt ? 'Yes' : st.consent ? 'No date' : 'No',
+      detail: consentAt ? `${fmtDate(consentAt)} at ${fmtTime(consentAt)}${st.consent.viaSample ? ', with the sample data' : ''}` : 'No consent date is stored.' },
+    { key: 'encrypted', title: 'Encrypted on this device', kind: enc ? 'ok' : 'warn', word: enc ? 'Yes' : 'No',
+      detail: enc ? 'AES-GCM, 256-bit key held by this browser' : 'This browser does not offer the encryption tools.' },
+    { key: 'signin', title: 'Sign-in without a password', kind: method === 'code' || method === 'passkey' ? 'ok' : 'warn',
+      word: method === 'code' ? 'Email code' : method === 'passkey' ? 'Passkey' : method === 'sample' ? 'Demo sign-in' : 'Not known',
+      detail: method === 'sample' ? 'Sample data was loaded without signing in. No password exists.' : method === 'code' || method === 'passkey' ? 'No password is stored, so none can leak.' : 'The sign-in method was not recorded.' },
+    { key: 'sent', title: 'Nothing sent without approval', kind: 'ok', word: sent ? `${sent} sent` : 'Nothing sent',
+      detail: sent ? `${plural(sent, 'report')} left, each one after you approved it.` : 'No report has left this device.' },
+    { key: 'ai', title: 'Proof AI under your control', kind: aiOn ? 'ok' : 'off', word: aiOn ? 'On' : 'Off',
+      detail: aiOn ? 'You can switch it off below.' : 'It reads nothing until you switch it on.' },
+  ];
+}
+const glanceHTML = () => glance().map((g) => `<li class="${g.kind === 'ok' ? '' : g.kind}" data-glance="${g.key}"><span class="gt">${esc(g.title)}</span><span class="gw"><i>${g.kind === 'ok' ? CHECK : g.kind === 'warn' ? WARN : ''}</i><span data-word>${esc(g.word)}</span></span><span class="gd">${esc(g.detail)}</span></li>`).join('');
+window.WF_PRIVACY = { glance };
 
 function paint() {
   const st = S(), enc = Store.isEncrypted(), sent = st.sent || [], set = st.settings || {};
@@ -27,9 +53,11 @@ function paint() {
     encBadge: enc ? 'Encrypted on this device' : 'Stored on this device',
     statusLine: `Checked just now, ${fmtTime(new Date())}. ${sent.length ? `${plural(sent.length, 'report')} left through your own email app, the last on ${when(lastSent.at)}.` : 'Nothing has left your account.'}`,
     checksHtml: chk(enc, enc ? 'Encrypted on this device' : 'Not encrypted: this browser does not offer the encryption tools') + chk(true, signin) + chk(true, 'Kept in this browser only, not on a Wi-Fight server'),
-    disk: Store.rawOnDisk().slice(0, 160) + (Store.rawOnDisk().length > 160 ? '…' : ''),
-    diskCap: enc ? 'This is what is saved in your browser. It is encrypted with AES-GCM, so it cannot be read without the key held by this browser.' : 'This is what is saved in your browser. It is not encrypted, because this browser does not offer the encryption tools.',
-    diskSize: `First 160 of ${Store.rawOnDisk().length.toLocaleString('en-US')} characters`,
+    glanceHtml: glanceHTML(),
+    plainHtml: kv('First name', st.user && st.user.name) + kv('Plan', st.plan && st.plan.name) + kv('Speed tests', String((st.tests || []).length)),
+    disk: Store.rawOnDisk().slice(0, DISK_CHARS),
+    diskCap: enc ? 'The same data, as it sits on this device. It is encrypted with AES-GCM, so it cannot be read without the key held by this browser.' : 'This is what is saved in your browser. It is not encrypted, because this browser does not offer the encryption tools.',
+    diskSize: `First ${Math.min(DISK_CHARS, Store.rawOnDisk().length)} of ${Store.rawOnDisk().length.toLocaleString('en-US')} characters`,
     testsSub: !set.scheduled ? 'Scheduled tests are off.' : isPaused() ? `Paused until ${when(set.pausedUntil)}.` : `${SCHEDULE.length} tests a day. Next test ${facts.nextTest.paused ? 'when the pause ends' : facts.nextTest.label}.`,
     cTests: (st.tests || []).length, cPlan: st.plan ? 1 : 0, cBill: st.bill ? 1 : 0, cChat: userMsgs(), cAcct: st.user ? 1 : 0,
     dlNote: `One file with all ${plural((st.tests || []).length, 'result')} and your plan.`,
@@ -47,6 +75,7 @@ function paint() {
   $('#pause').hidden = paused; $('#resume').hidden = !paused;
   $('#pausenote').textContent = paused ? `Paused until ${when(set.pausedUntil)}` : 'Need a break? Tests start again on their own.';
   $('#pausenote').classList.toggle('strong', paused);
+  if (!$('#finds').hidden) searchDisk();   // the saved text changes with every save, so search it again
 }
 
 /* ---------- switches: saved the moment they change ---------- */
@@ -59,7 +88,6 @@ $('#pause').onclick = async () => { const until = new Date(now(S()).getTime() + 
 $('#resume').onclick = async () => { await Store.update((s) => { s.settings = { ...(s.settings || {}), pausedUntil: null }; }); paint(); toast('Tests resumed'); };
 
 /* ---------- what we hold: View sheets ---------- */
-const kv = (k, v) => `<div class="kv"><span class="k">${esc(k)}</span><span class="v">${esc(v == null || v === '' ? 'None' : v)}</span></div>`;
 const done = '<button class="btn sm" data-close style="width:100%;margin-top:16px">Done</button>';
 const LOC = { normal: 'Regular', near: 'Near router', far: 'Far room' };
 const SRC = { mlab: 'M-Lab', practice: 'Practice', sample: 'Sample' };
@@ -100,6 +128,32 @@ $('#withdraw').onclick = () => {
     <p class="body" style="margin:8px 0 16px">No test of any kind can run without your consent, so all speed tests stop. Your stored results stay on this device until you delete them. You can agree again later.</p>
     <div class="col gap8"><button class="btn" id="withdraw-yes">Withdraw consent</button><button class="btn ghost" data-close>Cancel</button></div>`);
   $('#withdraw-yes', w).onclick = async () => { await Store.update((s) => { s.consent = null; }); go('onboarding-consent.html'); };
+};
+
+/* ---------- search what is really saved for the user's own details ---------- */
+function searchDisk() {
+  const st = S(), raw = Store.rawOnDisk(), enc = Store.isEncrypted();
+  const terms = [['first name', st.user && st.user.name], ['email', st.user && st.user.email], ['plan name', st.plan && st.plan.name]];
+  const rows = terms.map(([label, value]) => {
+    const text = String(value || '').trim();
+    return { label, text, found: text ? raw.includes(text) : null };
+  });
+  $('#finds').innerHTML = rows.map((r) => `<li class="${r.found == null ? 'na' : r.found ? 'hit' : ''}" data-find="${esc(r.label)}" data-found="${r.found == null ? 'na' : r.found}"><span>Your ${esc(r.label)}${r.text ? `, <b>${esc(r.text)}</b>` : ''}</span><strong>${r.found == null ? 'Nothing stored to search for' : `<i>${r.found ? CROSS : CHECK}</i>${r.found ? 'Found' : 'Not found'}`}</strong></li>`).join('');
+  $('#finds').hidden = false;
+  const hits = rows.filter((r) => r.found).length;
+  $('#findnote').textContent = `Searched all ${raw.length.toLocaleString('en-US')} saved characters. ${hits ? (enc ? 'A match in encrypted data is a chance run of the same letters.' : 'The data is not encrypted, so it can be read.') : 'Your details are in there, but only as scrambled text.'}`;
+  return rows;
+}
+$('#find').onclick = searchDisk;
+
+/* ---------- guided demo shortcut ---------- */
+window.wfDemoFill = async () => {
+  const d = $('#disk');
+  await bringIntoView(d, 600);
+  d.open = true;
+  await bringIntoView(d, 900);
+  $('#find').click();
+  await bringIntoView($('#finds'), 600);
 };
 
 paint();

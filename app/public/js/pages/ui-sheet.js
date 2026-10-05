@@ -30,3 +30,12 @@ export async function copyText(text) {
     const ok = document.execCommand('copy'); ta.remove(); return ok;
   } catch { return false; }
 }
+
+/** Guided demo helpers: a short pause, and a smooth scroll that keeps tall blocks at the top and small ones centred. */
+export const pause = (ms) => new Promise((res) => setTimeout(res, ms));
+export async function bringIntoView(el, wait = 600) {
+  if (!el) return;
+  const tall = el.getBoundingClientRect().height > window.innerHeight * 0.6;
+  el.scrollIntoView({ behavior: 'smooth', block: tall ? 'start' : 'center' });
+  await pause(wait);
+}

@@ -27,4 +27,19 @@ agree.addEventListener('click', async () => {
   await Store.update((s) => { s.consent = { mlab: true, ai: aiOk, at: new Date().toISOString() }; s.settings = { ...s.settings, aiAnalyze: aiOk }; });
   go('onboarding-signin.html');
 });
+
+// Guided demo shortcut ("Do it for me"): the same clicks a person would make, with pauses so people can follow.
+const pause = (ms) => new Promise((r) => setTimeout(r, ms));
+let filling = false;
+window.wfDemoFill = async () => {
+  if (filling) return; filling = true;
+  try {
+    mlab.closest('label').scrollIntoView({ block: 'center', behavior: 'smooth' }); await pause(500);
+    if (!mlab.checked) { mlab.click(); await pause(750); }
+    if (!ai.checked) { ai.click(); await pause(750); }
+    agree.scrollIntoView({ block: 'center', behavior: 'smooth' }); await pause(450);
+    if (!agree.disabled) agree.click();
+    await pause(1500);
+  } finally { filling = false; }
+};
 document.documentElement.dataset.ready = '1';

@@ -4,7 +4,7 @@
 // Conversations are saved in state.chats, inside the encrypted store.
 import { boot, $, $$, esc, toast, closeSheet, AI, Store } from '../shell.js';
 import { fmtTime, fmtDate } from '../engine.js';
-import { openSheet, switchHTML, copyText } from './ui-sheet.js';
+import { openSheet, switchHTML, copyText, pause } from './ui-sheet.js';
 
 const { facts, ai: status } = await boot({ need: 'plan' });
 const S = () => Store.get();
@@ -71,8 +71,11 @@ async function persist(conv) {
     s.chats = Array.isArray(s.chats) ? s.chats : [];
     const i = s.chats.findIndex((c) => c.id === conv.id);
     if (i >= 0) s.chats[i] = copy; else s.chats.push(copy);
+    if (cur === conv) s.chatCurrent = conv.id;
   });
 }
+/** Remember which conversation is on screen, so leaving the page and coming back shows the same one. */
+async function remember(id) { if ((S().chatCurrent || null) !== (id || null)) await Store.update((s) => { s.chatCurrent = id || null; }); }
 const setUrl = (id) => history.replaceState(null, '', id ? `${location.pathname}?c=${encodeURIComponent(id)}` : location.pathname);
 
 /* ---------- words built from the user's real situation ---------- */
@@ -341,6 +344,7 @@ async function newChat() {
   await settle();
   cur = fresh(); failed = null; confirmId = null; stick = true;
   setUrl(null); closeSheet(); render();
+  await remember(null);
   if (window.matchMedia('(min-width:721px)').matches && aiOn()) input.focus({ preventScroll: true });
 }
 async function openChat(id) {
@@ -349,10 +353,11 @@ async function openChat(id) {
   const c = saved().find((x) => x.id === id); if (!c) return;
   cur = JSON.parse(JSON.stringify(c)); failed = null; confirmId = null; stick = true;
   setUrl(cur.id); closeSheet(); render();
+  await remember(cur.id);
 }
 async function deleteChat(id) {
   if (busy && busy.conv.id === id) await settle();
-  await Store.update((s) => { s.chats = (s.chats || []).filter((c) => c.id !== id); });
+  await Store.update((s) => { s.chats = (s.chats || []).filter((c) => c.id !== id); if (s.chatCurrent === id) s.chatCurrent = null; });
   confirmId = null;
   if (cur.id === id) { cur = fresh(); failed = null; stick = true; setUrl(null); render(); }
   else paintList();
@@ -407,9 +412,31 @@ $('#eyebrow').textContent = H ? `Ask Proof AI · Day ${facts.dayNumber} of ${fac
 await migrate();
 const params = new URLSearchParams(location.search);
 const q0 = params.get('q'), c0 = params.get('c');
-const found = !q0 && c0 ? saved().find((c) => c.id === c0) : null;
-if (found) cur = JSON.parse(JSON.stringify(found)); else setUrl(null); // also removes ?q so a reload does not ask twice
+// With no chat named in the address, reopen the conversation that was on screen last time.
+const want = q0 ? null : c0 || S().chatCurrent || null;
+const found = want ? saved().find((c) => c.id === want) : null;
+if (found) { cur = JSON.parse(JSON.stringify(found)); setUrl(cur.id); } else setUrl(null); // also removes ?q so a reload does not ask twice
 grow(); render();
+if (found && c0) await remember(cur.id);
 window.addEventListener('resize', () => { if (stick) toBottom(); paintJump(); });
 if (q0 && aiOn()) send(q0);
+
+/* ---------- guided demo shortcut: a new chat, the question typed out, and a real answer ---------- */
+const DEMO_Q = 'Why is my internet slow at night?';
+let demoing = false;
+window.wfDemoFill = async () => {
+  if (demoing) return;
+  if (!aiOn()) { toast('Proof AI is off. Turn it on to ask.'); return; }   // the demo never switches it on by itself
+  demoing = true;
+  try {
+    await newChat();
+    await pause(500);
+    input.value = '';
+    for (const ch of DEMO_Q) { input.value += ch; input.dispatchEvent(new Event('input', { bubbles: true })); await pause(28); }
+    await pause(450);
+    sendBtn.click();
+    const reply = pending;
+    if (reply) await Promise.race([reply, pause(60000)]);
+  } finally { demoing = false; }
+};
 document.documentElement.dataset.chat = '1';

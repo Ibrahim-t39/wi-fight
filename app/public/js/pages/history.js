@@ -46,8 +46,50 @@ if (!facts.headline) {
     const m = $('#marks'); m.style.gridTemplateColumns = `repeat(${days.length},minmax(0,1fr))`; m.innerHTML = marks;
     $$('[data-range]').forEach((c) => c.classList.toggle('on', Number(c.dataset.range) === n));
   };
-  $$('[data-range]').forEach((c) => { c.style.cursor = 'pointer'; c.onclick = () => draw(Number(c.dataset.range)); });
+  let range = 14;
+  $$('[data-range]').forEach((c) => { c.style.cursor = 'pointer'; c.onclick = () => { range = Number(c.dataset.range); showRun++; draw(range); }; });
   draw(14);
+
+  // ----- show what Proof AI ignored -----
+  // Each ignored dip is drawn inside its own day at its real height (dip speed over plan speed),
+  // dropping from that day's median, then marked as ignored. The day's bar never moves.
+  let showRun = 0;
+  const reduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+  const showIgnored = async () => {
+    const id = ++showRun;
+    const inView = () => (range === 14 ? facts.days : facts.days.filter((d) => !d.future).slice(-7));
+    // If a dip's day is not on screen, switch to the full 14 days first.
+    if (facts.ignored.some((x) => !inView().some((d) => d.day === x.day))) range = 14;
+    draw(range);
+    const days = inView(), bars = $$('#bars .bar'), still = reduced();
+    if (!still) { $('#bars').scrollIntoView({ block: 'center', behavior: 'smooth' }); await wait(450); if (id !== showRun) return; }
+    const pctOf = (mbps) => Math.max(0, Math.min(100, (mbps / facts.plan.down) * 100)).toFixed(1);
+    const marks = [];
+    for (const x of facts.ignored.slice().sort((a, b) => new Date(a.t) - new Date(b.t))) {
+      const i = days.findIndex((d) => d.day === x.day); if (i < 0 || !bars[i]) continue;
+      const day = days[i];
+      const m = document.createElement('div');
+      m.className = 'dipmark'; m.dataset.day = x.day; m.dataset.down = x.down;
+      m.title = `${x.when}: ${x.down} Mbps, ignored as a one-off dip. Day ${day.day} median stayed ${day.median} Mbps.`;
+      m.innerHTML = `<span><b>${x.down}</b><em>ignored</em></span>`;
+      m.style.bottom = `${still || day.median == null ? pctOf(x.down) : pctOf(day.median)}%`;
+      bars[i].appendChild(m);
+      marks.push(m);
+      if (still) { m.classList.add('in', 'ignored'); continue; }
+      void m.offsetWidth;
+      m.classList.add('in'); m.style.bottom = `${pctOf(x.down)}%`;
+      await wait(550); if (id !== showRun) return;
+    }
+    if (still) return;
+    await wait(1100); if (id !== showRun) return;
+    for (const m of marks) { m.classList.add('ignored'); await wait(350); if (id !== showRun) return; }
+    await wait(400);
+  };
+  const showBtn = $('#showIgnored');
+  showBtn.hidden = !facts.ignored.length;
+  showBtn.onclick = () => showIgnored();
+  if (facts.ignored.length) window.wfDemoFill = showIgnored;
 
   // ----- Proof AI: kept and ignored -----
   const ign = facts.ignored;

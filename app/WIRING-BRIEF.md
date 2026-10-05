@@ -46,3 +46,15 @@ The server now picks a model in this order: Claude (when a key is set), a model 
 - `AI.resetStatus()`.
 The store has a new `chats` array for saved conversations.
 A local answer takes about 10 seconds and streams as it is written. Tests that wait for a full model answer should allow 90 seconds.
+
+## Update: demo readiness round
+
+The goal of this round: an in-class demo that is quick, easy to follow, and cannot get stuck, with clear "wow" moments for AI and for cybersecurity. Not dumbed down: everything shown must still be real.
+
+New shared pieces (read them, do not edit them):
+- `public/js/tour.js`: the guided demo bar, loaded on every page. It shows a "Do it for me" button whenever the page defines `window.wfDemoFill = async () => { ... }`. That function must perform the page's key demo action through the page's own real code paths (the same handlers a click would run), with short pauses so the audience can follow (about 400 to 900 ms between visible steps). It must be safe to call twice. It must never run a real M-Lab speed test, send anything, or open an email app.
+- `public/samples/`: fictional sample documents. `manifest.json` lists two bills (`northstar-bill.png`, `pinecrest-bill.png`) with their known `fields`, their `planId`, and `regions` (percent boxes for each line: `plan`, `totalTop`, `planPrice`, `equipment`, `fee0`, `fee1`, `total`, `promo`), plus `northstar-label.png`. Regenerate with `tools/make-samples.py` only if you must; prefer not to.
+- `AI.readBill(dataUrl, known)`: pass the manifest `fields` as `known` when the photo is a bundled sample. With a language model connected, the model really reads the image (the local model reads both sample bills correctly in about 6 seconds). With none, the known values are returned and labelled.
+- Any element with the attribute `data-tour-start` opens the guided demo's start dialog.
+
+The server is running at http://localhost:4810 with a real local model (`gemma3:4b`). Do not stop or restart it.

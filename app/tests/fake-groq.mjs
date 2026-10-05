@@ -2,6 +2,7 @@
 // Run: node tests/fake-groq.mjs   (listens on 4899). It checks the Authorization header like the real service.
 import http from 'node:http';
 http.createServer((req, res) => {
+  if (req.method === 'GET' && req.url.endsWith('/models')) { res.writeHead(200, { 'Content-Type': 'application/json' }); return res.end(JSON.stringify({ data: [{ id: 'whisper-large-v3' }, { id: 'openai/gpt-oss-120b' }, { id: 'meta-llama/llama-4-maverick-17b-128e-instruct' }, { id: 'meta-llama/llama-guard-4-12b' }] })); }
   let raw = ''; req.on('data', (c) => (raw += c)); req.on('end', () => {
     if (req.headers.authorization !== 'Bearer test-key') { res.writeHead(401, { 'Content-Type': 'application/json' }); return res.end(JSON.stringify({ error: { message: 'Invalid API Key' } })); }
     const b = JSON.parse(raw || '{}');

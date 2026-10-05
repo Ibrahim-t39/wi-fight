@@ -227,6 +227,30 @@ a{text-decoration:none}
   .cta .btn{width:100%}
   .foot{flex-direction:column;align-items:flex-start;padding:28px 0 36px}
 }
+/* ---------- guided demo call to action and the "What you will see" strip ---------- */
+.hero-cta{align-items:center}
+.hero-cta .how{font:600 15px var(--body);color:var(--ink-2);padding:0 8px;text-decoration:underline;text-underline-offset:4px;text-decoration-color:rgba(255,255,255,.25)}
+.hero-cta .how:hover{color:var(--ink)}
+.btn svg.play{width:16px;height:16px}
+.see{position:relative;z-index:1;padding:6px 0 44px}
+.see-title{font:600 11px/1 var(--body);letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3);text-align:center;margin-bottom:14px}
+.see-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.see-card{display:flex;gap:14px;align-items:flex-start;padding:16px 18px;border-radius:20px;background:rgba(255,255,255,.05);border:1px solid var(--line);color:var(--ink);transition:border-color .15s,background .15s}
+.see-card:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.28)}
+.see-card .ic{width:38px;height:38px;border-radius:12px;flex:none;display:grid;place-items:center;background:rgba(39,71,245,.28);color:#B8C4FF}
+.see-card .ic svg{width:19px;height:19px}
+.see-card.ai .ic{background:var(--ai-grad);color:#fff}
+.see-card.sec .ic{background:var(--good-bg);color:var(--good)}
+.see-card b{display:block;font:700 16px/1.25 var(--body)}
+.see-card span.d{display:block;font:500 13.5px/1.42 var(--body);color:var(--ink-2);margin-top:3px}
+.see-card .go{margin-left:auto;flex:none;align-self:center;color:var(--ink-3)}
+.see-card .go svg{width:16px;height:16px;display:block}
+.cta-btns{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:10px}
+.cta-btns .btn{margin-top:0}
+.cta .btn.alt{background:rgba(255,255,255,.12);color:#fff;border:1.5px solid rgba(255,255,255,.55)}
+@media (min-width:1101px){.hero-grid{padding-bottom:64px}}
+@media (max-width:980px){.see-grid{grid-template-columns:1fr;gap:8px}.see-card{padding:13px 14px;border-radius:18px}.see{padding-bottom:32px}}
+@media (max-width:720px){.hero-cta .how{align-self:center;padding:4px 8px}.cta-btns{flex-direction:column;width:100%}}
 </style></head><body>
 
 <!-- ================= HERO (dark, immersive) ================= -->
@@ -246,7 +270,8 @@ a{text-decoration:none}
         <p class="hero-sub">Wi-Fight tests your speed for two weeks, compares it to what your provider promised, and gives you proof.</p>
         <div class="hero-cta">
           <a class="btn primary" data-cta href="onboarding-consent.html">Start your two-week check</a>
-          <a class="btn ghost" href="#how">See how it works</a>
+          <button type="button" class="btn ghost" data-tour-start><svg class="play" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13a1 1 0 0 0 1.500.860l11-6.500a1 1 0 0 0 0-1.720l-11-6.500A1 1 0 0 0 8 5.500z"/></svg>Start the guided demo</button>
+          <a class="how" href="#how">See how it works</a>
         </div>
       </div>
 
@@ -288,6 +313,15 @@ a{text-decoration:none}
     <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2.500"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Encrypted</span>
     <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4.500 6v6c0 4.500 3.200 7.600 7.500 9 4.300-1.400 7.500-4.500 7.500-9V6z"/><path d="m9 12 2 2 4-4"/></svg>You approve everything</span>
   </div></div></div>
+
+  <div class="see" id="see"><div class="wrap">
+    <div class="see-title">What you will see</div>
+    <div class="see-grid">
+      <a class="see-card ai" href="#ai"><span class="ic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.900 5.600a3 3 0 0 0 1.900 1.900L21.400 11.400l-5.600 1.900a3 3 0 0 0-1.900 1.900L12 20.800l-1.900-5.600a3 3 0 0 0-1.900-1.900L2.600 11.400l5.600-1.900a3 3 0 0 0 1.900-1.900z"/></svg></span><span><b>Proof AI</b><span class="d">Reads your bill, spots real problems, and answers your questions.</span></span><span class="go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M6 13l6 6 6-6"/></svg></span></a>
+      <a class="see-card sec" href="#privacy"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2.500"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span><span><b>Security you can see</b><span class="d">Consent first, encrypted on your device, nothing sent without your approval.</span></span><span class="go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M6 13l6 6 6-6"/></svg></span></a>
+      <a class="see-card" href="#goal"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.800 3 2.800 15 0 18M12 3c-2.800 3-2.800 15 0 18"/></svg></span><span><b>UN Goal 9</b><span class="d">Affordable internet only counts if you get what you pay for.</span></span><span class="go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M6 13l6 6 6-6"/></svg></span></a>
+    </div>
+  </div></div>
 </section>
 
 <!-- ================= THE GAP ================= -->
@@ -514,7 +548,7 @@ a{text-decoration:none}
 </section>
 
 <!-- ================= WHY IT MATTERS ================= -->
-<section class="sec" style="padding-bottom:0">
+<section class="sec" id="goal" style="padding-bottom:0">
   <div class="wrap">
     <div class="card sdg">
       <div class="nine"><b>9</b><span>UN Goal</span></div>
@@ -533,7 +567,10 @@ a{text-decoration:none}
     <div class="cta">
       <h2>Find out in two weeks.</h2>
       <p>Four quick tests a day. One clear answer. A report you approve before it goes anywhere.</p>
-      <a class="btn" data-cta href="onboarding-consent.html">Start your two-week check</a>
+      <div class="cta-btns">
+        <a class="btn" data-cta href="onboarding-consent.html">Start your two-week check</a>
+        <button type="button" class="btn alt" data-tour-start><svg class="play" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13a1 1 0 0 0 1.500.860l11-6.500a1 1 0 0 0 0-1.720l-11-6.500A1 1 0 0 0 8 5.500z"/></svg>Start the guided demo</button>
+      </div>
       <small>Consent first. Delete everything in one tap.</small>
     </div>
     <footer class="foot">
@@ -544,4 +581,5 @@ a{text-decoration:none}
   </div>
 </section>
 <script type="module" src="js/pages/index.js"></script>
+<script type="module" src="js/tour.js"></script>
 </body></html>

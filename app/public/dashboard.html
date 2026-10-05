@@ -13,6 +13,21 @@
 .half{grid-column:span 6;justify-content:center;padding:20px}
 .half .statnum{font-size:40px}
 @media (max-width:720px){.scorebody{flex-direction:column;align-items:stretch !important}.ringwrap{margin:0 auto}}
+/* How Proof AI got here: four steps, each with a real number from the engine */
+.pipe{display:flex;flex-direction:column;gap:8px}
+.pipe-steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.pstep{display:flex;flex-direction:column;gap:3px;padding:10px 12px;border-radius:14px;background:var(--surface-2);border:1px solid var(--line);text-decoration:none;color:var(--ink-2);font:600 12.5px/1.3 var(--body);opacity:0;transform:translateY(8px);transition:opacity .3s,transform .3s cubic-bezier(.2,.9,.3,1.2),border-color .2s}
+.pstep.in{opacity:1;transform:none}
+.pstep:hover,.pstep:focus-visible{border-color:var(--cobalt);outline:none}
+.pstep .k{display:flex;align-items:center;gap:6px;font:700 10.5px/1 var(--body);letter-spacing:.07em;color:var(--ink-3)}
+.pstep .k svg{width:13px;height:13px;color:var(--good);flex:none}
+.pstep b{font:700 17px/1 var(--display);color:var(--ink);font-variant-numeric:tabular-nums}
+.pstep small{font:500 11.5px/1.3 var(--body);color:var(--ink-3)}
+.aibody{display:flex;flex-direction:column;gap:16px;transition:opacity .35s}
+.aibody.wait .reasons,.aibody.wait .aichips{visibility:hidden}
+.aibody.wait .ai-text{color:var(--ink-3)}
+@media (max-width:720px){.pipe-steps{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (prefers-reduced-motion:reduce){.pstep,.aibody{transition:none}}
 </style></head><body>
 <div class="app">
   <aside class="sidebar">
@@ -72,9 +87,15 @@
           <span class="ai-tag"><svg viewBox="0 0 24 24" fill="#8B5CF6"><path d="M12 2l1.900 5.600a3 3 0 0 0 1.900 1.900L21.400 11.400l-5.600 1.900a3 3 0 0 0-1.900 1.900L12 20.800l-1.900-5.600a3 3 0 0 0-1.900-1.900L2.600 11.400l5.600-1.900a3 3 0 0 0 1.900-1.900z"/></svg>PROOF AI · WHAT THIS MEANS</span>
           <span class="ai-meta" data-b="aiMeta"></span>
         </div>
-        <p class="ai-text" style="font-size:19px" data-b="aiSentenceHtml">Proof AI is reading your results.</p>
-        <div class="reasons" data-b="aiReasonsHtml"></div>
-        <div class="row gap8" style="flex-wrap:wrap" data-b="aiChipsHtml"></div>
+        <div class="pipe" id="pipe" hidden>
+          <div class="eyebrow">How Proof AI got here</div>
+          <div class="pipe-steps" id="pipeSteps"></div>
+        </div>
+        <div class="aibody wait" id="aiBody">
+          <p class="ai-text" style="font-size:19px" data-b="aiSentenceHtml" id="aiSentence">Proof AI is reading your results.</p>
+          <div class="reasons" data-b="aiReasonsHtml"></div>
+          <div class="row gap8 aichips" style="flex-wrap:wrap" data-b="aiChipsHtml"></div>
+        </div>
         <div class="row gap12" style="flex-wrap:wrap">
           <button class="btn sm" data-href="diagnosis.html">See the evidence</button><button class="btn ghost sm" data-href="chat.html">Ask Proof AI</button>
           <span class="ai-note grow" style="min-width:160px" data-b="aiNote"></span>
@@ -102,7 +123,7 @@
       </section>
 
       <!-- PROMISED VS GOT -->
-      <section class="card span-5 col gap12">
+      <section class="card span-5 col gap12" id="labelCard">
         <div><div class="h3">Promised vs. what you got</div><div class="small">Your plan's label beside your own measurements</div></div>
         <div id="label"></div>
       </section>
@@ -125,4 +146,5 @@
   <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg>Report</div>
 </nav>
 <script type="module" src="js/pages/dashboard.js"></script>
+<script type="module" src="js/tour.js"></script>
 </body></html>

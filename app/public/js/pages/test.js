@@ -16,6 +16,10 @@ const q = new URLSearchParams(location.search).get('location');
 let where = q === 'near' || q === 'far' ? q : 'normal';
 let cancelled = false;
 let running = false;
+let runToken = 0;        // each run gets a number, so an abandoned run can never save a result later
+let current = null;      // the promise of the run in progress
+let realFailed = false;  // the real test did not run in this visit, so a practice test took its place
+const STALL_MS = 12000;  // a real test that shows no progress for this long gets the practice offer
 
 // ---------- header, marks ----------
 const regularCount = () => Store.get().tests.filter((t) => (t.location || 'normal') === 'normal').length;
@@ -104,10 +108,30 @@ function showReady() {
 $('#resume').onclick = async () => { await Store.update((s) => { s.settings = { ...(s.settings || {}), pausedUntil: null }; }); showReady(); };
 
 // ---------- running ----------
-async function run(practice) {
+// The notice for a real test that failed, stalled, or fell back. One button: run the practice test.
+function alertReal(title, text, offer = true) {
+  $('#fallbackTitle').textContent = title; $('#fallbackText').textContent = text;
+  $('#usePractice').hidden = !offer;
+  const box = $('#fallback'); box.hidden = false;
+  if (offer) box.scrollIntoView({ block: 'center', behavior: 'smooth' });
+}
+$('#usePractice').onclick = () => { running = false; current = run(true); };
+
+function run(practice) { current = runOnce(practice); return current; }
+async function runOnce(practice) {
   if (running || isPaused()) return;
   running = true; cancelled = false;
+  const token = ++runToken;
+  const stale = () => cancelled || token !== runToken;
   let phase = 'locate', fellBack = false, lastDown = 0;
+  $('#fallback').hidden = true;
+  // Watchdog for the real test only: no progress for a while means the network is probably blocking it.
+  let dog = null;
+  const pet = () => {
+    clearTimeout(dog);
+    if (!practice) dog = setTimeout(() => { if (!stale() && running) { realFailed = true; alertReal('The real test is not getting through', 'This network may be blocking it. Nothing has been measured yet. You can keep waiting, or switch now.'); } }, STALL_MS);
+  };
+  pet();
   $('#ready').hidden = true; $('#cancel').hidden = false; $('#livedot').hidden = false;
   $('#big').classList.remove('idle'); $('#big').textContent = '0';
   $('#cap').textContent = 'Mbps download';
@@ -120,7 +144,8 @@ async function run(practice) {
   drawTitle();
   const cb = {
     onPhase(p) {
-      if (cancelled) return;
+      if (stale()) return;
+      pet(); if (!fellBack) $('#fallback').hidden = true;
       phase = p;
       $('#statusWord').textContent = PHASES[p] || '';
       if (p === 'download') { $('#cap').textContent = 'Mbps download'; }
@@ -131,7 +156,8 @@ async function run(practice) {
       }
     },
     onDown(v) {
-      if (cancelled) return;
+      if (stale()) return;
+      pet(); if (!practice && !fellBack) realFailed = false;
       lastDown = v;
       $('#big').textContent = Math.round(v);
       ring('work', v);
@@ -139,35 +165,56 @@ async function run(practice) {
       $('#ringsvg').setAttribute('aria-label', `${Math.round(v)} Mbps download so far, out of a ${plan.down} Mbps plan`);
     },
     onUp(v) {
-      if (cancelled) return;
+      if (stale()) return;
+      pet();
       $('#big').textContent = Math.round(v);
       slot('Up', numHTML(v, 'Mbps'), '<span class="dot"></span>Live', 'now');
     },
     onServer() {},
     onFallback() {
-      fellBack = true;
-      $('#fallback').hidden = false;
+      if (stale()) return;
+      fellBack = true; realFailed = true;
+      alertReal('The real test could not run here', 'A practice test is running in its place. It is not a real measurement.', false);
       $('#foot').textContent = 'Practice test. Nothing is sent to M-Lab and nothing is published.';
     },
   };
   let r;
   try {
     // Real path: no practice flag, so the wrapper runs the M-Lab test. Practice path: { practice: true }.
-    r = practice ? await runSpeedTest(cb, { practice: true, location: where }) : await runSpeedTest(cb, { location: where });
+    // A failed real test stops here and says so, instead of quietly becoming a practice test.
+    r = practice ? await runSpeedTest(cb, { practice: true, location: where }) : await runSpeedTest(cb, { location: where, noFallback: true });
   } catch (e) {
+    clearTimeout(dog);
+    if (stale()) return;
     if (e instanceof ConsentError) { go('onboarding-consent.html'); return; }
     running = false;
     $('#cancel').hidden = true; $('#livedot').hidden = true;
     showReady();
-    $('#statusWord').textContent = 'The test could not run. Try again.';
+    $('#statusWord').textContent = practice ? 'The test could not run. Try again.' : 'The real test could not run';
+    if (!practice) { realFailed = true; alertReal('The real test could not run here', 'This network may be blocking M-Lab. Nothing was measured and nothing was saved. A practice test shows how the app works. It is not a real measurement.'); }
     return;
   }
-  if (cancelled) return;
-  await finish(r, fellBack);
+  clearTimeout(dog);
+  if (stale()) return;
+  await finish(r, fellBack || (practice && realFailed));
 }
 
 $('#start').onclick = () => run(false);
 $('#practice').onclick = () => run(true);
+// The guided demo's "Do it for me": always the practice test, never the real one. Waits until it has finished.
+// Safe to call twice: a run in progress is awaited, and a finished test is not run again.
+window.wfDemoFill = async () => {
+  if (!$('#actions').hidden) return;
+  const pause = (ms) => new Promise((r) => setTimeout(r, ms));
+  // A real test that is stuck: take the practice offer. Any other run in progress is simply awaited.
+  if (running) { if (!$('#fallback').hidden && !$('#usePractice').hidden) $('#usePractice').click(); await current; return; }
+  if (isPaused()) { $('#resume').click(); await pause(600); }
+  await pause(500);
+  $('#practice').click();
+  await current;
+};
+// While the guided demo is running, remind the presenter which button is safe.
+try { const tour = JSON.parse(localStorage.getItem('wf.tour.v1') || 'null'); $('#presenting').hidden = !(tour && tour.on); } catch { $('#presenting').hidden = true; }
 // Cancel leaves the page. Nothing is saved, because saving only happens in finish().
 $('#cancel').onclick = () => { cancelled = true; go('dashboard.html'); };
 
@@ -195,7 +242,8 @@ async function finish(r, fellBack) {
   r$.innerHTML = `<b>${saved.down} Mbps</b> is <b>${pct}% of your plan</b>, ${ok ? 'at or above' : 'below'} the fair line of ${f.fairLine} Mbps.${esc(place)}`;
   const isPractice = saved.source === 'practice';
   $('#practiceLabel').hidden = !isPractice;
-  $('#fallback').hidden = !fellBack;
+  if (fellBack && isPractice) alertReal('The real test could not run here', 'So this is a practice test, not a real measurement. It is saved and marked as practice.', false);
+  else $('#fallback').hidden = true;
   $('#foot').textContent = isPractice ? 'Practice result saved on this device and marked as practice. Nothing was sent to M-Lab.' : `Measured with M-Lab's open test${saved.server ? ', server in ' + saved.server : ''}. M-Lab publishes this result and your IP address.`;
 
   slot('Down', numHTML(saved.down, 'Mbps'), `${ok ? CHECK : ''}${pct}% of plan`, ok ? 'done' : 'bad');

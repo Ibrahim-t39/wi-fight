@@ -69,6 +69,8 @@
 .demo{padding:12px 14px;border-radius:14px;background:var(--warn-bg);border:1px solid rgba(199,119,0,.28);font:500 14px/1.45 var(--body);color:#4A3A12}
 .demo b{font:700 17px var(--display);letter-spacing:.08em;color:#2E2206;font-variant-numeric:tabular-nums}
 button.link{background:none;border:0;padding:0;font:inherit;font-weight:600;cursor:pointer}
+button.link.fillcode{align-self:flex-start;margin-top:-8px;font:600 13px var(--body);color:var(--ink-3);text-decoration:underline;text-underline-offset:3px}
+button.link.fillcode:hover{color:var(--cobalt)}
 button.btn.pill2{font-family:var(--body)}
 .otp .gap{margin-left:6px}
 .trust{display:flex;gap:12px;align-items:center;padding:14px 16px;border-radius:18px;background:var(--cobalt-50);border:1px solid var(--cobalt-100);font:600 15px/1.4 var(--body)}
@@ -130,6 +132,7 @@ button.btn.pill2{font-family:var(--body)}
         <section class="card col gap16" id="codecard" hidden>
           <div class="row between"><div class="moment"><span class="m">2</span><span class="h3">Enter your code</span></div><span class="badge good"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7"/></svg>Code ready</span></div>
           <div class="demo" id="demonote" role="status"></div>
+          <button type="button" class="link fillcode" id="fillcode">Fill the code for me</button>
           <p class="body">Enter the 6-digit code for <b style="color:var(--ink)" data-b="email"></b></p>
           <div class="otp" id="otp" role="group" aria-label="6-digit code"><input class="" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="1" aria-label="Digit 1 of 6"><input class="" type="text" inputmode="numeric" autocomplete="off" maxlength="1" aria-label="Digit 2 of 6"><input class="" type="text" inputmode="numeric" autocomplete="off" maxlength="1" aria-label="Digit 3 of 6"><input class="gap" type="text" inputmode="numeric" autocomplete="off" maxlength="1" aria-label="Digit 4 of 6"><input class="" type="text" inputmode="numeric" autocomplete="off" maxlength="1" aria-label="Digit 5 of 6"><input class="" type="text" inputmode="numeric" autocomplete="off" maxlength="1" aria-label="Digit 6 of 6"></div>
           <div class="err" id="codeerr" role="alert" hidden></div>
@@ -144,4 +147,5 @@ button.btn.pill2{font-family:var(--body)}
   </div>
 </div>
 <script type="module" src="js/pages/onboarding-signin.js"></script>
+<script type="module" src="js/tour.js"></script>
 </body></html>

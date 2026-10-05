@@ -114,6 +114,9 @@ button.quiet{background:none;border:0;cursor:pointer;padding:6px 2px}
 .sfnum{font-size:84px;line-height:.95}
 #sofar.isbad .sfnum{color:var(--bad)}#sofar.isgood .sfnum{color:var(--good)}
 @media (max-width:720px){.waithead{font-size:30px}.sfnum{font-size:64px}}
+/* guided demo: the block being talked about gets a ring for a moment */
+#reveal,.aiwrap,#sharecard,.waitcard{scroll-margin:16px 0;transition:box-shadow .3s}
+.beat{box-shadow:0 0 0 4px rgba(39,71,245,.55),0 0 0 10px rgba(39,71,245,.14) !important}
 </style></head><body>
 <div class="app">
   <aside class="sidebar">
@@ -316,4 +319,5 @@ button.quiet{background:none;border:0;cursor:pointer;padding:6px 2px}
   <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg>Report</div>
 </nav>
 <script type="module" src="js/pages/verdict.js"></script>
+<script type="module" src="js/tour.js"></script>
 </body></html>

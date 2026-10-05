@@ -84,6 +84,43 @@ async function verify() {
 }
 $('#verify').addEventListener('click', verify);
 
+// Presenter convenience: put the code shown in the notice into the six boxes, through the same input handlers as typing.
+const pause = (ms) => new Promise((r) => setTimeout(r, ms));
+async function typeCode(gap = 0) {
+  if (!pending) return false;
+  const code = pending.code;
+  boxes.forEach((b) => { b.value = ''; b.classList.remove('f'); });
+  for (let i = 0; i < 6; i++) {
+    boxes[i].focus(); boxes[i].value = code[i];
+    boxes[i].dispatchEvent(new Event('input', { bubbles: true }));
+    if (gap) await pause(gap);
+  }
+  return true;
+}
+$('#fillcode').addEventListener('click', () => typeCode(0));
+
+// Guided demo shortcut ("Do it for me"): type the email, ask for a code, enter it, verify. Nothing is sent anywhere.
+let filling = false;
+window.wfDemoFill = async () => {
+  if (filling) return; filling = true;
+  try {
+    if (!pending) {
+      const addr = 'jordan@example.com';
+      email.scrollIntoView({ block: 'center', behavior: 'smooth' }); email.focus(); email.value = '';
+      for (const ch of addr) { email.value += ch; email.dispatchEvent(new Event('input', { bubbles: true })); await pause(35); }
+      await pause(500);
+      $('#sendcode').click();
+      for (let i = 0; i < 40 && card.hidden; i++) await pause(50);
+      if (card.hidden || !pending) return;
+      await pause(800);
+    }
+    await typeCode(140);
+    await pause(600);
+    $('#verify').click();
+    await pause(1500);
+  } finally { filling = false; }
+};
+
 // Passkey: a real WebAuthn credential made by this device. No server checks it in this prototype.
 const b64url = (buf) => btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 $('#passkey').addEventListener('click', async () => {

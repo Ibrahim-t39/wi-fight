@@ -57,7 +57,7 @@ function wireNav(state, facts, ai) {
     if (foot) foot.innerHTML = `<span class="badge lock" style="align-self:flex-start"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2.500"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>${Store.isEncrypted() ? 'Encrypted on this device' : 'Stored on this device'}</span>
       <div class="small" style="color:var(--ink-2)">Nothing is sent without your approval.</div>
       <div class="small" data-ai-mode>${ai.provider === 'local' ? 'Proof AI: live, on this computer' : ai.live ? 'Proof AI: live (' + esc(ai.label || 'AI') + ')' : 'Proof AI: offline mode'}</div>
-      <button class="btn ghost sm" data-demo style="align-self:stretch">${ICON.flask}Demo data</button>`;
+      <button class="btn ghost sm" data-demo style="align-self:stretch">${ICON.flask}Demo</button>`;
   }
   // phone tab bar: Home, History, [Run test], Proof AI, More
   const bar = $('.tabbar');
@@ -97,7 +97,8 @@ export function openDemo() {
   const w = sheet(`<div class="h3">Demo data</div>
     <p class="small" style="margin:6px 0 14px;color:var(--ink-2)">A two-week check takes two weeks. For a demo, load a labelled sample so every page has results to show. Sample data is marked on every page.</p>
     <div class="col gap8">
-      <button class="btn primary" data-s="9">Load sample: day 9 of 14</button>
+      <button class="btn primary" data-tour-start>Start the guided demo</button>
+      <button class="btn" data-s="9">Load sample: day 9 of 14</button>
       <button class="btn" data-s="14">Load sample: finished check</button>
       <button class="btn ghost" data-s="0">Clear tests and start fresh</button>
     </div>`);

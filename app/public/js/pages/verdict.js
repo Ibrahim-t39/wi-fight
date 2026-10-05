@@ -1,12 +1,27 @@
 // Verdict page: the two-week result. Every number comes from facts (the engine) or recommend().
 import { boot, bind, $, esc, toast, badge, statusKind, barsHTML, xlabelsHTML, daysHTML, chipsHTML, reasonsHTML, labelHTML, AI } from '../shell.js';
 import { recommend, fmtDate } from '../engine.js';
+import { pause, bringIntoView } from './ui-sheet.js';
 
 const { state, facts } = await boot({ need: 'plan' });
 const plan = facts.plan;
 const H = facts.headline;
 const plural = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
 bind({ planHtml: `<b style="color:var(--ink)">${esc(plan.name)}</b> · $${esc(plan.price)} a month` });
+
+/* ---------- guided demo shortcut: three beats down the page ---------- */
+let demoing = false;
+window.wfDemoFill = async () => {
+  if (demoing) return;
+  demoing = true;
+  const beat = async (el, ms) => { if (!el) return; await bringIntoView(el, 500); el.classList.add('beat'); await pause(ms); el.classList.remove('beat'); };
+  try {
+    if (!facts.complete) { await beat($('.waitcard'), 1500); return; }
+    await beat($('#reveal'), 1900);
+    await beat($('.aiwrap'), 2400);
+    await beat($('#sharecard'), 1600);
+  } finally { demoing = false; }
+};
 
 if (!facts.complete) {
   // ---------- in progress ----------

@@ -74,8 +74,8 @@
 .aistep + .aistep{border-top:1px solid var(--line)}
 .aistep em{margin-left:auto;font:600 12px var(--body);font-style:normal;color:var(--good)}
 .aistep i{width:18px;height:18px;border-radius:50%;background:var(--good);color:#fff;display:grid;place-items:center}
-.scan{display:grid;grid-template-columns:136px 1fr;gap:18px;align-items:start}
-.billwrap{display:flex;flex-direction:column;gap:8px}
+.scan{display:grid;grid-template-columns:minmax(0,1fr);gap:16px;align-items:start}
+.billwrap{display:flex;flex-direction:column;gap:8px;min-width:0}
 .bill{background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px 11px;box-shadow:0 6px 16px rgba(11,15,26,.10);display:flex;flex-direction:column;gap:6px;transform:rotate(-1.500deg);aspect-ratio:3/4}
 .bill i{display:block;height:5px;border-radius:3px;background:#DADDE5}
 .bill .logo{width:26px;height:10px;background:#B9BECB;margin-bottom:5px}
@@ -130,16 +130,75 @@ button:focus-visible,.field:focus-within{outline:3px solid var(--cobalt-100);out
 @media (max-width:860px){
   .ways{grid-template-columns:1fr}
   .ai-card{padding:16px}
-  .scan{grid-template-columns:1fr}
-  .billwrap{flex-direction:row;align-items:center;gap:14px}
-  .bill{width:84px;flex:none;padding:8px 7px;gap:4px}.bill i{height:3px}.bill .logo{height:7px;width:18px}
-  .billcap{text-align:left;font-size:12px}
   .radio-card{padding:14px}
   .pm .sep{display:none}.pm .up{display:block}
   .fair .hidem{display:none}
   .aiactions .btn.primary{flex-basis:100%}.aiactions .btn.ghost{flex:1}
   .fair p{font-size:17px}
 }
+/* ---------- sample bills ---------- */
+.samples{display:flex;flex-direction:column;gap:10px;padding-top:16px;border-top:1px solid var(--line)}
+.samples-h b{display:block;font:700 15px/1.3 var(--body)}
+.samples-h span{display:block;font:500 13px/1.4 var(--body);color:var(--ink-3);margin-top:2px}
+.samples-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.scard{display:flex;flex-direction:column;border-radius:16px;border:1px solid var(--line);background:var(--surface);overflow:hidden}
+.scard .pic{display:block;height:132px;overflow:hidden;background:#fff;border-bottom:1px solid var(--line);position:relative}
+.scard .pic img{display:block;width:100%;height:auto}
+.scard .pic::after{content:"Fictional sample";position:absolute;left:8px;top:8px;padding:4px 7px;border-radius:999px;background:rgba(11,15,26,.78);color:#fff;font:700 10px/1 var(--body);letter-spacing:.04em;text-transform:uppercase}
+.scard .sb{display:flex;flex-direction:column;gap:4px;padding:12px;flex:1}
+.scard .small{color:var(--ink-2)}
+.scard .sa{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:auto;padding-top:8px;flex-wrap:wrap}
+.scard .dl{font:600 13px var(--body);color:var(--cobalt);text-decoration:underline;text-underline-offset:3px}
+/* ---------- the scan, large ---------- */
+#scan{scroll-margin-top:14px}
+.stage{position:relative;border-radius:12px;overflow:hidden;background:#fff;border:1px solid var(--line);box-shadow:0 10px 28px rgba(11,15,26,.14);line-height:0}
+.stage img{display:block;width:100%;height:auto;min-height:120px}
+.stage.up img{max-height:520px;object-fit:contain;background:var(--surface-2)}
+.scanline{position:absolute;left:0;right:0;top:0;height:22%;pointer-events:none;opacity:0;background:linear-gradient(180deg,transparent,rgba(139,92,246,.10) 55%,rgba(39,71,245,.28));border-bottom:2px solid #6C7BFF;box-shadow:0 8px 20px rgba(39,71,245,.35)}
+.stage.reading .scanline{opacity:1;animation:sweep 1.9s cubic-bezier(.45,0,.55,1) infinite}
+@keyframes sweep{0%{transform:translateY(-100%)}100%{transform:translateY(455%)}}
+.hbox{position:absolute;box-sizing:border-box;border:1.5px solid var(--cobalt);border-radius:6px;background:rgba(39,71,245,.07);box-shadow:0 0 0 2px rgba(39,71,245,.14);pointer-events:none;animation:boxin .45s cubic-bezier(.2,.9,.3,1.2) both}
+.hbox.junk{border-color:var(--warn);background:rgba(199,119,0,.11);box-shadow:0 0 0 2px rgba(199,119,0,.16)}
+.hbox.promo{border-style:dashed}
+.hbox .tg{position:absolute;right:17%;top:50%;transform:translateY(-50%);padding:3px 6px;border-radius:999px;background:var(--warn);color:#fff;font:700 9.5px/1 var(--body);white-space:nowrap}
+@keyframes boxin{from{opacity:0;transform:scale(1.07)}}
+.frow{transition:opacity .3s ease,transform .3s ease}
+.frow.hid{opacity:0;transform:translateY(8px);visibility:hidden}
+.frow.pop{animation:rowpop .8s ease}
+@keyframes rowpop{0%{box-shadow:0 0 0 4px var(--cobalt-100)}100%{box-shadow:0 0 0 4px transparent}}
+.frow .fv.txtv{font:600 14px/1.25 var(--body);white-space:normal;text-align:right;padding-right:6px}
+.chk{display:inline-flex;align-items:center;height:20px;padding:0 7px;border-radius:999px;background:var(--bad-bg);color:var(--bad);font:700 11px/1 var(--body);white-space:nowrap}
+.take{display:flex;align-items:center;gap:14px;min-height:52px}
+.frows:empty::before{content:"The values appear here, one at a time, as they are found.";display:block;padding:16px;border-radius:14px;border:1px dashed var(--line);background:var(--surface-2);font:500 13px/1.45 var(--body);color:var(--ink-3)}
+.take .tm{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px}
+.take .btn{flex:none}
+.match{display:flex;align-items:center;gap:7px;flex-wrap:wrap;font:600 13px/1.35 var(--body);color:var(--good)}
+.match.part{color:var(--warn)}
+.match svg{flex:none}
+.match span.q{font-weight:500;color:var(--ink-3)}
+.offnote{padding:10px 12px;border-radius:12px;background:var(--warn-bg);border:1px solid rgba(199,119,0,.28);font:600 13px/1.4 var(--body);color:#4A3A12}
+@media (min-width:1160px){
+  .ai-card.wide{width:min(820px,calc(62vw - 80px));align-self:center}
+  .ai-card.wide .scan{grid-template-columns:minmax(0,44%) minmax(0,1fr);gap:20px}
+  .ai-card.wide .take{min-height:78px}
+  .ai-card.wide .aisteps{flex-direction:row;padding:0 4px}
+  .ai-card.wide .aistep{flex:1;min-width:0;padding:0 10px;font-size:13px;white-space:nowrap}
+  .ai-card.wide .aistep + .aistep{border-top:0;border-left:1px solid var(--line)}
+}
+@media (max-width:1159px){
+  #aisteps,#scanErr{order:-2}.scan{order:-1}
+  .stage{width:100%;max-width:400px;margin:0 auto}
+  .take{flex-direction:column;align-items:stretch}
+}
+@media (max-width:860px){
+  #scan{scroll-margin-top:84px}
+  .stage{max-width:290px}
+  .billcap{font-size:12px}
+  .samples-grid{grid-template-columns:1fr}
+  .scard{flex-direction:row}.scard .pic{width:104px;height:auto;min-height:132px;flex:none;border-bottom:0;border-right:1px solid var(--line)}
+  .scard .pic::after{content:"Sample";left:6px;top:6px}
+}
+@media (prefers-reduced-motion:reduce){.stage.reading .scanline{animation:none;top:39%}.hbox,.frow.pop{animation:none}.frow{transition:none}}
 </style></head><body>
 <div class="ob">
   <aside class="rail dark">
@@ -212,16 +271,27 @@ button:focus-visible,.field:focus-within{outline:3px solid var(--cobalt-100);out
           <div id="scanIdle" class="col gap16" hidden>
             <p class="ai-text">Take one photo of your bill. Proof AI finds the plan price, equipment rental, and extra fees, and points out any fee that looks like a junk fee.</p>
             <button type="button" class="btn primary" id="choose"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.5" r="3.5"/></svg>Take or choose a photo</button>
+            <div class="samples" id="samplesBlock" hidden>
+              <div class="samples-h"><b>No bill handy? Use a sample bill</b><span>Both sample bills are fictional. The providers, accounts, and addresses are made up.</span></div>
+              <div class="samples-grid" id="samples"></div>
+            </div>
           </div>
 
           <div id="scanWork" class="col gap16" hidden>
             <div class="aisteps" id="aisteps" aria-live="polite"></div>
-            <p class="ai-text" id="scanText" hidden></p>
             <div class="err" id="scanErr" role="alert" hidden></div>
+            <div class="take" id="take">
+              <div class="tm">
+                <p class="ai-text" id="scanText" aria-live="polite"></p>
+                <div class="match" id="scanMatch" hidden></div>
+                <div class="offnote" id="scanOffNote" role="status" hidden></div>
+              </div>
+              <button type="button" class="btn primary sm" id="usePlan" hidden></button>
+            </div>
             <div class="scan">
               <div class="billwrap">
-                <div class="bill photo"><img id="thumb" alt="The bill photo you chose"></div>
-                <div class="billcap">Your bill photo. Shown here only.</div>
+                <div class="stage" id="stage"><img id="thumb" alt="The bill photo you chose"><div class="scanline"></div><div id="boxes"></div></div>
+                <div class="billcap" id="billcap">Your bill photo. Shown here only.</div>
               </div>
               <div class="frows" id="frows"></div>
             </div>
@@ -254,4 +324,5 @@ button:focus-visible,.field:focus-within{outline:3px solid var(--cobalt-100);out
   </div>
 </div>
 <script type="module" src="js/pages/onboarding-plan.js"></script>
+<script type="module" src="js/tour.js"></script>
 </body></html>

@@ -31,24 +31,42 @@ if (!facts.headline || !D || D.cause === 'unknown') {
     stamp: `${facts.sample ? 'Sample data · ' : ''}Day ${facts.dayNumber} of ${facts.totalDays}`,
   });
 
+  // The evidence score, rebuilt here from the engine's own weights: start at 50, each finding moves it.
+  // "exact" is true only when that sum equals the engine's providerPct. Only then is the arithmetic shown.
+  const steps = D.evidence.map((e) => {
+    const w = Number(e.weight) || 0;
+    const dir = e.supports === 'provider' ? 1 : e.supports === 'wifi' ? -1 : 0;
+    return { e, move: dir * w, mapped: w === 0 || dir !== 0 };
+  });
+  const moves = steps.filter((s) => s.move).map((s) => s.move);
+  const exact = !quiet && steps.length > 0 && steps.every((s) => s.mapped) && 50 + moves.reduce((a, b) => a + b, 0) === D.providerPct;
+  const sumOf = (list) => `50${list.map((m) => ` ${m < 0 ? '-' : '+'} ${Math.abs(m)}`).join('')}`;
+  const sumText = `${sumOf(moves)} = ${D.providerPct}% provider`;
+  const sumHTML = exact ? `<div class="sumline" id="sumline">${sumText}<small>Starts at 50, an even chance. Each finding moves it.${D.cause === 'wifi' ? ` Wi-Fi gets the rest: ${D.wifiPct}%.` : ''}</small></div>` : '';
+  const zonesHTML = (level) => `<div class="zones" style="grid-template-columns:60% 20% 20%"><span data-z="low" class="${level === 'low' ? 'on' : ''}">Low</span><span data-z="medium" class="${level === 'medium' ? 'on' : ''}">Medium</span><span data-z="high" class="${level === 'high' ? 'on' : ''}">High</span></div>`;
+
   // Confidence
   const conf = $('#conf');
+  const drawConf = () => {
   if (quiet) {
     conf.classList.add('calm');
     conf.innerHTML = `<div class="lab"><span class="t">Good news</span><span class="badge good"><span class="dot"></span>${esc(facts.headline.statusWord)}</span></div>
       <p class="body" style="font-size:14px;margin-top:10px">Your median is <b>${facts.headline.mbps} Mbps</b>, which is ${facts.headline.pct}% of your plan and at or above the ${facts.fairLine} Mbps fair line. There is no lasting slowdown to explain, so there is no confidence score to show.</p>`;
   } else if (unsure) {
     conf.innerHTML = `<div class="lab"><span class="t">Not enough evidence yet</span></div>
-      <p class="body" style="font-size:14px;margin-top:10px">The findings so far do not point clearly one way. ${D.needsPairedTest ? 'A test next to your router and one in a far room will settle it.' : 'More days of tests will make it clearer.'}</p>`;
+      <p class="body" style="font-size:14px;margin-top:10px">The findings so far do not point clearly one way. ${D.needsPairedTest ? 'A test next to your router and one in a far room will settle it.' : 'More days of tests will make it clearer.'}</p>${sumHTML}`;
   } else {
     const c = D.confidence;
-    conf.innerHTML = `<div class="lab"><span class="t">Confidence: ${esc(D.level)}</span><span class="num p">${c}<span class="unit" style="font-size:14px">%</span></span></div>
+    conf.innerHTML = `<div class="lab"><span class="t">Confidence: ${esc(D.level)}</span><span class="num p"><span data-n>${c}</span><span class="unit" style="font-size:14px">%</span></span></div>
       <div class="meter" role="img" aria-label="Confidence ${c} percent, ${esc(D.level)}"><i style="width:${c}%"></i><b style="left:60%"></b><b style="left:80%"></b><em style="left:${c}%"></em></div>
-      <div class="zones" style="grid-template-columns:60% 20% 20%"><span class="${D.level === 'low' ? 'on' : ''}">Low</span><span class="${D.level === 'medium' ? 'on' : ''}">Medium</span><span class="${D.level === 'high' ? 'on' : ''}">High</span></div>
-      <div class="small" style="margin-top:12px;color:var(--ink-2)">How strongly your test results point one way.${D.needsPairedTest ? ' Less certain without a router check.' : ''}</div>`;
+      ${zonesHTML(D.level)}
+      <div class="small" style="margin-top:12px;color:var(--ink-2)">How strongly your test results point one way.${D.needsPairedTest ? ' Less certain without a router check.' : ''}</div>${sumHTML}`;
   }
+  };
+  drawConf();
 
   // The two causes
+  let drawBalance = () => {};
   if (quiet) $('#compareCard').hidden = true;
   else {
     const ev = (k) => D.evidence.find((e) => e.key === k);
@@ -62,15 +80,19 @@ if (!facts.headline || !D || D.cause === 'unknown') {
     if (ev('evening')) pro.push('slower in the evening');
     if (ev('streak')) pro.push(`below the fair line ${facts.streak.len} days in a row`);
     const provCap = pro.length ? pro.join(', ').replace(/^./, (ch) => ch.toUpperCase()) + '.' : 'Nothing in your tests points here yet.';
-    const opt = (name, pct, icon, cap, win, lose) => `<div class="opt${win ? ' win' : ''}" data-opt="${name === 'Your Wi-Fi' ? 'wifi' : 'provider'}">
-        <div class="row between"><div class="itile${win ? '' : ' mute'}"${win ? ' style="background:var(--cobalt);color:#fff"' : ''}>${icon}</div><span class="badge ${win ? 'pick' : 'mute'}">${win ? 'Likely' : lose ? 'Unlikely' : 'Possible'}</span></div>
-        <div class="row between"><span class="name">${name}</span><span class="num pct" style="color:var(--${win ? 'cobalt' : 'ink-3'})">${pct}<span class="unit" style="font-size:12px">%</span></span></div>
+    const opt = (name, pct, icon, cap, win, lose, live) => `<div class="opt${win ? ' win' : ''}" data-opt="${name === 'Your Wi-Fi' ? 'wifi' : 'provider'}">
+        <div class="row between"><div class="itile${win ? '' : ' mute'}"${win ? ' style="background:var(--cobalt);color:#fff"' : ''}>${icon}</div><span class="badge ${win ? 'pick' : 'mute'}">${live ? 'Weighing' : win ? 'Likely' : lose ? 'Unlikely' : 'Possible'}</span></div>
+        <div class="row between"><span class="name">${name}</span><span class="num pct" style="color:var(--${win ? 'cobalt' : 'ink-3'})"><span data-n>${pct}</span><span class="unit" style="font-size:12px">%</span></span></div>
         <div class="like"><i style="width:${pct}%"></i></div>
         <div class="small"${win ? ' style="color:var(--ink-2)"' : ''}>${esc(cap)}</div>
       </div>`;
-    $('#balance').innerHTML = opt('Your Wi-Fi', D.wifiPct, ICON.wifi, wifiCap, D.cause === 'wifi', D.cause === 'provider')
-      + '<div class="vs">VS</div>'
-      + opt('Your provider', D.providerPct, ICON.tower, provCap, D.cause === 'provider', D.cause === 'wifi');
+    // live = true draws the even 50 / 50 starting point of the replay, with no winner yet
+    drawBalance = (live) => {
+      $('#balance').innerHTML = opt('Your Wi-Fi', live ? 50 : D.wifiPct, ICON.wifi, wifiCap, !live && D.cause === 'wifi', !live && D.cause === 'provider', live)
+        + '<div class="vs">VS</div>'
+        + opt('Your provider', live ? 50 : D.providerPct, ICON.tower, provCap, !live && D.cause === 'provider', !live && D.cause === 'wifi', live);
+    };
+    drawBalance(false);
   }
 
   // Evidence rows
@@ -123,9 +145,7 @@ if (!facts.headline || !D || D.cause === 'unknown') {
 
   // The score, shown only when the listed weights really add up to the result
   if (!quiet && n) {
-    const moves = D.evidence.filter((e) => e.weight && e.supports !== 'neutral').map((e) => (e.supports === 'provider' ? e.weight : -e.weight));
-    const total = 50 + moves.reduce((a, b) => a + b, 0);
-    if (total === D.providerPct) {
+    if (exact) {
       $('#score').hidden = false;
       $('#score').innerHTML = `<span class="small">Provider score</span><b>50${moves.map((m) => ` ${m < 0 ? 'minus' : 'plus'} ${Math.abs(m)}`).join('')} = ${D.providerPct}%</b><span class="small">Starts at 50, an even chance. Wi-Fi gets the rest: ${D.wifiPct}%.</span>`;
     }
@@ -138,4 +158,110 @@ if (!facts.headline || !D || D.cause === 'unknown') {
     bind({ checkTitle: 'One check is missing', checkText: 'Proof AI has no near and far tests yet, so this diagnosis is less certain without it. Stand next to your router and run one test, then run one in a far room. Each takes about 20 seconds.' });
   }
   if (quiet) bind({ reportTitle: 'Keep a record of your results' });
+
+  // ---------- Watch Proof AI decide ----------
+  // A replay of the evidence score. Every value shown is one of the engine's: each item's weight and
+  // direction, and the final providerPct. Nothing here is scripted.
+  if (!quiet && n) {
+    const SEEN = 'wf.diag.replayed';
+    const STEP = 1200;
+    const reduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+    const title = $('[data-b="title"]'), sub = $('[data-b="sub"]'), grid = $('#grid');
+    const rows = () => Array.from(document.querySelectorAll('#evidence .ev'));
+    const levelOf = (c) => (c >= 80 ? 'high' : c >= 60 ? 'medium' : 'low');
+    let runId = 0;
+
+    // Count a number on screen from where it is to its new value.
+    const rafs = new WeakMap();
+    const tween = (el, to, ms = 700) => {
+      if (!el) return;
+      cancelAnimationFrame(rafs.get(el));
+      const from = Number(el.textContent) || 0, t0 = performance.now();
+      if (from === to) return;
+      const tick = (t) => {
+        const k = Math.max(0, Math.min(1, (t - t0) / ms)), e = 1 - Math.pow(1 - k, 3);
+        el.textContent = Math.round(from + (to - from) * e);
+        if (k < 1 && el.isConnected) rafs.set(el, requestAnimationFrame(tick));
+      };
+      rafs.set(el, requestAnimationFrame(tick));
+    };
+    // Move the meter and both bars to a provider score of p.
+    const show = (p, ms) => {
+      const c = Math.max(p, 100 - p);
+      $('.meter i', conf).style.width = `${c}%`; $('.meter em', conf).style.left = `${c}%`;
+      tween($('.lab [data-n]', conf), c, ms);
+      conf.querySelectorAll('[data-z]').forEach((z) => z.classList.toggle('on', z.dataset.z === levelOf(c)));
+      [['provider', p], ['wifi', 100 - p]].forEach(([k, v]) => {
+        const o = $(`[data-opt="${k}"]`); if (!o) return;
+        $('.like i', o).style.width = `${v}%`; tween($('[data-n]', o), v, ms);
+      });
+    };
+
+    const finish = (emphasis) => {
+      grid.classList.remove('replaying'); grid.dataset.replay = 'done';
+      title.classList.remove('weigh'); title.textContent = D.title; sub.textContent = D.sub || '';
+      drawConf(); drawBalance(false);
+      rows().forEach((r, i) => { r.classList.remove('lit', 'seen'); r.open = i === 0; });
+      $('#watch').hidden = false; $('#skip').hidden = true;
+      if (emphasis && !reduced()) [title, $('.lab .t', conf)].forEach((el) => { if (!el) return; el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); });
+    };
+
+    const play = async () => {
+      const id = ++runId;
+      if (reduced()) { finish(false); return; }
+      grid.classList.add('replaying'); grid.dataset.replay = 'playing';
+      $('#watch').hidden = true; $('#skip').hidden = false;
+      title.classList.remove('pop'); title.classList.add('weigh'); title.textContent = 'Weighing the evidence...';
+      sub.textContent = 'Starting even: 50 / 50';
+      conf.classList.remove('calm');
+      conf.innerHTML = `<div class="lab"><span class="t">Confidence</span><span class="num p"><span data-n>50</span><span class="unit" style="font-size:14px">%</span></span></div>
+        <div class="meter" role="img" aria-label="Confidence meter, replaying"><i style="width:50%"></i><b style="left:60%"></b><b style="left:80%"></b><em style="left:50%"></em></div>
+        ${zonesHTML('low')}
+        <div class="now" aria-live="polite"><div class="what" id="nowWhat"><small>START</small>An even chance: 50% provider, 50% Wi-Fi.</div><span id="nowDelta"></span></div>
+        <div class="sumline" id="runline">50</div>`;
+      drawBalance(true);
+      rows().forEach((r) => { r.open = false; r.classList.remove('lit', 'seen'); });
+      await wait(900); if (id !== runId) return;
+
+      if (!exact) {
+        // The listed weights do not add up to the engine's result, so no per-step story: go straight to its value.
+        rows().forEach((r) => r.classList.add('lit'));
+        $('#nowWhat').innerHTML = `<small>ALL ${n} FINDINGS</small>Weighed together.`;
+        $('#runline').hidden = true;
+        show(D.providerPct, 1100);
+        await wait(STEP + 300); if (id !== runId) return;
+      } else {
+        let run = 50; const done = [];
+        for (let i = 0; i < steps.length; i++) {
+          const { e, move } = steps[i];
+          const r = rows()[i];
+          if (r) { r.classList.add('lit'); r.open = true; }
+          $('#nowWhat').innerHTML = `<small>FINDING ${i + 1} OF ${n}</small>${esc(e.title)}`;
+          $('#nowDelta').outerHTML = move
+            ? `<span class="delta ${move > 0 ? 'provider' : 'wifi'}" id="nowDelta" data-move="${move}">${move > 0 ? '+' : '-'}${Math.abs(move)} toward ${move > 0 ? 'your provider' : 'Wi-Fi'}</span>`
+            : '<span class="delta zero" id="nowDelta" data-move="0">No change</span>';
+          run += move; if (move) done.push(move);
+          $('#runline').textContent = `${sumOf(done)}${done.length ? ` = ${run}` : ''}`;
+          sub.textContent = `Now ${run}% provider, ${100 - run}% Wi-Fi`;
+          show(run, 700);
+          await wait(STEP); if (id !== runId) return;
+          if (r) { r.classList.remove('lit'); r.classList.add('seen'); r.open = false; }
+        }
+      }
+      if (id !== runId) return;
+      finish(true);
+    };
+
+    $('#replayRow').hidden = false;
+    $('#watch').onclick = () => play();
+    $('#skip').onclick = () => { runId++; finish(false); };
+    // The guided demo's "Do it for me": back to the top, then the same replay the button runs.
+    window.wfDemoFill = async () => { window.scrollTo({ top: 0, behavior: reduced() ? 'auto' : 'smooth' }); await wait(400); await play(); };
+
+    // Play once by itself, the first time this page is opened in a browser session.
+    let seen = true;
+    try { seen = !!sessionStorage.getItem(SEEN); sessionStorage.setItem(SEEN, '1'); } catch { seen = true; }
+    if (!seen && !document.documentElement.classList.contains('ai-off')) play();
+  }
 }

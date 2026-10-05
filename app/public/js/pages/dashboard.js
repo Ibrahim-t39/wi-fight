@@ -37,7 +37,52 @@ if (!facts.headline) {
   $$('[data-range]').forEach((c) => { c.style.cursor = 'pointer'; c.onclick = () => drawBars(Number(c.dataset.range)); });
   drawBars(7);
 
+  // How Proof AI got here: four steps with the engine's own counts. Each links to the page that shows it.
+  const plural = (n, one, many) => (n === 1 ? one : many);
+  const TICK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.500"/></svg>';
+  const dips = facts.ignored.length;
+  // Regular tests that count toward the daily medians: not router checks, and not the dips set aside in step 2.
+  const counted = state.tests.filter((t) => (t.location || 'normal') === 'normal').length - dips;
+  const ev = facts.diagnosis.evidence.length;
+  const pipeline = [
+    { href: 'history.html', text: `Collected <b>${counted}</b> ${plural(counted, 'test', 'tests')}`, sub: 'regular tests that count' },
+    { href: 'history.html', text: `Set aside <b>${dips}</b> one-off ${plural(dips, 'dip', 'dips')}`, sub: dips ? 'left out of the daily median' : 'none found so far' },
+    { href: 'history.html', text: `Compared <b>${facts.daysDone}</b> ${plural(facts.daysDone, 'day', 'days')} to the fair line`, sub: `${facts.daysBelow} below it` },
+    { href: 'diagnosis.html', text: `Weighed <b>${ev}</b> ${plural(ev, 'piece', 'pieces')} of evidence`, sub: 'Wi-Fi or provider' },
+  ];
+  $('#pipeSteps').innerHTML = pipeline.map((p, i) => `<a class="pstep" href="${p.href}" data-step="${i + 1}"><span class="k">${TICK}STEP ${i + 1}</span><span>${p.text}</span><small>${esc(p.sub)}</small></a>`).join('');
+  $('#pipe').hidden = false;
+
   // Proof AI insight: numbers from the engine, wording from Claude (live) or the built-in writer (offline)
-  const ai = await AI.insight(facts, state);
-  bind({ aiSentenceHtml: AI.html(ai.sentence), aiReasonsHtml: reasonsHTML(ai.reasons), aiChipsHtml: chipsHTML(ai.chips), aiNote: AI.note(ai.mode), aiMeta: `Updated after your last test · ${ai.mode === 'live' ? 'live' : 'offline mode'}` });
+  const insight = AI.insight(facts, state);
+  const reduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+  let runId = 0;
+  // The steps tick in one after another, then the insight appears. Safe to run again.
+  const playPipeline = async () => {
+    const id = ++runId;
+    const body = $('#aiBody'), stepEls = $$('.pstep');
+    const still = reduced();
+    body.classList.add('wait'); body.dataset.insight = 'waiting';
+    $('#aiSentence').textContent = 'Proof AI is reading your results.';
+    stepEls.forEach((el) => el.classList.toggle('in', still));
+    if (!still) {
+      await wait(150);
+      for (const el of stepEls) { if (id !== runId) return; el.classList.add('in'); await wait(250); }
+      await wait(200);
+    }
+    const ai = await insight;
+    if (id !== runId) return;
+    bind({ aiSentenceHtml: AI.html(ai.sentence), aiReasonsHtml: reasonsHTML(ai.reasons), aiChipsHtml: chipsHTML(ai.chips), aiNote: AI.note(ai.mode), aiMeta: `Updated after your last test · ${ai.mode === 'live' ? 'live' : 'offline mode'}` });
+    body.classList.remove('wait'); body.dataset.insight = 'ready';
+  };
+  playPipeline();
+  // The guided demo's "Do it for me": replay the analysis, then bring the Broadband Facts card into view.
+  window.wfDemoFill = async () => {
+    $('#pipe').scrollIntoView({ block: 'center', behavior: reduced() ? 'auto' : 'smooth' });
+    await wait(400);
+    await playPipeline();
+    await wait(900);
+    $('#labelCard').scrollIntoView({ block: 'center', behavior: reduced() ? 'auto' : 'smooth' });
+  };
 }

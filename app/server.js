@@ -37,8 +37,25 @@ const hasKey = Boolean(process.env.ANTHROPIC_API_KEY || process.env.ANTHROPIC_AU
 // Groq (OpenAI-compatible API). Model names can be changed in .env without touching code.
 const GROQ_KEY = process.env.GROQ_API_KEY || '';
 const GROQ_URL = (process.env.GROQ_BASE_URL || 'https://api.groq.com/openai/v1').replace(/\/$/, '');
-const GROQ_MODEL = process.env.GROQ_MODEL || 'llama-3.3-70b-versatile';
-const GROQ_VISION_MODEL = process.env.GROQ_VISION_MODEL || 'meta-llama/llama-4-scout-17b-16e-instruct';
+// Preferred Groq models, best first. Groq retires models over time, so the server asks Groq which ones
+// exist and uses the first match. GROQ_MODEL / GROQ_VISION_MODEL in .env go to the front of the list.
+const TEXT_PREFS = [process.env.GROQ_MODEL, 'llama-3.3-70b-versatile', 'openai/gpt-oss-120b', 'moonshotai/kimi-k2-instruct', 'qwen/qwen3-32b', 'openai/gpt-oss-20b', 'llama-3.1-8b-instant'].filter(Boolean);
+const VISION_PREFS = [process.env.GROQ_VISION_MODEL, 'meta-llama/llama-4-scout-17b-16e-instruct', 'meta-llama/llama-4-maverick-17b-128e-instruct'].filter(Boolean);
+let GROQ_MODEL = TEXT_PREFS[0];
+let GROQ_VISION_MODEL = VISION_PREFS[0];
+let groqChecked = 0;
+async function groqPick(force = false) {
+  if (!force && Date.now() - groqChecked < 10 * 60 * 1000) return;
+  groqChecked = Date.now();
+  try {
+    const r = await fetch(`${GROQ_URL}/models`, { headers: { Authorization: `Bearer ${GROQ_KEY}` }, signal: AbortSignal.timeout(6000) });
+    if (!r.ok) return;
+    const ids = ((await r.json()).data || []).filter((m) => m.active !== false).map((m) => m.id);
+    const chatty = (id) => !/guard|whisper|tts|speech|embed|safeguard|compound/i.test(id);
+    GROQ_MODEL = TEXT_PREFS.find((m) => ids.includes(m)) || ids.find((id) => chatty(id) && /70b|120b|kimi|qwen/i.test(id)) || ids.find(chatty) || GROQ_MODEL;
+    GROQ_VISION_MODEL = VISION_PREFS.find((m) => ids.includes(m)) || ids.find((id) => /llama-4|vision/i.test(id)) || GROQ_VISION_MODEL;
+  } catch { /* keep the current choice */ }
+}
 // Force one backend with WIFIGHT_PROVIDER=claude|groq|local|none. Default: the first one available.
 const FORCE = (process.env.WIFIGHT_PROVIDER || '').toLowerCase();
 
@@ -67,10 +84,10 @@ async function localReady() {
 async function provider() {
   if (FORCE === 'none') return null;
   if (FORCE === 'claude') return client ? 'claude' : null;
-  if (FORCE === 'groq') return GROQ_KEY ? 'groq' : null;
+  if (FORCE === 'groq') { if (GROQ_KEY) await groqPick(); return GROQ_KEY ? 'groq' : null; }
   if (FORCE === 'local') return (await localReady()) ? 'local' : null;
   if (client) return 'claude';
-  if (GROQ_KEY) return 'groq';
+  if (GROQ_KEY) { await groqPick(); return 'groq'; }
   if (await localReady()) return 'local';
   return null;
 }
@@ -119,8 +136,8 @@ const TASKS = {
     prompt: `Draft a message from the user to their internet provider's support team. Tone: ${['polite', 'firm', 'short'].includes(b.tone) ? b.tone : 'polite'}. 4 to 6 sentences (2 to 3 if the tone is short). State the plan and price, the measured median speed and percent of plan, how many days fell below the fair line, and that tests next to the router were low too if FACTS says so. Ask for a fix or a bill credit. Sign with the user's first name from FACTS. Plain text with line breaks. No ** markers in this task.\n\nFACTS:\n${JSON.stringify(b.facts)}`,
   }),
   bill: () => ({
-    schema: () => z.object({ planPrice: z.number().nullable(), equipment: z.number().nullable(), fees: z.array(z.object({ name: z.string(), amount: z.number(), junk: z.boolean(), why: z.string() })), total: z.number().nullable(), promoEnds: z.string().nullable(), provider: z.string().nullable(), plan: z.string().nullable(), confidence: z.enum(['high', 'medium', 'low']) }),
-    prompt: `Read this internet bill photo. Extract the monthly plan price, any equipment rental, each extra fee (mark "junk": true for company-imposed fees that are not government taxes, such as network enhancement, infrastructure, or administrative fees, and say why in one short sentence), the total, and when any promotional price ends. Use null for anything you cannot read. Set confidence to how legible the bill was.`,
+    schema: () => z.object({ sees: z.string(), isBill: z.boolean(), planPrice: z.number().nullable(), equipment: z.number().nullable(), fees: z.array(z.object({ name: z.string(), amount: z.number(), junk: z.boolean(), why: z.string() })), total: z.number().nullable(), promoEnds: z.string().nullable(), provider: z.string().nullable(), plan: z.string().nullable(), confidence: z.enum(['high', 'medium', 'low']) }),
+    prompt: `Look at this photo. In "sees" say in one short sentence what the photo actually shows. Set "isBill" to true only if it shows an internet bill with printed amounts. If it does not, use null for every other field and an empty "fees" list. If it is a bill, extract the provider's company name, the plan name, the monthly plan price, any equipment rental, each extra fee (mark "junk": true for company-imposed fees that are not government taxes, such as network enhancement, infrastructure, regulatory recovery, or administrative fees, and say why in one short sentence), the total, and in "promoEnds" the month and year the promotional price ends, written like "Jan 2027". Only list fees that are printed on the bill with their own amount. Use null for anything you cannot read. Set confidence to how legible the bill was.`,
   }),
 };
 
@@ -183,7 +200,7 @@ const reasonsSchema = { type: 'object', properties: { sentence: { type: 'string'
 const LOCAL_SCHEMA = {
   insight: reasonsSchema, verdict: reasonsSchema,
   draft: { type: 'object', properties: { subject: { type: 'string' }, body: { type: 'string' } }, required: ['subject', 'body'] },
-  bill: { type: 'object', properties: { planPrice: { type: ['number', 'null'] }, equipment: { type: ['number', 'null'] }, fees: { type: 'array', items: { type: 'object', properties: { name: { type: 'string' }, amount: { type: 'number' }, junk: { type: 'boolean' }, why: { type: 'string' } }, required: ['name', 'amount', 'junk', 'why'] } }, total: { type: ['number', 'null'] }, promoEnds: { type: ['string', 'null'] }, provider: { type: ['string', 'null'] }, plan: { type: ['string', 'null'] }, confidence: { type: 'string', enum: ['high', 'medium', 'low'] } }, required: ['planPrice', 'equipment', 'fees', 'total', 'promoEnds', 'confidence'] },
+  bill: { type: 'object', properties: { sees: { type: 'string' }, isBill: { type: 'boolean' }, planPrice: { type: ['number', 'null'] }, equipment: { type: ['number', 'null'] }, fees: { type: 'array', items: { type: 'object', properties: { name: { type: 'string' }, amount: { type: 'number' }, junk: { type: 'boolean' }, why: { type: 'string' } }, required: ['name', 'amount', 'junk', 'why'] } }, total: { type: ['number', 'null'] }, promoEnds: { type: ['string', 'null'] }, provider: { type: ['string', 'null'] }, plan: { type: ['string', 'null'] }, confidence: { type: 'string', enum: ['high', 'medium', 'low'] } }, required: ['sees', 'isBill', 'provider', 'plan', 'planPrice', 'equipment', 'fees', 'total', 'promoEnds', 'confidence'] },
 };
 
 async function runLocal(body, t) {
@@ -200,7 +217,7 @@ async function runLocal(body, t) {
   }
   try {
     const r = await fetch(`${OLLAMA}/api/chat`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: AbortSignal.timeout(90000),
-      body: JSON.stringify({ model: LOCAL_MODEL, stream: false, keep_alive: '30m', format: LOCAL_SCHEMA[body.task], options: { temperature: 0.2 }, messages: [{ role: 'system', content: SYSTEM }, msg] }) });
+      body: JSON.stringify({ model: LOCAL_MODEL, stream: false, keep_alive: '30m', format: LOCAL_SCHEMA[body.task], options: { temperature: body.task === 'bill' ? 0 : 0.2 }, messages: [{ role: 'system', content: SYSTEM }, msg] }) });
     if (!r.ok) { console.warn('Local model error', r.status, (await r.text()).slice(0, 300)); return { status: 502, json: { error: `Local model error ${r.status}` } }; }
     const j = await r.json();
     let result; try { result = JSON.parse(j.message.content); } catch { return { status: 502, json: { error: 'The local model returned an unreadable answer.' } }; }
@@ -208,8 +225,38 @@ async function runLocal(body, t) {
       const bad = ungrounded(JSON.stringify(result), body.facts);
       if (bad.length) return { status: 422, json: { error: 'grounding', detail: `The model wrote numbers that are not in your data (${bad.slice(0, 4).join(', ')}), so its answer was discarded.` } };
     }
+    if (body.task === 'bill') result = cleanBill(result);
     return { status: 200, json: { mode: 'live', provider: 'local', model: LOCAL_MODEL, result } };
   } catch { return { status: 502, json: { error: 'Could not reach the local model.' } }; }
+}
+
+// Checks on a bill reading that do not depend on the model. Small models sometimes invent a bill from a
+// blank photo, list a fee with no amount, or call a company fee a tax. These rules catch that in code.
+const NOT_A_BILL = { isBill: false, planPrice: null, equipment: null, fees: [], total: null, promoEnds: null, provider: null, plan: null, confidence: 'low' };
+function cleanBill(r) {
+  if (!r || typeof r !== 'object') return { ...NOT_A_BILL };
+  const amount = (v) => (typeof v === 'number' && Number.isFinite(v) && v >= 0 ? v : null);
+  const sees = typeof r.sees === 'string' ? r.sees : '';
+  // the model describes the photo first; if its own description does not mention a bill, do not trust the amounts
+  if (r.isBill === false || (sees && !/\b(bill|invoice|statement|receipt)\b/i.test(sees))) return { ...NOT_A_BILL, sees };
+  let fees = (Array.isArray(r.fees) ? r.fees : []).filter((x) => x && typeof x.name === 'string' && x.name.trim() && amount(x.amount) > 0)
+    .map((x) => ({ name: x.name.trim().slice(0, 80), amount: x.amount, junk: !!x.junk, why: x.junk ? 'The company adds this charge. It is not a government tax.' : String(x.why || '').slice(0, 160) })).slice(0, 8);
+  // The line items must add up to the printed total. If they add up to more, a fee was listed twice or invented:
+  // keep the largest set of fees that makes the sum match. If nothing matches, keep them all and lower the confidence.
+  let confidence = ['high', 'medium', 'low'].includes(r.confidence) ? r.confidence : 'medium';
+  const base = (amount(r.planPrice) || 0) + (amount(r.equipment) || 0); const total = amount(r.total);
+  const adds = (list) => Math.abs(base + list.reduce((a, x) => a + x.amount, 0) - total) < 0.011;
+  if (total != null && amount(r.planPrice) != null && !adds(fees)) {
+    let best = null;
+    for (let mask = (1 << fees.length) - 1; mask >= 0; mask--) {
+      const pick = fees.filter((_, i) => mask & (1 << i));
+      if (adds(pick) && (!best || pick.length > best.length)) best = pick;
+    }
+    if (best) fees = best; else if (confidence === 'high') confidence = 'medium';
+  }
+  const promo = typeof r.promoEnds === 'string' && /\b(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\.?\s+\d{4}\b|\b\d{1,2}\/\d{2,4}\b/i.test(r.promoEnds) ? r.promoEnds.trim().slice(0, 40) : null;
+  const str = (v) => (typeof v === 'string' && v.trim() ? v.trim().slice(0, 80) : null);
+  return { isBill: true, sees, planPrice: amount(r.planPrice), equipment: amount(r.equipment), fees, total: amount(r.total), promoEnds: promo, provider: str(r.provider), plan: str(r.plan), confidence };
 }
 
 // The report draft prompt, shared by the local and Groq backends. Plain text, first line is the subject.
@@ -254,11 +301,12 @@ async function runLocalDraft(body) {
 async function groqFetch(payload, signal) {
   return fetch(`${GROQ_URL}/chat/completions`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${GROQ_KEY}` }, signal: signal || AbortSignal.timeout(60000), body: JSON.stringify(payload) });
 }
-const groqError = (status) => (status === 401 || status === 403 ? { status: 401, json: { error: 'The Groq key was rejected. Check GROQ_API_KEY in .env.' } } : status === 429 ? { status: 429, json: { error: 'Groq is busy or the free limit was reached. Try again in a moment.' } } : status === 404 || status === 400 ? { status: 502, json: { error: 'Groq rejected the request. The model name in .env may be out of date.' } } : { status: 502, json: { error: `Groq error ${status}` } });
+const groqError = (status) => { if (status === 404 || status === 400) groqChecked = 0; return groqErrorInfo(status); };
+const groqErrorInfo = (status) => (status === 401 || status === 403 ? { status: 401, json: { error: 'The Groq key was rejected. Check GROQ_API_KEY in .env.' } } : status === 429 ? { status: 429, json: { error: 'Groq is busy or the free limit was reached. Try again in a moment.' } } : status === 404 || status === 400 ? { status: 502, json: { error: 'Groq rejected the request. The server will look for another model. Try again.' } } : { status: 502, json: { error: `Groq error ${status}` } });
 const JSON_SHAPE = {
   insight: '{"sentence": string, "reasons": [{"title": string, "detail": string}]} with at most 3 reasons',
   verdict: '{"sentence": string, "reasons": [{"title": string, "detail": string}]} with exactly 3 reasons',
-  bill: '{"planPrice": number|null, "equipment": number|null, "fees": [{"name": string, "amount": number, "junk": boolean, "why": string}], "total": number|null, "promoEnds": string|null, "provider": string|null, "plan": string|null, "confidence": "high"|"medium"|"low"}',
+  bill: '{"sees": string, "isBill": boolean, "planPrice": number|null, "equipment": number|null, "fees": [{"name": string, "amount": number, "junk": boolean, "why": string}], "total": number|null, "promoEnds": string|null, "provider": string|null, "plan": string|null, "confidence": "high"|"medium"|"low"}',
 };
 async function runGroq(body, t) {
   try {
@@ -282,15 +330,20 @@ async function runGroq(body, t) {
         : 'The two-week check is complete. "sentence": explain the verdict in three plain sentences. "reasons": 3, each with a short title that ends with a period and one detail sentence that cites numbers from the facts.';
       user = `${ask}\nDownload speed, upload speed, and response time are different things. Do not mix up Mbps with dollars.\n\nFACTS\n${factSheet(body.facts)}`;
     }
-    const r = await groqFetch({ model, temperature: 0.2, max_tokens: 900, response_format: { type: 'json_object' }, messages: [{ role: 'system', content: system }, { role: 'user', content: user }] });
+    const payload = { model, temperature: 0.2, max_tokens: 900, response_format: { type: 'json_object' }, messages: [{ role: 'system', content: system }, { role: 'user', content: user }] };
+    let r = await groqFetch(payload);
+    if (r.status === 400) { // some models do not accept JSON mode (for example with an image): ask again in plain mode
+      console.warn('Groq 400, retrying without JSON mode', (await r.text()).slice(0, 200));
+      delete payload.response_format; r = await groqFetch(payload);
+    }
     if (!r.ok) { console.warn('Groq error', r.status, (await r.text()).slice(0, 300)); return groqError(r.status); }
-    let result; try { result = JSON.parse((await r.json()).choices[0].message.content); } catch { return { status: 502, json: { error: 'Groq returned an unreadable answer.' } }; }
+    let result; try { const raw = String((await r.json()).choices[0].message.content || ''); result = JSON.parse(raw.slice(raw.indexOf('{'), raw.lastIndexOf('}') + 1)); } catch { return { status: 502, json: { error: 'Groq returned an unreadable answer.' } }; }
     if (body.task !== 'bill') {
       if (typeof result.sentence !== 'string' || !Array.isArray(result.reasons)) return { status: 502, json: { error: 'Groq returned an answer in the wrong shape.' } };
       result.reasons = result.reasons.filter((x) => x && typeof x.title === 'string' && typeof x.detail === 'string').slice(0, 3);
       const bad = ungrounded(JSON.stringify(result), body.facts);
       if (bad.length) return { status: 422, json: { error: 'grounding', detail: `The model wrote numbers that are not in your data (${bad.slice(0, 4).join(', ')}), so its answer was discarded.` } };
-    } else if (!Array.isArray(result.fees)) result.fees = [];
+    } else result = cleanBill(result);
     return { status: 200, json: { mode: 'live', provider: 'groq', model, result } };
   } catch (e) { console.warn('Groq request failed', e.message); return { status: 502, json: { error: 'Could not reach Groq.' } }; }
 }
@@ -392,7 +445,7 @@ async function runAI(body) {
       const bad = ungrounded(JSON.stringify(response.parsed_output), body.facts);
       if (bad.length) return { status: 422, json: { error: 'grounding', detail: `The model wrote numbers that are not in your data (${bad.slice(0, 4).join(', ')}), so its answer was discarded.` } };
     }
-    return { status: 200, json: { mode: 'live', provider: 'claude', model: MODEL, result: response.parsed_output } };
+    return { status: 200, json: { mode: 'live', provider: 'claude', model: MODEL, result: body.task === 'bill' ? cleanBill(response.parsed_output) : response.parsed_output } };
   } catch (error) {
     if (error instanceof Anthropic.AuthenticationError) return { status: 401, json: { error: 'The AI key was rejected.' } };
     if (error instanceof Anthropic.RateLimitError) return { status: 429, json: { error: 'The AI service is busy. Try again in a moment.' } };

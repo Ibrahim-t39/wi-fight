@@ -3,12 +3,13 @@
 // This prototype has no mail server. "Approve and send" opens the user's own email app.
 import { boot, bind, $, $$, esc, toast, AI, Store, sha256 } from '../shell.js';
 import { fmtDate, fmtTime, dayKey } from '../engine.js';
-import { paintSwitch, copyText } from './ui-sheet.js';
+import { paintSwitch, copyText, pause, bringIntoView } from './ui-sheet.js';
 
 const { state, facts } = await boot({ need: 'plan' });
 const FCC_URL = 'https://consumercomplaints.fcc.gov/';
 const MARK = '<svg viewBox="0 -1.300 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.300 16.200A8.300 8.300 0 0 1 16.900 6.300"/><path d="M19.900 12.300a8.300 8.300 0 0 1-.6 3.900"/><path d="m8 12.600 3 3 8.400-9.700"/></svg>';
 const SEAL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4.5 6v6c0 4.5 3.2 7.6 7.5 9 4.3-1.4 7.5-4.5 7.5-9V6z"/><path d="m9 12 2 2 4-4"/></svg>';
+const CROSS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>';
 const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>';
 
 /** JSON with keys sorted at every level, so the same data always gives the same text. */
@@ -178,6 +179,9 @@ if (!facts.headline) {
     paintSwitch($('[data-switch="fcc"]'), !!R.fcc);
     const ok = canSend();
     $$('.sendbtn').forEach((b) => { b.disabled = !ok; });
+    // the two things the lock waits for, ticked from the same state the gate reads
+    const needs = { approved: !!d && d.approved === true, read: read === true };
+    $$('.sendlist li').forEach((li) => { const on = needs[li.dataset.need]; li.classList.toggle('done', on); li.dataset.done = on ? 'true' : 'false'; li.title = on ? 'Done' : 'Still needed'; li.setAttribute('aria-label', `${$('span', li).textContent}: ${on ? 'done' : 'still needed'}`); });
     $('#gate').textContent = !d ? '' : !d.approved && !read ? 'To send: approve the draft above, then tick the box.' : !d.approved ? 'To send: approve the draft above.' : !read ? 'To send: tick the box.' : 'Ready. This opens your own email app.';
     const st = $('#status');
     st.className = `badge ${sent.length ? 'good' : 'warn'}`;
@@ -192,7 +196,8 @@ if (!facts.headline) {
   }
 
   /* ---------- draft controls ---------- */
-  $$('[data-tone]').forEach((c) => { c.onclick = async () => { if (busy || (cur() && c.dataset.tone === cur().tone && !cur().edited)) return; await makeDraft(c.dataset.tone); }; });
+  const setTone = async (tone) => { if (busy || (cur() && tone === cur().tone && !cur().edited)) return; await makeDraft(tone); };
+  $$('[data-tone]').forEach((c) => { c.onclick = () => setTone(c.dataset.tone); });
   $('#regen').onclick = async () => { if (busy) return; const same = await makeDraft(cur() ? cur().tone : 'polite'); if (same) toast('Offline mode writes the same words each time. Change the tone for a different draft.'); };
   $('#dprev').onclick = async () => { if (R.idx > 0) { R.idx--; editing = false; setRead(false); await save(); paint(); } };
   $('#dnext').onclick = async () => { if (R.idx < R.drafts.length - 1) { R.idx++; editing = false; setRead(false); await save(); paint(); } };
@@ -243,6 +248,73 @@ if (!facts.headline) {
   $('#share').onclick = async () => {
     if (navigator.share) { try { await navigator.share({ title: 'Wi-Fight speed report', text: summary }); return; } catch (e) { if (e && e.name === 'AbortError') return; } }
     toast((await copyText(summary)) ? 'Summary copied. Paste it anywhere.' : 'Could not copy');
+  };
+
+  /* ---------- tamper test: works on a copy of the signed data, never on the report itself ---------- */
+  const ORIG = data.headline.medianMbps;
+  const tp = { val: ORIG, hash, seq: 0, done: Promise.resolve() };
+  /** The same canonical JSON and the same SHA-256 the report uses, with one value changed in a copy. */
+  const tamperedJson = (v) => canonical({ ...data, headline: { ...data.headline, medianMbps: v } });
+  api.tamperedJson = tamperedJson;
+  api.tamper = tp;
+  const hashHTML = (h) => h.split('').map((ch, i) => (ch === hash[i] ? ch : `<mark>${ch}</mark>`)).join('');
+  function paintTamper(valid) {
+    const v = $('#tp-verdict'), same = tp.hash === hash;
+    $('#tp-val').classList.toggle('changed', valid && tp.val !== ORIG);
+    if (!valid) {
+      $('#tp-new').textContent = '';
+      v.className = 'tp-verdict idle'; $('i', v).innerHTML = ''; $('#tp-word').textContent = 'Type a number to test.'; $('#tp-count').textContent = '';
+      v.dataset.state = 'idle';
+      return;
+    }
+    const diff = tp.hash.split('').filter((ch, i) => ch !== hash[i]).length;
+    $('#tp-new').innerHTML = hashHTML(tp.hash);
+    v.className = `tp-verdict ${same ? 'good' : 'bad'}`; v.dataset.state = same ? 'match' : 'mismatch'; v.dataset.diff = String(diff);
+    $('i', v).innerHTML = same ? CHECK : CROSS;
+    $('#tp-word').textContent = same ? 'Matches. Nothing was changed.' : 'Does not match. This report was changed.';
+    $('#tp-count').textContent = same ? '0 of 64 characters changed.' : `${diff} of 64 characters changed, after changing ${ORIG} to ${tp.val}.`;
+  }
+  function setTamper(raw, { fromInput = false } = {}) {
+    const n = raw === '' || raw == null ? NaN : Number(raw);
+    const valid = Number.isFinite(n) && n >= 0 && n <= 100000;
+    const seq = ++tp.seq;
+    if (!fromInput && valid) $('#tp-val').value = String(n);
+    if (!valid) { paintTamper(false); return tp.done; }
+    tp.done = sha256(tamperedJson(n)).then((h) => { if (seq !== tp.seq) return; tp.val = n; tp.hash = h; paintTamper(true); });
+    return tp.done;
+  }
+  const stepTamper = (by) => { const now = Number($('#tp-val').value); return setTamper(Math.max(0, (Number.isFinite(now) && $('#tp-val').value !== '' ? now : ORIG) + by)); };
+  const openTamper = (open) => { $('#tp-panel').hidden = !open; const b = $('#tamperbtn'); b.setAttribute('aria-expanded', open ? 'true' : 'false'); b.textContent = open ? 'Close the test' : 'Try to tamper with it'; b.classList.toggle('primary', !open); b.classList.toggle('ghost', open); };
+  $('#tp-orig').textContent = hash;
+  $('#tp-origval').textContent = `The report says ${ORIG}. Change it by any amount.`;
+  $('#tamperbtn').onclick = () => openTamper($('#tp-panel').hidden);
+  $('#tp-minus').onclick = () => stepTamper(-1);
+  $('#tp-plus').onclick = () => stepTamper(1);
+  $('#tp-reset').onclick = () => setTamper(ORIG);
+  $('#tp-val').addEventListener('input', (e) => setTamper(e.target.value, { fromInput: true }));
+  await setTamper(ORIG);
+
+  /* ---------- guided demo shortcut: tone, then the tamper test. It never approves or sends. ---------- */
+  let demoing = false;
+  window.wfDemoFill = async () => {
+    if (demoing) return;
+    demoing = true;
+    try {
+      await bringIntoView($('.draftcard'), 700);
+      $('[data-tone="firm"]').focus({ preventScroll: true });
+      for (let i = 0; busy && i < 900; i++) await pause(100);   // a draft that is still being written
+      await setTone('firm');
+      await pause(1400);
+      await bringIntoView($('#tamper'), 800);
+      if ($('#tp-panel').hidden) $('#tamperbtn').click();
+      await setTamper(ORIG);
+      await pause(700);
+      await bringIntoView($('#tp-verdict'), 500);
+      $('#tp-plus').click(); await tp.done;
+      await pause(1600);
+      $('#tp-reset').click(); await tp.done;
+      await pause(500);
+    } finally { demoing = false; }
   };
 
   paint();

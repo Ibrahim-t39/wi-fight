@@ -1,0 +1,157 @@
+{
+ "note": "Fictional sample documents for demos. Providers, accounts, and addresses are made up.",
+ "bills": [
+  {
+   "id": "northstar-bill",
+   "file": "northstar-bill.png",
+   "title": "Northstar Fiber bill",
+   "blurb": "$80 a month, with one fee worth questioning",
+   "aspect": 0.7727,
+   "planId": "ns500",
+   "fields": {
+    "provider": "Northstar Fiber",
+    "plan": "Northstar Fiber 500",
+    "planPrice": 65,
+    "equipment": 10,
+    "fees": [
+     {
+      "name": "Network enhancement fee",
+      "amount": 5,
+      "junk": true,
+      "why": "A company fee, not a government tax."
+     }
+    ],
+    "total": 80,
+    "promoEnds": "Jan 2027"
+   },
+   "regions": {
+    "plan": {
+     "x": 6.35,
+     "y": 28.05,
+     "w": 44,
+     "h": 3.43
+    },
+    "totalTop": {
+     "x": 55.76,
+     "y": 16.47,
+     "w": 35.76,
+     "h": 3.4
+    },
+    "planPrice": {
+     "x": 6.35,
+     "y": 37.38,
+     "w": 87.29,
+     "h": 5
+    },
+    "equipment": {
+     "x": 6.35,
+     "y": 42.39,
+     "w": 87.29,
+     "h": 5.05
+    },
+    "fee0": {
+     "x": 6.35,
+     "y": 47.43,
+     "w": 87.29,
+     "h": 5.05
+    },
+    "total": {
+     "x": 6.35,
+     "y": 52.48,
+     "w": 87.29,
+     "h": 3.95
+    },
+    "promo": {
+     "x": 6.35,
+     "y": 58.43,
+     "w": 87.29,
+     "h": 5.71
+    }
+   }
+  },
+  {
+   "id": "pinecrest-bill",
+   "file": "pinecrest-bill.png",
+   "title": "Pinecrest bill",
+   "blurb": "$86.99 a month, with two extra fees",
+   "aspect": 0.7727,
+   "planId": "pc500",
+   "fields": {
+    "provider": "Pinecrest",
+    "plan": "Pinecrest Internet 500",
+    "planPrice": 65,
+    "equipment": 12,
+    "fees": [
+     {
+      "name": "Broadcast and infrastructure fee",
+      "amount": 7.49,
+      "junk": true,
+      "why": "A company fee, not a government tax."
+     },
+     {
+      "name": "Regulatory recovery fee",
+      "amount": 2.5,
+      "junk": true,
+      "why": "A company fee, not a government tax."
+     }
+    ],
+    "total": 86.99,
+    "promoEnds": "Mar 2027"
+   },
+   "regions": {
+    "plan": {
+     "x": 6.35,
+     "y": 28.05,
+     "w": 44,
+     "h": 3.43
+    },
+    "totalTop": {
+     "x": 55.76,
+     "y": 16.47,
+     "w": 35.76,
+     "h": 3.4
+    },
+    "planPrice": {
+     "x": 6.35,
+     "y": 37.38,
+     "w": 87.29,
+     "h": 5
+    },
+    "equipment": {
+     "x": 6.35,
+     "y": 42.39,
+     "w": 87.29,
+     "h": 5.05
+    },
+    "fee0": {
+     "x": 6.35,
+     "y": 47.43,
+     "w": 87.29,
+     "h": 5.05
+    },
+    "fee1": {
+     "x": 6.35,
+     "y": 52.48,
+     "w": 87.29,
+     "h": 5.05
+    },
+    "total": {
+     "x": 6.35,
+     "y": 57.53,
+     "w": 87.29,
+     "h": 3.95
+    },
+    "promo": {
+     "x": 6.35,
+     "y": 63.48,
+     "w": 87.29,
+     "h": 5.71
+    }
+   }
+  }
+ ],
+ "label": {
+  "file": "northstar-label.png",
+  "title": "Northstar Fiber 500 broadband label"
+ }
+}

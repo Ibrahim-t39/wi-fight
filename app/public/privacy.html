@@ -71,6 +71,34 @@ button.ctlbox{width:100%;text-align:left;cursor:pointer;font-family:inherit;colo
 .dlist{margin:0 0 0 18px;font:500 14px/1.6 var(--body);color:var(--ink)}
 .btn.danger{background:var(--bad);color:#fff}
 .sheet .kv{font-size:14px;gap:12px}.sheet .kv .v{text-align:right}
+/* security at a glance, and the on-disk comparison */
+.glance{padding:20px 22px}
+.glist{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin:14px 0 0;padding:0;list-style:none}
+.glist li{display:flex;flex-direction:column;gap:5px;padding:12px 14px;border-radius:var(--r-tile);background:var(--surface-2);border:1px solid var(--line);min-width:0}
+.glist .gt{font:600 13.5px/1.3 var(--body);color:var(--ink)}
+.glist .gw{display:inline-flex;align-items:center;gap:6px;font:700 15px/1.2 var(--body);color:var(--good)}
+.glist .gw i{width:18px;height:18px;border-radius:50%;background:var(--good);color:#fff;display:grid;place-items:center;flex:none}
+.glist .gw i svg{width:11px;height:11px}
+.glist li.warn .gw{color:var(--warn)}.glist li.warn .gw i{background:var(--warn)}
+.glist li.off .gw{color:var(--ink-2)}.glist li.off .gw i{background:var(--ink-3)}
+.glist .gd{font:500 12.5px/1.35 var(--body);color:var(--ink-3);overflow-wrap:anywhere}
+.cmp{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:12px;margin-top:12px}
+.cmpbox{border-radius:12px;border:1px solid var(--line);background:var(--surface);padding:12px 14px;min-width:0}
+.cmplab{font:600 11px var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin-bottom:4px}
+.cmpbox .kv{padding:9px 0;font-size:14.5px;gap:12px}.cmpbox .kv .v{text-align:right;overflow-wrap:anywhere}
+.cmpbox .mono{margin:6px 0;background:var(--surface-2)}
+.findrow{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:12px}
+.finds{display:grid;gap:8px;margin:10px 0 0;padding:0;list-style:none}
+.finds li{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px;border-radius:12px;background:var(--surface);border:1px solid var(--line);font:500 14px/1.35 var(--body);color:var(--ink-2)}
+.finds li span{min-width:0;overflow-wrap:anywhere}
+.finds li span b{color:var(--ink);font-family:ui-monospace,Menlo,monospace;font-weight:600}
+.finds li strong{flex:none;display:inline-flex;align-items:center;gap:6px;font:700 14px var(--body);color:var(--good)}
+.finds li strong i{width:18px;height:18px;border-radius:50%;background:var(--good);color:#fff;display:grid;place-items:center}
+.finds li strong i svg{width:11px;height:11px}
+.finds li.hit strong{color:var(--bad)}.finds li.hit strong i{background:var(--bad)}
+.finds li.na strong{color:var(--ink-3)}
+@media (max-width:1100px){.glist{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:720px){.glance{padding:18px}.glist{grid-template-columns:1fr}.glist li{flex-direction:row;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:4px 12px}.glist .gd{flex-basis:100%}.cmp{grid-template-columns:1fr}}
 </style></head><body>
 <div class="app">
   <aside class="sidebar">
@@ -100,6 +128,11 @@ button.ctlbox{width:100%;text-align:left;cursor:pointer;font-family:inherit;colo
     </div>
 
     <div class="g" data-wait>
+      <section class="card span-12 glance" aria-labelledby="glance-h">
+        <div class="row between" style="gap:10px;flex-wrap:wrap"><h2 class="h3" id="glance-h">Security at a glance</h2><span class="small">Each line is checked when this page opens.</span></div>
+        <ul class="glist" id="glance" data-b="glanceHtml"></ul>
+      </section>
+
       <section class="card span-12 status">
         <div class="shieldbig"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4.5 6v6c0 4.5 3.2 7.6 7.5 9 4.3-1.4 7.5-4.5 7.5-9V6z"/><path d="m9 12 2 2 4-4"/></svg></div>
         <div class="col gap4">
@@ -109,9 +142,12 @@ button.ctlbox{width:100%;text-align:left;cursor:pointer;font-family:inherit;colo
         <div class="checks" data-b="checksHtml"></div>
         <details class="disk" id="disk">
           <summary><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span>See what is stored on disk</span></summary>
-          <pre class="mono" id="diskraw" data-b="disk"></pre>
-          <div class="small" data-b="diskSize"></div>
-          <div class="small" style="color:var(--ink-2);margin-top:4px" data-b="diskCap"></div>
+          <div class="cmp">
+            <div class="cmpbox"><div class="cmplab">What you see</div><div id="plainbox" data-b="plainHtml"></div><div class="small" style="margin-top:6px">Unlocked for you, in this browser, while the app is open.</div></div>
+            <div class="cmpbox"><div class="cmplab">What is saved on this device</div><pre class="mono" id="diskraw" data-b="disk"></pre><div class="small" data-b="diskSize"></div><div class="small" style="color:var(--ink-2);margin-top:4px" data-b="diskCap"></div></div>
+          </div>
+          <div class="findrow"><button type="button" class="btn sm" id="find">Search the saved data for my name</button><span class="small" id="findnote" role="status"></span></div>
+          <ul class="finds" id="finds" hidden></ul>
         </details>
       </section>
 
@@ -195,4 +231,5 @@ button.ctlbox{width:100%;text-align:left;cursor:pointer;font-family:inherit;colo
   <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg>Report</div>
 </nav>
 <script type="module" src="js/pages/privacy.js"></script>
+<script type="module" src="js/tour.js"></script>
 </body></html>
