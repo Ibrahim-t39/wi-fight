@@ -15,7 +15,7 @@ const ICONS = {
 };
 
 const MAKERS = [
-  [/^openai\/|^gpt-/i, { maker: 'OpenAI', icon: 'openai' }],
+  [/^openai\/|^gpt-|whisper/i, { maker: 'OpenAI', icon: 'openai' }],
   [/^qwen\/|^qwen/i, { maker: 'Alibaba Cloud (Qwen)', icon: 'qwen-color' }],
   [/llama/i, { maker: 'Meta', icon: 'meta-color' }],
   [/^claude/i, { maker: 'Anthropic', icon: 'anthropic' }],
@@ -28,7 +28,7 @@ const HOSTS = { groq: { name: 'Groq', icon: 'groq', note: 'runs the models in th
 export function modelName(id) {
   let s = String(id || '').split('/').pop().replace(/:/g, ' ').replace(/-(versatile|instant|instruct|preview|latest)\b/gi, '').replace(/-\d+e\b/gi, '');
   s = s.replace(/^gpt-oss/i, 'GPT-OSS').replace(/^gpt/i, 'GPT').replace(/^qwen(\d)/i, 'Qwen $1').replace(/^llama-?/i, 'Llama ').replace(/^gemma-?(\d)/i, 'Gemma $1').replace(/^claude-/i, 'Claude ').replace(/^kimi/i, 'Kimi');
-  s = s.replace(/(\d)-(\d)(?!\d*b\b)/g, '$1.$2').replace(/-/g, ' ').replace(/\b(\d+(?:\.\d+)?)b\b/gi, '$1B').replace(/\b([a-z])([a-z]+)\b/g, (m, a, b) => a.toUpperCase() + b);
+  s = s.replace(/^whisper/i, 'Whisper').replace(/(\d)-(\d)(?!\d*[bm]\b)/g, '$1.$2').replace(/-/g, ' ').replace(/\b(\d+(?:\.\d+)?)([bm])\b/gi, (m, n, u) => n + u.toUpperCase()).replace(/\bv(\d)\b/gi, 'v$1').replace(/\b([a-z])([a-z]+)\b/g, (m, a, b) => a.toUpperCase() + b);
   return s.replace(/\s+/g, ' ').replace(/^GPT OSS/, 'GPT-OSS').replace(/\bk(\d)\b/, 'K$1').trim() || 'AI model';
 }
 export function modelInfo(id) {
@@ -45,23 +45,37 @@ export function modelChip(id, { maker = true } = {}) {
   return `<span class="mchip" title="${esc(m.id)}">${m.icon ? `<i class="mico">${m.icon}</i>` : ''}<b>${esc(m.name)}</b>${maker ? `<span>${esc(m.maker)}</span>` : ''}</span>`;
 }
 
-/** What is live right now: { live, provider, host, text, photo }. text and photo are modelInfo objects or null. */
+/** What is live right now: { live, provider, host, text, photo, fast, guard, speech }. Each role is a modelInfo object or null.
+ *  A role is only reported when the server says that model is available to it, so nothing is listed that is not really wired in. */
 export async function modelStack() {
+  const none = { live: false, provider: null, host: null, text: null, photo: null, fast: null, guard: null, speech: null };
   try {
     const st = await (await fetch('api/status')).json();
-    if (!st.live) return { live: false, provider: null, host: null, text: null, photo: null };
-    let text = st.model, photo = st.model;
-    if (st.provider === 'groq') { try { const m = await (await fetch('api/models')).json(); text = m.text || text; photo = m.photo || text; } catch { /* keep the status model */ } }
-    return { live: true, provider: st.provider, host: hostInfo(st.provider), text: modelInfo(text), photo: modelInfo(photo) };
-  } catch { return { live: false, provider: null, host: null, text: null, photo: null }; }
+    if (!st.live) return none;
+    let m = { text: st.model, photo: st.model };
+    if (st.provider === 'groq') { try { m = { ...m, ...(await (await fetch('api/models')).json()) }; } catch { /* keep the status model */ } }
+    const info = (id) => (id ? modelInfo(id) : null);
+    return { live: true, provider: st.provider, host: hostInfo(st.provider), text: info(m.text), photo: info(m.photo || m.text), fast: info(m.fast), guard: info(m.guard), speech: info(m.speech) };
+  } catch { return none; }
 }
 
-/** Two or three cards that name the models and what each one does. Used on the landing page, About, and the chat panel. */
+/** The jobs, in the order a request meets them. Used by stackHTML and by pages that want the list. */
+export function modelRoles(st) {
+  if (!st || !st.live) return [];
+  const same = st.photo && st.text && st.photo.id === st.text.id;
+  return [
+    st.guard && { key: 'guard', m: st.guard, role: 'Safety screen', desc: 'Checks each chat message for prompt injection before the main model sees it.' },
+    st.text && { key: 'text', m: st.text, role: same ? 'Writes and reads' : 'Writes the answers', desc: same ? 'Explains your results, answers questions, drafts the letter, and reads your bill photo.' : 'Explains your results, answers your questions, and drafts the letter to your provider.' },
+    !same && st.photo && { key: 'photo', m: st.photo, role: 'Reads your bill', desc: 'Looks at the photo of your bill and pulls out the plan, the price, and each fee.' },
+    st.speech && { key: 'speech', m: st.speech, role: 'Hears your question', desc: 'Turns a spoken question in the chat into text. The recording is not kept.' },
+    st.fast && { key: 'fast', m: st.fast, role: 'Backup writer', desc: 'A smaller, faster model that takes over if the main one is busy.' },
+  ].filter(Boolean);
+}
+
+/** Small cards that name each model, its maker, and its one job, plus where they run. Used on the landing page and About. */
 export function stackHTML(st) {
   if (!st || !st.live) return '<div class="mstack"><div class="mcard off"><div class="mrole">Proof AI is in offline mode</div><div class="mdesc">No AI model is connected right now, so answers come from the built-in writer. It uses the same numbers and cannot invent one.</div></div></div>';
-  const card = (m, role, desc) => `<div class="mcard"><div class="mtop">${m.icon ? `<i class="mico lg">${m.icon}</i>` : ''}<div><div class="mname">${esc(m.name)}</div><div class="mmaker">${esc(m.maker)}</div></div></div><div class="mrole">${esc(role)}</div><div class="mdesc">${esc(desc)}</div></div>`;
-  const same = st.text.id === st.photo.id;
-  return `<div class="mstack">${card(st.text, same ? 'Writes and reads' : 'Writes the answers', same ? 'Explains your results, answers questions, drafts the letter, and reads your bill photo.' : 'Explains your results, answers your questions in the chat, and drafts the letter to your provider.')}
-    ${same ? '' : card(st.photo, 'Reads your bill', 'Looks at the photo of your bill and pulls out the plan, the price, and each fee.')}
-    ${st.host ? `<div class="mcard host"><div class="mtop"><i class="mico lg">${st.host.icon}</i><div><div class="mname">${esc(st.host.name)}</div><div class="mmaker">Where it runs</div></div></div><div class="mrole">Hosting</div><div class="mdesc">${esc(st.host.name)} ${esc(st.host.note)}. Your key stays on the server and never reaches the browser.</div></div>` : ''}</div>`;
+  const card = (m, role, desc) => `<div class="mcard"><div class="mrole">${esc(role)}</div><div class="mtop">${m.icon ? `<i class="mico lg">${m.icon}</i>` : ''}<div><div class="mname">${esc(m.name)}</div><div class="mmaker">${esc(m.maker)}</div></div></div><div class="mdesc">${esc(desc)}</div></div>`;
+  return `<div class="mstack">${modelRoles(st).map((r) => card(r.m, r.role, r.desc)).join('')}
+    ${st.host ? `<div class="mcard host"><div class="mrole">Where they run</div><div class="mtop"><i class="mico lg">${st.host.icon}</i><div><div class="mname">${esc(st.host.name)}</div><div class="mmaker">Hosting</div></div></div><div class="mdesc">${esc(st.host.name)} ${esc(st.host.note)}. The key stays on our server and never reaches the browser.</div></div>` : ''}</div>`;
 }

@@ -182,6 +182,20 @@ button.switch{border:0;padding:0;cursor:pointer}
 .simtag{font:600 11px/1 var(--body);color:var(--warn);background:var(--warn-bg);border-radius:99px;padding:5px 9px;margin-left:8px;white-space:nowrap}
 .hbar span{flex:1;min-width:0}.hbar .btn{flex:none}
 .hbar{display:flex;align-items:center;justify-content:space-between;gap:12px;border-radius:14px;background:var(--surface-2);border:1px solid var(--line);padding:10px 13px;font:500 13.5px/1.4 var(--body);color:var(--ink-2)}
+
+/* ---------- safety screen line and voice button ---------- */
+.gline{display:flex;align-items:center;gap:8px;font:500 12.5px/1.45 var(--body);color:var(--ink-3);margin-top:2px}
+.gline svg{width:14px;height:14px;flex:none;color:var(--good)}
+.gline .mchip{height:24px;font-size:11.5px;padding:0 9px 0 6px}
+.gline.bad{align-items:flex-start;border-radius:14px;background:var(--bad-bg);padding:11px 13px;color:var(--ink);font-size:13.5px}
+.gline.bad svg{color:var(--bad);margin-top:2px;width:16px;height:16px}
+.composer .mic{width:36px;height:36px;border-radius:50%;border:0;background:transparent;color:var(--ink-2);display:grid;place-items:center;cursor:pointer;flex:none;align-self:flex-end;margin-bottom:1px}
+.composer .mic svg{width:19px;height:19px}
+.composer .mic:hover{background:var(--surface-2);color:var(--ink)}
+.composer .mic.on{background:var(--bad);color:#fff;animation:micpulse 1.1s ease-in-out infinite}
+.composer .mic.busy{opacity:.55;cursor:progress}
+@keyframes micpulse{50%{box-shadow:0 0 0 7px rgba(229,72,77,.18)}}
+@media (prefers-reduced-motion:reduce){.composer .mic.on{animation:none}}
 </style></head><body>
 <div class="app">
   <aside class="sidebar">
@@ -233,6 +247,7 @@ button.switch{border:0;padding:0;cursor:pointer}
         </div>
         <form class="composer" id="composer" autocomplete="off">
           <textarea id="q" rows="1" maxlength="2000" placeholder="Ask about your internet" aria-label="Ask Proof AI about your internet" enterkeyhint="send"></textarea>
+          <button class="mic" id="mic" type="button" aria-label="Ask by voice" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.500 6.500 0 0 0 13 0M12 17.500V21"/></svg></button>
           <button class="send" id="send" type="button" aria-label="Send question" disabled></button>
         </form>
         <div class="ai-note docknote">Proof AI answers from your own results and can make mistakes. <button type="button" class="link humanlink" data-human>Talk to a person</button></div>

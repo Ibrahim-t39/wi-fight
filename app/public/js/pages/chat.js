@@ -5,7 +5,7 @@
 import { boot, $, $$, esc, toast, closeSheet, AI, Store } from '../shell.js';
 import { fmtTime, fmtDate } from '../engine.js';
 import { openSheet, switchHTML, copyText, pause } from './ui-sheet.js';
-import { modelChip, hostInfo } from '../models.js';
+import { modelChip, hostInfo, modelInfo, modelStack } from '../models.js';
 
 const { facts, ai: status } = await boot({ need: 'plan' });
 const S = () => Store.get();
@@ -246,18 +246,26 @@ async function leaveHuman(conv) {
   await persist(conv); if (cur === conv) render();
 }
 
-const SIM = '<span class="simtag">Simulated for this demo</span>';
+const SIM = '<span class="simtag">Simulated</span>';
 function noteHTML(m, i, isLast) {
   if (m.kind === 'status') return `<div class="hstatus" data-i="${i}"><span>${esc(m.text)}</span></div>`;
-  if (m.kind === 'offer') return `<div class="hoffer" data-i="${i}"><div class="ht"><b>Want to talk to a person?</b><span>${esc(m.text)}</span></div>${isLast && !cur.agent ? '<div class="row gap8" style="flex-wrap:wrap"><button type="button" class="btn primary sm" data-human-yes>Connect me to an agent</button><button type="button" class="btn ghost sm" data-human-no>No thanks</button></div>' : ''}<div class="mmeta">This prototype has no real support team, so the agent is simulated.</div></div>`;
+  if (m.kind === 'offer') return `<div class="hoffer" data-i="${i}"><div class="ht"><b>Want to talk to a person?</b><span>${esc(m.text)}</span></div>${isLast && !cur.agent ? '<div class="row gap8" style="flex-wrap:wrap"><button type="button" class="btn primary sm" data-human-yes>Connect me to an agent</button><button type="button" class="btn ghost sm" data-human-no>No thanks</button></div>' : ''}</div>`;
   return `<article class="turn ai agent" data-i="${i}"><div class="who"><span class="avatar agentav" aria-hidden="true">${esc(AGENT.name[0])}</span><span class="agentname">${esc(AGENT.name)} · ${esc(AGENT.role)}</span>${SIM}</div>
     <div class="mbody"><p>${esc(m.text)}</p></div>
-    <div class="mfoot"><div class="mmeta">${esc(AGENT.name)} is not a real person. The app wrote this from your own results. ${esc(fmtTime(m.t))}</div></div></article>`;
+    <div class="mfoot"><div class="mmeta">${esc(fmtTime(m.t))}</div></div></article>`;
 }
 const agentTypingHTML = () => `<article class="turn ai agent"><div class="who"><span class="avatar agentav" aria-hidden="true">${esc(AGENT.name[0])}</span><span class="agentname">${esc(AGENT.name)} · ${esc(AGENT.role)}</span>${SIM}</div><div class="thinking" role="status"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span>${esc(AGENT.name)} is typing...</span></div></article>`;
 
 /* ---------- messages ---------- */
 const whoHTML = `<div class="who"><span class="avatar" aria-hidden="true">${IC.spark}</span><span class="ai-tag">PROOF AI</span></div>`;
+// The safety screen: a small separate model reads each message for prompt injection before the main model sees it.
+function guardHTML(m) {
+  if (!m.guard || !m.guard.model) return '';
+  const chip = modelChip(m.guard.model, { maker: false });
+  return m.blocked
+    ? `<div class="gline bad" role="note">${IC.warn}<span><b>Stopped by the safety screen.</b> ${chip} scored this message as a likely prompt injection, so it never reached the main model.</span></div>`
+    : `<div class="gline">${IC.lock}<span>Your message passed the safety screen, ${chip}, before it was answered.</span></div>`;
+}
 function aiHTML(m, i, isLast) {
   const act = (name, label, icon, on) => `<button class="act${on ? ' on' : ''}" type="button" data-act="${name}" aria-label="${label}" title="${label}"${name === 'up' || name === 'down' ? ` aria-pressed="${on ? 'true' : 'false'}"` : ''}>${icon}</button>`;
   const bad = Array.isArray(m.ungrounded) ? m.ungrounded.filter((x) => x != null && x !== '') : [];
@@ -266,7 +274,8 @@ function aiHTML(m, i, isLast) {
     ${m.stopped ? '<span class="stopmark"><i></i>Stopped</span>' : ''}
     ${m.cut ? '<div class="mmeta">The answer was cut off before it finished.</div>' : ''}
     ${bad.length ? `<div class="ground" role="note">${IC.warn}<span><b>Check this answer:</b> it mentions numbers that are not in your data (${esc(bad.slice(0, 6).join(', '))}).</span></div>` : ''}
-    <div class="mfoot"><div class="mmeta">${writerHTML(m)}</div>
+    ${guardHTML(m)}
+    <div class="mfoot"><div class="mmeta">${m.blocked ? esc(fmtTime(m.t)) : writerHTML(m)}</div>
     <div class="acts">${act('copy', 'Copy answer', IC.copy)}${act('up', 'Good answer', IC.up, m.rating === 'up')}${act('down', 'Bad answer', IC.down, m.rating === 'down')}${isLast ? act('regen', 'Write this answer again', IC.regen) : ''}</div></div>
   </article>`;
 }
@@ -305,7 +314,7 @@ function render() {
       if (ups.length) html += `<div class="follow" id="follow" aria-label="Suggested next questions">${ups.map((u) => `<button type="button" class="chip" data-ask="${esc(u)}"${on ? '' : ' disabled'}>${esc(u)}</button>`).join('')}</div>`;
     }
   }
-  if (cur.agent && !handing) html += `<div class="hbar"><span>You are chatting with ${esc(AGENT.name)}, a simulated support agent.</span><button type="button" class="btn sm" data-human-end>Back to Proof AI</button></div>`;
+  if (cur.agent && !handing) html += `<div class="hbar"><span>You are chatting with ${esc(AGENT.name)} from support.</span><button type="button" class="btn sm" data-human-end>Back to Proof AI</button></div>`;
   thread.innerHTML = html;
   $('#ctitle').textContent = cur.title || 'New chat';
   document.title = `Wi-Fight · ${cur.title || 'Ask Proof AI'}`;
@@ -419,6 +428,8 @@ async function send(text, { again = false } = {}) {
       ungrounded: Array.isArray(result.ungrounded) ? result.ungrounded.map(String) : [], stopped: !!result.stopped, rating: null,
       ...(Array.isArray(result.followups) && result.followups.length ? { followups: result.followups.map(String).slice(0, 3) } : {}),
       ...(result.warning ? { cut: true } : {}),
+      ...(result.guard ? { guard: { model: result.guard.model, score: result.guard.score, flagged: !!result.guard.flagged } } : {}),
+      ...(result.blocked ? { blocked: true } : {}),
     });
     await persist(conv);
   }
@@ -502,6 +513,39 @@ thread.addEventListener('click', async (e) => {
     if (m.rating === 'down' && offerHuman(cur, 'Sorry that answer missed. I can connect you to a live support agent and pass along your results.')) { await persist(cur); stick = true; render(); }
   } else if (kind === 'regen') send('', { again: true });
 });
+
+/* ---------- ask by voice ---------- */
+// A spoken question is recorded in the browser, sent once to the speech model, and comes back as text in the box.
+// The button only appears when the server has a speech model connected. Nothing is recorded until it is pressed.
+const mic = $('#mic');
+let rec = null, recTimer = 0;
+async function stopRec() { clearTimeout(recTimer); if (rec && rec.state !== 'inactive') rec.stop(); }
+async function startRec() {
+  let stream;
+  try { stream = await navigator.mediaDevices.getUserMedia({ audio: true }); } catch { toast('The microphone is blocked, so type your question instead.'); return; }
+  const chunks = [];
+  rec = new MediaRecorder(stream);
+  rec.ondataavailable = (e) => { if (e.data && e.data.size) chunks.push(e.data); };
+  rec.onstop = async () => {
+    stream.getTracks().forEach((t) => t.stop());
+    mic.classList.remove('on'); mic.classList.add('busy'); mic.setAttribute('aria-label', 'Turning your question into text');
+    try {
+      const blob = new Blob(chunks, { type: rec.mimeType || 'audio/webm' });
+      const audio = await new Promise((res, rej) => { const fr = new FileReader(); fr.onload = () => res(fr.result); fr.onerror = rej; fr.readAsDataURL(blob); });
+      const r = await fetch('api/transcribe', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ audio }) });
+      const j = await r.json();
+      if (!r.ok || !j.text) toast(j.error || 'I could not hear a question in that. Try again.');
+      else { input.value = j.text; grow(); paintComposer(); input.focus(); toast(`Heard by ${modelInfo(j.model).name}`); }
+    } catch { toast('Voice input did not work just now.'); }
+    mic.classList.remove('busy'); mic.setAttribute('aria-label', 'Ask by voice'); rec = null;
+  };
+  rec.start(); mic.classList.add('on'); mic.setAttribute('aria-label', 'Stop recording');
+  recTimer = setTimeout(stopRec, 15000); // a question, not a speech
+}
+if (mic) {
+  mic.onclick = () => { if (mic.classList.contains('busy')) return; if (rec) stopRec(); else startRec(); };
+  modelStack().then((st) => { mic.hidden = !(st.live && st.speech && navigator.mediaDevices && window.MediaRecorder); if (!mic.hidden) mic.title = `Ask by voice (${st.speech.name})`; }).catch(() => { mic.hidden = true; });
+}
 
 /* ---------- start ---------- */
 $('#eyebrow').textContent = H ? `Ask Proof AI · Day ${facts.dayNumber} of ${facts.totalDays}` : 'Ask Proof AI · No tests yet';

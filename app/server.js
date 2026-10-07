@@ -41,6 +41,11 @@ const GROQ_URL = (process.env.GROQ_BASE_URL || 'https://api.groq.com/openai/v1')
 // exist and uses the first match. GROQ_MODEL / GROQ_VISION_MODEL in .env go to the front of the list.
 const TEXT_PREFS = [process.env.GROQ_MODEL, 'llama-3.3-70b-versatile', 'openai/gpt-oss-120b', 'moonshotai/kimi-k2-instruct', 'qwen/qwen3-32b', 'openai/gpt-oss-20b', 'llama-3.1-8b-instant'].filter(Boolean);
 const VISION_PREFS = [process.env.GROQ_VISION_MODEL, 'qwen/qwen3.8-27b', 'qwen/qwen3.6-27b', 'meta-llama/llama-4-scout-17b-16e-instruct', 'meta-llama/llama-4-maverick-17b-128e-instruct'].filter(Boolean);
+// More models with their own jobs, used only when Groq lists them for this key.
+const GUARD_PREFS = [process.env.GROQ_GUARD_MODEL, 'meta-llama/llama-prompt-guard-2-86m', 'meta-llama/llama-prompt-guard-2-22m'].filter(Boolean); // screens messages for prompt injection
+const FAST_PREFS = [process.env.GROQ_FAST_MODEL, 'openai/gpt-oss-20b', 'llama-3.1-8b-instant'].filter(Boolean);   // backup writer when the main model is busy
+const SPEECH_PREFS = [process.env.GROQ_SPEECH_MODEL, 'whisper-large-v3-turbo', 'whisper-large-v3'].filter(Boolean); // turns a spoken question into text
+let GROQ_GUARD = null, GROQ_FAST = null, GROQ_SPEECH = null;
 let GROQ_MODEL = TEXT_PREFS[0];
 let GROQ_VISION_MODEL = VISION_PREFS[0];
 let groqChecked = 0;
@@ -57,6 +62,9 @@ async function groqPick(force = false) {
     const chatty = (id) => !/guard|whisper|tts|speech|embed|safeguard|compound/i.test(id);
     GROQ_MODEL = TEXT_PREFS.find((m) => ids.includes(m)) || ids.find((id) => chatty(id) && /70b|120b|kimi|qwen/i.test(id)) || ids.find(chatty) || GROQ_MODEL;
     GROQ_VISION_MODEL = VISION_PREFS.find((m) => ids.includes(m)) || ids.find((id) => /qwen3|llama-4|vision/i.test(id)) || GROQ_VISION_MODEL;
+    GROQ_GUARD = GUARD_PREFS.find((m) => ids.includes(m)) || ids.find((id) => /prompt-guard/i.test(id)) || null;
+    GROQ_FAST = FAST_PREFS.find((m) => ids.includes(m) && m !== GROQ_MODEL) || null;
+    GROQ_SPEECH = SPEECH_PREFS.find((m) => ids.includes(m)) || ids.find((id) => /whisper/i.test(id)) || null;
   } catch { /* keep the current choice */ }
 }
 // Force one backend with WIFIGHT_PROVIDER=claude|groq|local|none. Default: the first one available.
@@ -311,18 +319,56 @@ const JSON_SHAPE = {
   verdict: '{"sentence": string, "reasons": [{"title": string, "detail": string}]} with exactly 3 reasons',
   bill: '{"sees": string, "isBill": boolean, "planPrice": number|null, "equipment": number|null, "fees": [{"name": string, "amount": number, "junk": boolean, "why": string}], "total": number|null, "promoEnds": string|null, "provider": string|null, "plan": string|null, "confidence": "high"|"medium"|"low"}',
 };
-async function runGroq(body, t) {
+// Safety screen: a small classifier model reads the user's message before the main model does and scores how
+// likely it is to be a prompt injection ("ignore your instructions and ..."). Returns null when no such model is
+// available or the check fails, so a broken screen never blocks a normal question.
+async function groqScreen(text) {
+  if (!GROQ_GUARD || !text) return null;
+  try {
+    const r = await fetch(`${GROQ_URL}/chat/completions`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${GROQ_KEY}` }, signal: AbortSignal.timeout(5000),
+      body: JSON.stringify({ model: GROQ_GUARD, temperature: 0, max_tokens: 12, messages: [{ role: 'user', content: String(text).slice(0, 2000) }] }) });
+    if (!r.ok) { console.warn('Guard model error', r.status, (await r.text()).slice(0, 160)); return null; }
+    const raw = String((await r.json()).choices[0].message.content || '').trim();
+    const num = parseFloat(raw);
+    // The guard models answer with a score from 0 to 1, or with a label.
+    const score = Number.isFinite(num) && num >= 0 && num <= 1 ? num : /malicious|jailbreak|injection|unsafe/i.test(raw) ? 1 : /benign|safe/i.test(raw) ? 0 : null;
+    if (score == null) return null;
+    return { model: GROQ_GUARD, score: Math.round(score * 1000) / 1000, flagged: score >= 0.85 };
+  } catch (e) { console.warn('Guard check failed', e.message); return null; }
+}
+
+// Speech to text for a spoken question. The audio is sent once and not stored.
+async function runTranscribe(body) {
+  if ((await provider()) !== 'groq' || !GROQ_SPEECH) return { status: 503, json: { error: 'Voice input needs a connected speech model.' } };
+  const m = /^data:(audio\/[a-z0-9.+-]+)(?:;[^,]*)?;base64,(.+)$/i.exec(body.audio || '');
+  if (!m) return { status: 400, json: { error: 'A short audio recording is required.' } };
+  const buf = Buffer.from(m[2], 'base64');
+  if (buf.length < 800) return { status: 400, json: { error: 'That recording was too short.' } };
+  if (buf.length > 4e6) return { status: 413, json: { error: 'That recording is too long. Keep it under 30 seconds.' } };
+  const ext = /webm/.test(m[1]) ? 'webm' : /mp4|m4a|aac/.test(m[1]) ? 'm4a' : /ogg/.test(m[1]) ? 'ogg' : /wav/.test(m[1]) ? 'wav' : /mpeg|mp3/.test(m[1]) ? 'mp3' : 'webm';
+  try {
+    const form = new FormData();
+    form.append('file', new Blob([buf], { type: m[1] }), `question.${ext}`);
+    form.append('model', GROQ_SPEECH); form.append('language', 'en'); form.append('response_format', 'json'); form.append('temperature', '0');
+    const r = await fetch(`${GROQ_URL}/audio/transcriptions`, { method: 'POST', headers: { Authorization: `Bearer ${GROQ_KEY}` }, body: form, signal: AbortSignal.timeout(30000) });
+    if (!r.ok) { console.warn('Speech model error', r.status, (await r.text()).slice(0, 200)); return { status: 502, json: { error: 'The speech model could not read that recording.' } }; }
+    const text = String((await r.json()).text || '').replace(/\s*[—–]\s*/g, ', ').trim().slice(0, 600);
+    return { status: 200, json: { text, model: GROQ_SPEECH } };
+  } catch (e) { console.warn('Speech request failed', e.message); return { status: 502, json: { error: 'Could not reach the speech model.' } }; }
+}
+
+async function runGroq(body, t, useModel) {
   try {
     if (body.task === 'draft') {
       const { system, prompt } = draftPrompt(body);
-      const r = await groqFetch({ model: GROQ_MODEL, temperature: 0.3, max_tokens: 700, messages: [{ role: 'system', content: system }, { role: 'user', content: prompt }] });
+      const r = await groqFetch({ model: useModel || GROQ_MODEL, temperature: 0.3, max_tokens: 700, messages: [{ role: 'system', content: system }, { role: 'user', content: prompt }] });
       if (!r.ok) { console.warn('Groq error', r.status, (await r.text()).slice(0, 300)); return groqError(r.status); }
       const out = parseDraft((await r.json()).choices[0].message.content, body.facts);
-      return out.result ? { status: 200, json: { mode: 'live', provider: 'groq', model: GROQ_MODEL, result: out.result } } : out;
+      return out.result ? { status: 200, json: { mode: 'live', provider: 'groq', model: useModel || GROQ_MODEL, result: out.result } } : out;
     }
     if (!JSON_SHAPE[body.task]) return { status: 400, json: { error: 'Unknown task' } };
     const system = `${SYSTEM}\nReply with one JSON object only, no other text. Shape: ${JSON_SHAPE[body.task]}.`;
-    let model = GROQ_MODEL, user;
+    let model = useModel || GROQ_MODEL, user;
     if (body.task === 'bill') {
       if (!/^data:image\/(?:png|jpeg|webp|gif);base64,/.test(body.image || '')) return { status: 400, json: { error: 'A PNG, JPEG, WebP, or GIF photo is required.' } };
       model = GROQ_VISION_MODEL;
@@ -379,7 +425,7 @@ async function runChat(body, res) {
   res.writeHead(200, { 'Content-Type': 'text/event-stream; charset=utf-8', 'Cache-Control': 'no-store', Connection: 'keep-alive', 'X-Accel-Buffering': 'no' });
   const send = (o) => res.write(`data: ${JSON.stringify(o)}\n\n`);
   const system = CHAT_SYSTEM(body.facts || {});
-  let full = '', closed = false;
+  let full = '', closed = false, guard = null, usedModel = null;
   const ac = new AbortController();
   res.on('close', () => { closed = true; ac.abort(); });
   const noDash = (t) => t.replace(/\s*[\u2014\u2013]\s*/g, ', ');
@@ -393,7 +439,21 @@ async function runChat(body, res) {
       const final = await stream.finalMessage();
       if (final.stop_reason === 'refusal') { send({ error: 'The model declined to answer that.' }); return res.end(); }
     } else if (p === 'groq') {
-      const r = await groqFetch({ model: GROQ_MODEL, stream: true, temperature: 0.3, max_tokens: 900, messages: [{ role: 'system', content: system }, ...history] }, ac.signal);
+      // 1. Safety screen: a separate small model checks the newest message for prompt injection before the main model sees it.
+      guard = await groqScreen(history[history.length - 1].content);
+      if (guard && guard.flagged) {
+        const refusal = 'I cannot follow that instruction. It looks like an attempt to change how I work, so I stopped before answering. I can help with your speed results, your plan, your bill, or what to say to your provider.';
+        send({ delta: refusal });
+        send({ done: true, ...describe(p), guard, blocked: true, ungrounded: [] });
+        return res.end();
+      }
+      // 2. The main model answers. If it is busy or failing, the backup model takes over.
+      let r = await groqFetch({ model: GROQ_MODEL, stream: true, temperature: 0.3, max_tokens: 900, messages: [{ role: 'system', content: system }, ...history] }, ac.signal);
+      if (!r.ok && GROQ_FAST && (r.status === 429 || r.status >= 500)) {
+        console.warn('Groq main model failed, using the backup model', r.status);
+        usedModel = GROQ_FAST;
+        r = await groqFetch({ model: GROQ_FAST, stream: true, temperature: 0.3, max_tokens: 900, messages: [{ role: 'system', content: system }, ...history] }, ac.signal);
+      }
       if (!r.ok || !r.body) { console.warn('Groq error', r.status, (await r.text()).slice(0, 300)); send({ error: groqError(r.status).json.error }); return res.end(); }
       const dec = new TextDecoder(); let buf = '';
       for await (const chunk of r.body) {
@@ -427,7 +487,7 @@ async function runChat(body, res) {
       }
     }
     const clean = tidy(full);
-    send({ done: true, ...describe(p), text: clean !== full ? clean : undefined, ungrounded: ungrounded(full, body.facts || {}) });
+    send({ done: true, ...describe(p), ...(usedModel ? { model: usedModel } : {}), ...(guard ? { guard } : {}), text: clean !== full ? clean : undefined, ungrounded: ungrounded(full, body.facts || {}) });
   } catch (error) {
     if (!closed) {
       let msg = 'The AI service stopped unexpectedly.';
@@ -448,7 +508,9 @@ async function runAI(body) {
   if (p === 'groq') {
     // A hosted model sometimes returns a broken answer or drops the connection. One quiet second try fixes most of those.
     let out = await runGroq(body, t);
-    if (out.status === 502 || out.status === 422) { console.warn('Groq answer failed, trying once more', body.task, out.status, out.json && out.json.error); out = await runGroq(body, t); }
+    // The second try goes to the backup model when there is one, so a busy main model does not stall the demo.
+    if ((out.status === 502 || out.status === 422 || out.status === 429) && body.task !== 'bill') { console.warn('Groq answer failed, trying once more', body.task, out.status, out.json && out.json.error); out = await runGroq(body, t, out.status === 422 ? undefined : GROQ_FAST || undefined); }
+    else if (out.status === 502 && body.task === 'bill') out = await runGroq(body, t);
     return out;
   }
   if (!p) return { status: 503, json: { error: 'offline' } };
@@ -490,7 +552,7 @@ const allow = () => { if (Date.now() - windowStart > 60000) { windowStart = Date
 http.createServer(async (req, res) => {
   const url = new URL(req.url, `http://${req.headers.host}`);
   // Which models the Groq key can use and which ones this server picked. Model names only, never the key.
-  if (url.pathname === '/api/models') { if (GROQ_KEY) await groqPick(); return send(res, 200, JSON.stringify({ text: GROQ_KEY ? GROQ_MODEL : null, photo: GROQ_KEY ? GROQ_VISION_MODEL : null, available: GROQ_IDS })); }
+  if (url.pathname === '/api/models') { if (GROQ_KEY) await groqPick(); return send(res, 200, JSON.stringify({ text: GROQ_KEY ? GROQ_MODEL : null, photo: GROQ_KEY ? GROQ_VISION_MODEL : null, fast: GROQ_FAST, guard: GROQ_GUARD, speech: GROQ_SPEECH, available: GROQ_IDS })); }
   if (url.pathname === '/api/status') return send(res, 200, JSON.stringify(describe(await provider())));
   if (url.pathname === '/api/ai') {
     if (req.method !== 'POST') return send(res, 405, JSON.stringify({ error: 'POST only' }));
@@ -504,6 +566,14 @@ http.createServer(async (req, res) => {
       const out = await runAI(body);
       send(res, out.status, JSON.stringify(out.json));
     });
+    return;
+  }
+  if (url.pathname === '/api/transcribe') {
+    if (req.method !== 'POST') return send(res, 405, JSON.stringify({ error: 'POST only' }));
+    if (!allow()) return send(res, 429, JSON.stringify({ error: 'Too many AI requests. Wait a minute.' }));
+    let raw = '', tooBig = false;
+    req.on('data', (c) => { raw += c; if (raw.length > 6e6) { tooBig = true; req.destroy(); } });
+    req.on('end', async () => { if (tooBig) return; let body; try { body = JSON.parse(raw); } catch { return send(res, 400, JSON.stringify({ error: 'Bad JSON' })); } const out = await runTranscribe(body); send(res, out.status, JSON.stringify(out.json)); });
     return;
   }
   if (url.pathname === '/api/chat') {

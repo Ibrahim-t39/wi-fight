@@ -118,7 +118,7 @@ export const AI = {
             }
           }
           if (meta && meta.text) { text = meta.text; onDelta(text, ''); } // the server's tidied final text
-          if (text && !err) return { text, mode: 'live', provider: (meta && meta.provider) || st.provider, model: (meta && meta.model) || st.model, ungrounded: (meta && meta.ungrounded) || [], stopped: false };
+          if (text && !err) return { text, mode: 'live', provider: (meta && meta.provider) || st.provider, model: (meta && meta.model) || st.model, ungrounded: (meta && meta.ungrounded) || [], stopped: false, guard: (meta && meta.guard) || null, blocked: !!(meta && meta.blocked) };
           if (err && !text) throw new Error(err);
           if (text) return { text, mode: 'live', provider: st.provider, model: st.model, ungrounded: [], stopped: false, warning: err };
         }
