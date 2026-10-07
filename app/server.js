@@ -352,7 +352,7 @@ async function runTranscribe(body) {
     form.append('model', GROQ_SPEECH); form.append('language', 'en'); form.append('response_format', 'json'); form.append('temperature', '0');
     const r = await fetch(`${GROQ_URL}/audio/transcriptions`, { method: 'POST', headers: { Authorization: `Bearer ${GROQ_KEY}` }, body: form, signal: AbortSignal.timeout(30000) });
     if (!r.ok) { console.warn('Speech model error', r.status, (await r.text()).slice(0, 200)); return { status: 502, json: { error: 'The speech model could not read that recording.' } }; }
-    const text = String((await r.json()).text || '').replace(/\s*[—–]\s*/g, ', ').trim().slice(0, 600);
+    const text = String((await r.json()).text || '').replace(/\s*[\u2014\u2013]\s*/g, ', ').trim().slice(0, 600);
     return { status: 200, json: { text, model: GROQ_SPEECH } };
   } catch (e) { console.warn('Speech request failed', e.message); return { status: 502, json: { error: 'Could not reach the speech model.' } }; }
 }

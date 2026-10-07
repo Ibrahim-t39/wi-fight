@@ -1,5 +1,6 @@
 // Step 1: consent. Nothing is written to the store until the person presses "I agree, continue".
-import { Store, $, $$, go } from '../shell.js';
+import { Store, $, $$, go, paintTheme } from '../shell.js';
+paintTheme(); // draw the sun or moon on this page's light and dark toggle
 
 const state = await Store.load();
 const mlab = $('#c-mlab'), ai = $('#c-ai'), agree = $('#agree'), hint = $('#agree-hint');

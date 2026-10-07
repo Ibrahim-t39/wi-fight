@@ -1,6 +1,7 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Wi-Fight · Privacy & data</title>
-<link rel="icon" type="image/svg+xml" href="img/favicon.svg"><link rel="stylesheet" href="css/ds.css">
+<link rel="icon" type="image/svg+xml" href="img/favicon.svg">
+<script>try{var t=localStorage.getItem("wf.theme");if(t==="dark"||t==="light")document.documentElement.dataset.theme=t}catch(e){}</script><link rel="stylesheet" href="css/ds.css">
 <style>
 .badge svg{width:12px;height:12px;flex:none}.chip svg{width:14px;height:14px;flex:none}.btn svg{width:16px;height:16px;flex:none}.ic16{display:inline-grid}.ic16 svg{width:16px;height:16px}
 .status{display:grid;grid-template-columns:auto 1fr;gap:16px 20px;align-items:center;padding:22px}
@@ -8,7 +9,7 @@
 .status .shieldbig svg{width:28px;height:28px}
 .checks{grid-column:1 / -1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
 .chk{display:flex;gap:10px;align-items:center;padding:11px 14px;border-radius:var(--r-tile);background:var(--surface-2);border:1px solid var(--line);font:600 14px/1.4 var(--body)}
-.chk i{width:22px;height:22px;border-radius:50%;background:var(--good);color:#fff;display:grid;place-items:center;flex:none}
+.chk i{width:22px;height:22px;border-radius:50%;background:var(--good);color:var(--on-status);display:grid;place-items:center;flex:none}
 .chk i svg{width:13px;height:13px}
 .sec{padding:22px}
 .sechead{display:flex;align-items:center;gap:12px}
@@ -25,7 +26,7 @@
 .hold td small{display:block;font:500 12.5px var(--body);color:var(--ink-3);margin-top:2px}
 .hold .c{font-family:var(--display);font-size:18px;width:64px}
 .hold .a{text-align:right;width:52px}
-.link{color:var(--cobalt);font:700 14px var(--body);text-decoration:none;display:inline-flex;align-items:center;gap:4px}
+.link{color:var(--cobalt-ink);font:700 14px var(--body);text-decoration:none;display:inline-flex;align-items:center;gap:4px}
 .link svg{width:14px;height:14px}
 .notice{border-radius:var(--r-tile);background:var(--warn-bg);padding:14px;font:500 14px/1.5 var(--body);color:var(--ink)}
 .notice b{font-weight:700}
@@ -63,7 +64,7 @@ button.ctlbox{width:100%;text-align:left;cursor:pointer;font-family:inherit;colo
 .chk.warn i{background:var(--warn)}
 .status .shieldbig.warn{background:var(--warn-bg);color:var(--warn)}
 .disk{grid-column:1 / -1;border-radius:var(--r-tile);border:1px solid var(--line);background:var(--surface-2);padding:12px 14px;min-width:0}
-.disk summary{display:flex;align-items:center;gap:8px;cursor:pointer;font:700 14px var(--body);color:var(--cobalt);list-style:none}
+.disk summary{display:flex;align-items:center;gap:8px;cursor:pointer;font:700 14px var(--body);color:var(--cobalt-ink);list-style:none}
 .disk summary .chev{margin-left:auto;color:var(--ink-3);transition:transform .2s}
 .disk[open] summary .chev{transform:rotate(180deg)}
 .disk summary small{font:500 13px var(--body);color:var(--ink-3)}
@@ -80,7 +81,7 @@ button.ctlbox{width:100%;text-align:left;cursor:pointer;font-family:inherit;colo
 .msg b{display:block;font:700 12px var(--body);color:var(--ink);margin-bottom:3px}
 .monoi{font-family:ui-monospace,Menlo,monospace}
 .dlist{margin:0 0 0 18px;font:500 14px/1.6 var(--body);color:var(--ink)}
-.btn.danger{background:var(--bad);color:#fff}
+.btn.danger{background:var(--bad);color:var(--on-status)}
 .sheet .kv{font-size:14px;gap:12px}.sheet .kv .v{text-align:right}
 /* security at a glance, and the on-disk comparison */
 .glance{padding:20px 22px}
@@ -88,7 +89,7 @@ button.ctlbox{width:100%;text-align:left;cursor:pointer;font-family:inherit;colo
 .glist li{display:flex;flex-direction:column;gap:5px;padding:12px 14px;border-radius:var(--r-tile);background:var(--surface-2);border:1px solid var(--line);min-width:0}
 .glist .gt{font:600 13.5px/1.3 var(--body);color:var(--ink)}
 .glist .gw{display:inline-flex;align-items:center;gap:6px;font:700 15px/1.2 var(--body);color:var(--good)}
-.glist .gw i{width:18px;height:18px;border-radius:50%;background:var(--good);color:#fff;display:grid;place-items:center;flex:none}
+.glist .gw i{width:18px;height:18px;border-radius:50%;background:var(--good);color:var(--on-status);display:grid;place-items:center;flex:none}
 .glist .gw i svg{width:11px;height:11px}
 .glist li.warn .gw{color:var(--warn)}.glist li.warn .gw i{background:var(--warn)}
 .glist li.off .gw{color:var(--ink-2)}.glist li.off .gw i{background:var(--ink-3)}
@@ -104,7 +105,7 @@ button.ctlbox{width:100%;text-align:left;cursor:pointer;font-family:inherit;colo
 .finds li span{min-width:0;overflow-wrap:anywhere}
 .finds li span b{color:var(--ink);font-family:ui-monospace,Menlo,monospace;font-weight:600}
 .finds li strong{flex:none;display:inline-flex;align-items:center;gap:6px;font:700 14px var(--body);color:var(--good)}
-.finds li strong i{width:18px;height:18px;border-radius:50%;background:var(--good);color:#fff;display:grid;place-items:center}
+.finds li strong i{width:18px;height:18px;border-radius:50%;background:var(--good);color:var(--on-status);display:grid;place-items:center}
 .finds li strong i svg{width:11px;height:11px}
 .finds li.hit strong{color:var(--bad)}.finds li.hit strong i{background:var(--bad)}
 .finds li.na strong{color:var(--ink-3)}
@@ -182,7 +183,7 @@ button.ctlbox{width:100%;text-align:left;cursor:pointer;font-family:inherit;colo
             <div class="srow"><div><div class="t">Let Proof AI analyze my results</div><div class="n">Explains your speeds and finds the likely cause.</div></div><div class="state"><b data-word="aiAnalyze" class="off">Off</b><button type="button" class="switch" role="switch" aria-checked="false" aria-label="Let Proof AI analyze my results" data-switch="aiAnalyze"></button></div></div>
             <div class="srow"><div><div class="t">Let Proof AI read bill photos</div><div class="n">It reads the price and fees, and the photo is never stored.</div></div><div class="state"><b data-word="aiBill" class="off">Off</b><button type="button" class="switch" role="switch" aria-checked="false" aria-label="Let Proof AI read bill photos" data-switch="aiBill"></button></div></div>
           </div>
-          <div class="row gap8" style="padding-top:14px;border-top:1px solid var(--line);font:600 14px/1.4 var(--body)"><span class="ic16" style="color:var(--cobalt)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span>AI answers use only your own data.</div>
+          <div class="row gap8" style="padding-top:14px;border-top:1px solid var(--line);font:600 14px/1.4 var(--body)"><span class="ic16" style="color:var(--cobalt-ink)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span>AI answers use only your own data.</div>
         </section>
 
         <section class="card sec col gap12">

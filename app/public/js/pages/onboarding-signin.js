@@ -1,6 +1,7 @@
 // Step 2: sign in. There is no email server and no sign-in server, so any 6 digits are accepted as the code.
 // A real build would email a code and check it on a server.
-import { Store, $, $$, go, bind } from '../shell.js';
+import { Store, $, $$, go, bind, paintTheme } from '../shell.js';
+paintTheme(); // draw the sun or moon on this page's light and dark toggle
 
 const state = await Store.load();
 if (!state.consent || !state.consent.mlab) { go('onboarding-consent.html'); await new Promise(() => {}); }

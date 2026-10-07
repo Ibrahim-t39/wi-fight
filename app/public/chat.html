@@ -1,6 +1,7 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Wi-Fight · Ask Proof AI</title>
-<link rel="icon" type="image/svg+xml" href="img/favicon.svg"><link rel="stylesheet" href="css/ds.css">
+<link rel="icon" type="image/svg+xml" href="img/favicon.svg">
+<script>try{var t=localStorage.getItem("wf.theme");if(t==="dark"||t==="light")document.documentElement.dataset.theme=t}catch(e){}</script><link rel="stylesheet" href="css/ds.css">
 <style>
 .badge svg{width:12px;height:12px;flex:none}.chip svg{width:14px;height:14px;flex:none}.btn svg{width:16px;height:16px;flex:none}
 html,body{overflow-x:hidden}
@@ -20,7 +21,7 @@ button{color:inherit}
 .crow.on{background:var(--cobalt-50)}
 .copen{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px;align-items:flex-start;text-align:left;background:none;border:0;padding:9px 4px 9px 10px;border-radius:12px}
 .copen .ct{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:600 13.5px/1.25 var(--body);color:var(--ink)}
-.crow.on .ct{color:var(--cobalt)}
+.crow.on .ct{color:var(--cobalt-ink)}
 .copen .cd{font:500 11.5px var(--body);color:var(--ink-3)}
 .cdel{flex:none;width:32px;height:32px;margin-right:4px;border-radius:9px;border:0;background:none;color:var(--ink-3);display:grid;place-items:center;opacity:0}
 .cdel svg{width:15px;height:15px}
@@ -30,7 +31,7 @@ button{color:inherit}
 .crow.ask .q{font:600 13px/1.3 var(--body);color:var(--ink)}
 .crow.ask .row{gap:6px}
 .mini{height:30px;padding:0 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);font:600 12.5px var(--body);color:var(--ink)}
-.mini.danger{background:var(--bad);border-color:var(--bad);color:#fff}
+.mini.danger{background:var(--bad);border-color:var(--bad);color:var(--on-status)}
 .nochats{padding:8px 10px;font:500 12.5px/1.4 var(--body);color:var(--ink-3)}
 
 .convo{display:flex;flex-direction:column;min-height:0;min-width:0;position:relative}
@@ -81,7 +82,7 @@ button{color:inherit}
 .act{width:32px;height:32px;border-radius:9px;display:grid;place-items:center;color:var(--ink-3);background:transparent;border:0}
 .act svg{width:16px;height:16px}
 .act:hover{background:var(--surface);color:var(--ink)}
-.act.on{color:var(--cobalt);background:var(--cobalt-50)}
+.act.on{color:var(--cobalt-ink);background:var(--cobalt-50)}
 .errbox{display:flex;align-items:center;gap:12px;justify-content:space-between;flex-wrap:wrap;border-radius:14px;background:var(--bad-bg);padding:11px 13px;font:500 13.5px/1.45 var(--body);color:var(--ink)}
 .errbox span{flex:1;min-width:180px}
 .follow{display:flex;gap:8px;flex-wrap:wrap}
@@ -122,7 +123,7 @@ button.send.stop{background:var(--ink)}
 .scope .lrow .t,.scope-sheet .lrow .t{font:600 14px/1.3 var(--body);color:var(--ink)}
 .scope .lrow .s,.scope-sheet .lrow .s{font:500 12.5px/1.35 var(--body);color:var(--ink-3);margin-top:2px}
 .cant{border-radius:14px;background:var(--surface-2);border:1px solid var(--line);padding:12px;display:flex;gap:10px;align-items:flex-start;font:600 13px/1.4 var(--body);color:var(--ink)}
-.cant svg{width:16px;height:16px;flex:none;margin-top:1px;color:var(--cobalt)}
+.cant svg{width:16px;height:16px;flex:none;margin-top:1px;color:var(--cobalt-ink)}
 .modelline{display:flex;gap:10px;align-items:flex-start;font:500 12.5px/1.45 var(--body);color:var(--ink-2)}
 .modelline .mwho{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font:600 12.5px/1.3 var(--body);color:var(--ink)}
 .modelline .mwho .mchip{margin:0}
@@ -141,8 +142,8 @@ button.switch{border:0;padding:0;cursor:pointer}
   .chatmain,.chatmain.nopanel{grid-template-columns:240px minmax(0,1fr)}
   .scopecol,.chatmain.nopanel .showpanel{display:none}
   .scopechip{display:inline-flex;align-items:center;gap:7px;height:34px;padding:0 13px;border-radius:999px;background:var(--surface);border:1px solid var(--line);font:600 13px var(--body);color:var(--ink-2);white-space:nowrap;max-width:100%;overflow:hidden}
-  .scopechip svg{width:14px;height:14px;color:var(--cobalt);flex:none}
-  .scopechip b{color:var(--cobalt);font-weight:700}
+  .scopechip svg{width:14px;height:14px;color:var(--cobalt-ink);flex:none}
+  .scopechip b{color:var(--cobalt-ink);font-weight:700}
   .chiprow{max-width:816px;width:100%;margin:0 auto;padding:0 28px 10px;display:flex}
 }
 @media (max-width:900px){
@@ -171,14 +172,14 @@ button.switch{border:0;padding:0;cursor:pointer}
 }
 
 /* ---------- handoff to a person (simulated) ---------- */
-.humanlink{font:inherit;font-weight:600;color:var(--cobalt);text-decoration:underline;text-underline-offset:3px;background:none;border:0;padding:0;cursor:pointer}
+.humanlink{font:inherit;font-weight:600;color:var(--cobalt-ink);text-decoration:underline;text-underline-offset:3px;background:none;border:0;padding:0;cursor:pointer}
 .hstatus{display:flex;justify-content:center;text-align:center}
 .hstatus span{font:600 12.5px/1.45 var(--body);color:var(--ink-2);background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:7px 14px;max-width:92%}
 .hoffer{display:flex;flex-direction:column;gap:12px;border:1.5px solid var(--cobalt);border-radius:18px;padding:16px 18px;background:var(--surface)}
 .hoffer .ht{display:flex;flex-direction:column;gap:4px}
 .hoffer .ht b{font:700 16px/1.3 var(--body)}
 .hoffer .ht span{font:500 14.5px/1.45 var(--body);color:var(--ink-2)}
-.turn.agent .agentav{background:var(--good);color:#fff;font:700 14px/1 var(--body);display:grid;place-items:center}
+.turn.agent .agentav{background:var(--good);color:var(--on-status);font:700 14px/1 var(--body);display:grid;place-items:center}
 .agentname{font:700 13px/1 var(--body);color:var(--ink)}
 .simtag{font:600 11px/1 var(--body);color:var(--warn);background:var(--warn-bg);border-radius:99px;padding:5px 9px;margin-left:8px;white-space:nowrap}
 .hbar span{flex:1;min-width:0}.hbar .btn{flex:none}
@@ -193,7 +194,7 @@ button.switch{border:0;padding:0;cursor:pointer}
 .composer .mic{width:36px;height:36px;border-radius:50%;border:0;background:transparent;color:var(--ink-2);display:grid;place-items:center;cursor:pointer;flex:none;align-self:flex-end;margin-bottom:1px}
 .composer .mic svg{width:19px;height:19px}
 .composer .mic:hover{background:var(--surface-2);color:var(--ink)}
-.composer .mic.on{background:var(--bad);color:#fff;animation:micpulse 1.1s ease-in-out infinite}
+.composer .mic.on{background:var(--bad);color:var(--on-status);animation:micpulse 1.1s ease-in-out infinite}
 .composer .mic.busy{opacity:.55;cursor:progress}
 @keyframes micpulse{50%{box-shadow:0 0 0 7px rgba(229,72,77,.18)}}
 @media (prefers-reduced-motion:reduce){.composer .mic.on{animation:none}}

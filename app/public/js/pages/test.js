@@ -1,9 +1,10 @@
 // Live speed test page. Three states: ready, running, done.
 // "Start test" runs the simulated (practice) test, so it never touches the real connection.
 // "Use the real M-Lab test" is the opt-in for a real measurement.
-import { boot, bind, $, $$, go, chipsHTML, Store, AI, summarize, esc } from '../shell.js';
+import { boot, bind, $, $$, go, chipsHTML, Store, AI, summarize, esc, paintTheme } from '../shell.js';
 import { FAIR, CHECK_DAYS, SCHEDULE, now, fmtDate, fmtTime } from '../engine.js';
 import { runSpeedTest, ConsentError } from '../speedtest.js';
+paintTheme(); // draw the sun or moon on this page's light and dark toggle
 
 const { state, facts } = await boot({ need: 'plan' });
 const plan = facts.plan;

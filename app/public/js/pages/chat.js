@@ -157,7 +157,7 @@ function scopeHTML() {
       <div><div style="font:600 14px/1.3 var(--body)">Let Proof AI use my data</div><div class="small" data-ai-word style="color:${on ? 'var(--good)' : 'var(--ink-3)'};font-weight:700;margin-top:3px">${on ? 'On' : 'Off'}</div></div>
       ${switchHTML('aiAnalyze', on, 'Let Proof AI use my data')}
     </div>
-    <div class="small">${on ? 'Turn this off any time, here or in <a href="privacy.html" style="color:var(--cobalt);font-weight:600">Privacy &amp; data</a>.' : 'While this is off, Proof AI reads nothing and your questions are not sent. Turn it on here to ask again.'}</div>`;
+    <div class="small">${on ? 'Turn this off any time, here or in <a href="privacy.html" style="color:var(--cobalt-ink);font-weight:600">Privacy &amp; data</a>.' : 'While this is off, Proof AI reads nothing and your questions are not sent. Turn it on here to ask again.'}</div>`;
 }
 
 /* ---------- saved chats ---------- */

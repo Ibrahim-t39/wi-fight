@@ -10,6 +10,14 @@ export const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
 export const esc = AI.esc;
 // Leave softly: the page fades out (ds.css, .wf-leaving) just before the next one loads and fades in.
 export const go = (page) => { document.documentElement.classList.add('wf-leaving'); setTimeout(() => { location.href = page; }, 160); };
+// Light or dark. The choice is kept in this browser, and a small script in each page's head applies it before paint.
+const MOON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 0 1 9.500 4a8 8 0 1 0 10.500 10.500z"/></svg>';
+const SUN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2.500v2M12 19.500v2M2.500 12h2M19.500 12h2M5.300 5.300l1.400 1.400M17.300 17.300l1.400 1.400M5.300 18.700l1.400-1.400M17.300 6.700l1.400-1.400"/></svg>';
+export const isDark = () => document.documentElement.dataset.theme === 'dark';
+export function paintTheme() { document.querySelectorAll('[data-theme-toggle]').forEach((b) => { const d = isDark(); if (b.dataset.painted === String(d)) return; b.dataset.painted = String(d); b.innerHTML = b.hasAttribute('data-icon-only') ? (d ? SUN : MOON) : `${d ? SUN : MOON}${d ? 'Light mode' : 'Dark mode'}`; b.setAttribute('aria-label', d ? 'Switch to light mode' : 'Switch to dark mode'); }); }
+export function setTheme(t) { document.documentElement.dataset.theme = t; try { localStorage.setItem('wf.theme', t); } catch { /* storage may be blocked */ } paintTheme(); }
+document.addEventListener('click', (e) => { if (e.target.closest('[data-theme-toggle]')) { e.preventDefault(); setTheme(isDark() ? 'light' : 'dark'); } });
+new MutationObserver(paintTheme).observe(document.documentElement, { childList: true, subtree: true });
 // coming back with the browser's Back button must not show a faded-out page
 addEventListener('pageshow', () => document.documentElement.classList.remove('wf-leaving'));
 
@@ -63,6 +71,7 @@ function wireNav(state, facts, ai) {
       <div class="small" style="color:var(--ink-2)">Nothing is sent without your approval.</div>
       <div class="small" data-ai-mode>${ai.provider === 'local' ? 'Proof AI: ' + esc(modelName(ai.model)) + ', on this computer' : ai.live ? 'Proof AI: ' + esc(modelName(ai.model)) + (ai.provider === 'groq' ? ' on Groq' : '') : 'Proof AI: offline mode'}</div>
       <button class="btn ghost sm" data-demo style="align-self:stretch">${ICON.flask}Demo</button>
+      <button class="btn ghost sm" data-theme-toggle style="align-self:stretch"></button>
       <button class="btn ghost sm" data-logout style="align-self:stretch">${ICON.logout}Log out</button>`;
   }
   // phone tab bar: Home, History, [Run test], Proof AI, More
@@ -95,7 +104,7 @@ export function closeSheet() { const w = $('.sheet-wrap'); if (w) w.remove(); }
 function openMore() {
   const facts = summarize(Store.get());
   const items = [['Report', 'report.html'], ['Diagnosis', 'diagnosis.html'], ['Plans', 'plans.html'], ...(facts.complete ? [['Verdict', 'verdict.html']] : []), ['Privacy & data', 'privacy.html'], ['About', 'about.html']];
-  const w = sheet(`<div class="h3" style="margin-bottom:8px">More</div>${items.map(([n, r]) => `<a class="lrow" href="${r}" style="text-decoration:none;color:inherit"><span class="grow" style="font-weight:600">${n}</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></a>`).join('')}<button class="btn ghost sm" data-demo style="margin-top:14px;width:100%">${ICON.flask}Demo data</button><button class="btn ghost sm" data-logout style="margin-top:8px;width:100%">${ICON.logout}Log out</button>`);
+  const w = sheet(`<div class="h3" style="margin-bottom:8px">More</div>${items.map(([n, r]) => `<a class="lrow" href="${r}" style="text-decoration:none;color:inherit"><span class="grow" style="font-weight:600">${n}</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></a>`).join('')}<button class="btn ghost sm" data-demo style="margin-top:14px;width:100%">${ICON.flask}Demo data</button><button class="btn ghost sm" data-theme-toggle style="margin-top:8px;width:100%"></button><button class="btn ghost sm" data-logout style="margin-top:8px;width:100%">${ICON.logout}Log out</button>`);
   return w;
 }
 

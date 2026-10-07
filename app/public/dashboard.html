@@ -1,6 +1,7 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Wi-Fight · Dashboard</title>
-<link rel="icon" type="image/svg+xml" href="img/favicon.svg"><link rel="stylesheet" href="css/ds.css">
+<link rel="icon" type="image/svg+xml" href="img/favicon.svg">
+<script>try{var t=localStorage.getItem("wf.theme");if(t==="dark"||t==="light")document.documentElement.dataset.theme=t}catch(e){}</script><link rel="stylesheet" href="css/ds.css">
 <style>
 .ringwrap{position:relative;width:240px;height:240px;flex:none;margin:0 auto}
 .ringwrap .hero-num{font-size:72px}
@@ -20,7 +21,7 @@
 /* bar values sit inside the bar on a patch of the bar's own colour, so the fair line never runs through a number */
 .bars .fill{z-index:auto}
 .bars .val{z-index:3;top:6px;left:50%;right:auto;transform:translateX(-50%);padding:2px 5px;border-radius:6px;background:var(--cobalt);color:#fff}
-.bars .bar.low .val{background:var(--bad)}
+.bars .bar.low .val{background:var(--bad);color:var(--on-status)}
 .bars .threshold span{top:-24px}
 .tile .eyebrow{white-space:normal;line-height:1.3}
 #labelCard #label{flex:1;display:flex}

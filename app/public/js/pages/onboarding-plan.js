@@ -1,8 +1,9 @@
 // Step 3: your plan. Pick it from the catalog, or let Proof AI read a bill photo.
 // The bill photo lives in this page's memory only. It is never written to the store.
-import { Store, AI, $, $$, go, toast, esc } from '../shell.js';
+import { Store, AI, $, $$, go, toast, esc, paintTheme } from '../shell.js';
 import { FAIR } from '../engine.js';
 import { modelChip, modelStack } from '../models.js';
+paintTheme(); // draw the sun or moon on this page's light and dark toggle
 
 const state = await Store.load();
 if (!state.consent || !state.consent.mlab) { go('onboarding-consent.html'); await new Promise(() => {}); }

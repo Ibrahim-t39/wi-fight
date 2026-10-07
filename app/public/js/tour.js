@@ -58,6 +58,11 @@ function css() {
 .tour{animation:tourup .35s ease both}
 @keyframes tourup{from{opacity:0;transform:translateY(10px)}}
 .tour-spot{position:fixed;z-index:70;border-radius:22px;pointer-events:none;box-shadow:0 0 0 200vmax rgba(6,9,18,.52);outline:2px solid rgba(143,164,255,.5);outline-offset:0;transition:top .4s cubic-bezier(.2,.7,.2,1),left .4s cubic-bezier(.2,.7,.2,1),width .4s cubic-bezier(.2,.7,.2,1),height .4s cubic-bezier(.2,.7,.2,1),opacity .35s ease}
+/* dark mode: the bar sits on dark pages, so it lifts to the surface colour with a clearer edge, and the focus dimming goes deeper */
+:root[data-theme="dark"] .tour{background:var(--surface,#121724);border-color:color-mix(in srgb,var(--ink-3,#8E96AB) 45%,var(--line,#232A3B));box-shadow:0 18px 50px rgba(0,0,0,.6)}
+:root[data-theme="dark"] .tour-spot{box-shadow:0 0 0 200vmax rgba(0,0,0,.5);outline-color:rgba(143,164,255,.75)}
+:root[data-theme="dark"] .tour-dialog{box-shadow:0 0 0 1px var(--line,#232A3B),0 24px 60px rgba(0,0,0,.6)}
+:root[data-theme="dark"] .tour-dialog-back{background:rgba(0,0,0,.66)}
 .tour-skip .eyebrow{font:700 12px/1 var(--body,system-ui);letter-spacing:.12em;text-transform:uppercase;color:#8FA4FF;margin-bottom:16px}
 .tour-skip .track{height:8px;border-radius:99px;background:#1B2233;margin:26px auto 0;max-width:420px;overflow:hidden}.tour-skip .track i{display:block;height:100%;width:0;background:linear-gradient(90deg,#2747F5,#8B5CF6,#2FD9A0);border-radius:99px;transition:width .15s linear}
 @media (prefers-reduced-motion:reduce){.tour,.tour-spot{animation:none;transition:opacity .2s}}
@@ -72,7 +77,7 @@ function css() {
 .tour-dialog p{font:400 15px/1.45 var(--body,system-ui);color:var(--ink-2,#4A5163);margin:0 0 16px}
 .tour-dialog button{display:block;width:100%;text-align:left;border:1.5px solid var(--line,#E4E6EC);background:var(--surface,#fff);border-radius:16px;padding:14px 16px;margin-top:10px;cursor:pointer;font-family:inherit;color:inherit}
 .tour-dialog button b{display:block;font:700 16px/1.25 var(--body,system-ui)}.tour-dialog button span{display:block;font:500 13px/1.4 var(--body,system-ui);color:var(--ink-2,#4A5163);margin-top:2px}
-.tour-dialog button.pri{border-color:#2747F5;background:#F1F3FF}.tour-dialog button.quiet{border:0;text-align:center;color:var(--ink-3,#8A90A0);font:600 14px var(--body,system-ui);padding:10px}
+.tour-dialog button.pri{border-color:#2747F5;background:var(--cobalt-50,#F1F3FF)}.tour-dialog button.quiet{border:0;text-align:center;color:var(--ink-3,#8A90A0);font:600 14px var(--body,system-ui);padding:10px}
 @media (max-width:720px){.tour{left:8px;right:8px;top:8px;bottom:auto;width:auto;max-width:none;border-radius:16px}.tour-title{font-size:16px}.tour-row{font-size:12.5px;margin-top:6px}.tour-btns{padding:8px 10px 10px 12px}.tour-btns button{height:34px;font-size:13px;padding:0 12px}}
 @media print{.tour,.tour-skip,.tour-dialog-back{display:none !important}}`;
   document.head.appendChild(st);

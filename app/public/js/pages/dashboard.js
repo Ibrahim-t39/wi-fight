@@ -1,4 +1,4 @@
-import { boot, bind, $, $$, setRing, barsHTML, xlabelsHTML, daysHTML, chipsHTML, reasonsHTML, labelHTML, badge, statusKind, AI, esc } from '../shell.js';
+import { boot, bind, $, $$, setRing, barsHTML, xlabelsHTML, daysHTML, chipsHTML, reasonsHTML, labelHTML, badge, statusKind, AI, esc, isDark } from '../shell.js';
 import { now } from '../engine.js';
 import { modelStack, modelChip } from '../models.js';
 
@@ -16,9 +16,9 @@ if (!facts.headline) {
     eyebrow: facts.complete ? `Day ${facts.totalDays} of ${facts.totalDays} · check complete` : `Day ${facts.dayNumber} of ${facts.totalDays} · ${facts.testsCount} tests so far`,
     statusHtml: badge(statusKind(H.status), H.statusWord), pct: H.pct, got: H.mbps, got3: H.mbps, paid: facts.plan.down, paid2: facts.plan.down,
     fair: facts.fairLine,
-    basis: `This is the median of ${H.basis}, taken from ${facts.testsCount} ${facts.testsCount === 1 ? 'test' : 'tests'}. The black mark on the ring is the fair line.`,
+    basis: `This is the median of ${H.basis}, taken from ${facts.testsCount} ${facts.testsCount === 1 ? 'test' : 'tests'}. The ${isDark() ? 'white' : 'black'} mark on the ring is the fair line.`,
     progress: `${facts.daysDone} of ${facts.totalDays}`,
-    nextHtml: facts.complete ? 'Your check is complete. <a href="verdict.html" style="color:var(--cobalt);font-weight:600">See your verdict</a>.' : `${facts.totalDays - facts.daysDone} more day${facts.totalDays - facts.daysDone === 1 ? '' : 's'} and your verdict and report are ready. Next test <b style="color:var(--ink)">${esc(facts.nextTest.label)}</b>.`,
+    nextHtml: facts.complete ? 'Your check is complete. <a href="verdict.html" style="color:var(--cobalt-ink);font-weight:600">See your verdict</a>.' : `${facts.totalDays - facts.daysDone} more day${facts.totalDays - facts.daysDone === 1 ? '' : 's'} and your verdict and report are ready. Next test <b style="color:var(--ink)">${esc(facts.nextTest.label)}</b>.`,
     downBadgeHtml: badge(statusKind(H.status), `${H.pct}% of plan`),
     up: facts.upload ? facts.upload.mbps : 0, upBadgeHtml: facts.upload ? badge(statusKind(facts.upload.status), facts.upload.statusWord) : '',
     lat: facts.latency ? facts.latency.ms : 0, latBadgeHtml: facts.latency ? badge(statusKind(facts.latency.status), facts.latency.statusWord) : '',

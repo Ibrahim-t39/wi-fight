@@ -1,6 +1,7 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Wi-Fight · Sign in</title>
-<link rel="icon" type="image/svg+xml" href="img/favicon.svg"><link rel="stylesheet" href="css/ds.css">
+<link rel="icon" type="image/svg+xml" href="img/favicon.svg">
+<script>try{var t=localStorage.getItem("wf.theme");if(t==="dark"||t==="light")document.documentElement.dataset.theme=t}catch(e){}</script><link rel="stylesheet" href="css/ds.css">
 <style>
 .ob{display:grid;grid-template-columns:38% 1fr;min-height:100vh}
 .rail{position:relative;background:var(--bg);color:var(--ink);overflow:hidden}
@@ -28,6 +29,9 @@
 .panetop{width:100%;max-width:520px;display:flex;align-items:center;justify-content:space-between;height:40px;margin-bottom:28px}
 .backlink{display:inline-flex;align-items:center;gap:6px;font:600 14px var(--body);color:var(--ink-2)}
 .mtop{display:none}
+.mtop .themebtn{width:36px;height:36px}
+/* dark mode: the rail is already dark, so a hairline keeps it apart from the dark page */
+:root[data-theme="dark"] .rail{border-right:1px solid var(--line)}
 .rail .brand span,.mtop .brand span{display:inline}
 .nw{white-space:nowrap}
 .head{font:700 38px/1.06 var(--display);letter-spacing:-.025em;text-wrap:balance}
@@ -36,11 +40,11 @@
 .label{font:600 13px var(--body);color:var(--ink-2)}
 .btn{cursor:pointer;text-decoration:none}
 .secure{display:flex;align-items:center;gap:8px;font:500 13px/1.4 var(--body);color:var(--ink-3)}
-.secure svg{flex:none;color:var(--cobalt)}
+.secure svg{flex:none;color:var(--cobalt-ink)}
 @media (max-width:1100px){.railin{padding:32px 28px}.railhead{font-size:28px}}
 @media (max-width:860px){
   .ob{display:block}.rail,.panetop{display:none}
-  .mtop{display:flex;flex-direction:column;gap:12px;position:sticky;top:0;z-index:5;background:rgba(243,244,247,.9);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);padding:14px 16px 12px;border-bottom:1px solid var(--line)}
+  .mtop{display:flex;flex-direction:column;gap:12px;position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--bg) 90%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);padding:14px 16px 12px;border-bottom:1px solid var(--line)}
   .mtop .brand{padding:0;font-size:18px}.mtop .brand .mark{width:30px;height:30px;border-radius:9px}.mtop .brand .mark svg{width:19px;height:19px}
   .mtop .stepn{font:600 13px var(--body);color:var(--ink-2)}
   .mtop .progress i{height:5px;border-radius:3px}.mtop .progress i.done{background:var(--cobalt);opacity:.45}
@@ -69,11 +73,11 @@
 .err{font:600 14px/1.4 var(--body);color:var(--bad)}
 button.link{background:none;border:0;padding:0;font:inherit;font-weight:600;cursor:pointer}
 button.link.fillcode{font:600 13px var(--body);color:var(--ink-2);text-decoration:underline;text-underline-offset:3px}
-button.link.fillcode:hover{color:var(--cobalt)}
+button.link.fillcode:hover{color:var(--cobalt-ink)}
 button.btn.pill2{font-family:var(--body)}
 .otp .gap{margin-left:6px}
 .trust{display:flex;gap:12px;align-items:center;padding:14px 16px;border-radius:18px;background:var(--cobalt-50);border:1px solid var(--cobalt-100);font:600 15px/1.4 var(--body)}
-.link{color:var(--cobalt);font-weight:600}
+.link{color:var(--cobalt-ink);font-weight:600}
 @media (max-width:860px){.otp{gap:7px}.otp input{height:54px;border-radius:13px;font-size:24px}.otp .gap{margin-left:0}}
 </style></head><body>
 <div class="ob">
@@ -100,11 +104,11 @@ button.btn.pill2{font-family:var(--body)}
 
   <div>
     <header class="mtop">
-      <div class="row between"><div class="brand"><div class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 10.8 6.9 20.2 10.5 12.6 14.1 20.2 21.5 4.4"/><circle cx="10.5" cy="6.5" r="2.25" fill="currentColor" stroke="none"/></svg></div><span>Wi-Fight</span></div><span class="stepn">Step 2 of 4 · Sign in</span></div>
+      <div class="row between"><div class="brand"><div class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 10.8 6.9 20.2 10.5 12.6 14.1 20.2 21.5 4.4"/><circle cx="10.5" cy="6.5" r="2.25" fill="currentColor" stroke="none"/></svg></div><span>Wi-Fight</span></div><span class="row gap8"><span class="stepn">Step 2 of 4 · Sign in</span><button type="button" class="themebtn" data-theme-toggle data-icon-only aria-label="Switch between light and dark mode"></button></span></div>
       <div class="progress"><i class="done"></i><i class="on"></i><i class=""></i><i class=""></i></div>
     </header>
     <main class="pane">
-      <div class="panetop"><a class="backlink" href="onboarding-consent.html"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>Back</a><span class="eyebrow">Step 2 of 4 · Sign in</span></div>
+      <div class="panetop"><a class="backlink" href="onboarding-consent.html"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>Back</a><span class="row gap12"><span class="eyebrow">Step 2 of 4 · Sign in</span><button type="button" class="themebtn" data-theme-toggle data-icon-only aria-label="Switch between light and dark mode"></button></span></div>
       <div class="form">
 
         <div>

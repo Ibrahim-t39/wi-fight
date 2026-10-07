@@ -1,6 +1,7 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Wi-Fight · Diagnosis</title>
-<link rel="icon" type="image/svg+xml" href="img/favicon.svg"><link rel="stylesheet" href="css/ds.css">
+<link rel="icon" type="image/svg+xml" href="img/favicon.svg">
+<script>try{var t=localStorage.getItem("wf.theme");if(t==="dark"||t==="light")document.documentElement.dataset.theme=t}catch(e){}</script><link rel="stylesheet" href="css/ds.css">
 <style>
 .sample{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 10px;border-radius:999px;border:1px dashed var(--ink-3);font:600 12px var(--body);color:var(--ink-2);white-space:nowrap}
 .titlerow{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
@@ -20,7 +21,7 @@
 .meter b{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--surface-2)}
 .meter em{position:absolute;top:50%;width:22px;height:22px;margin:-11px 0 0 -11px;border-radius:50%;background:#fff;border:4px solid var(--cobalt);box-shadow:0 2px 6px rgba(11,15,26,.2)}
 .zones{display:grid;grid-template-columns:50% 25% 25%;margin-top:8px;font:600 11px var(--body);color:var(--ink-3);text-align:center}
-.zones .on{color:var(--cobalt);font-weight:700}
+.zones .on{color:var(--cobalt-ink);font-weight:700}
 
 /* balance */
 .balance{display:grid;grid-template-columns:1fr auto 1fr;gap:14px;align-items:stretch}
@@ -30,7 +31,7 @@
 .opt .pct{font-size:26px;line-height:1}
 .like{height:10px;border-radius:5px;background:var(--line);position:relative}
 .like i{position:absolute;left:0;top:0;bottom:0;border-radius:5px;background:var(--ink-3)}
-.opt.win .like{background:#fff}.opt.win .like i{background:var(--cobalt)}
+.opt.win .like{background:var(--surface)}.opt.win .like i{background:var(--cobalt)}
 .vs{align-self:center;width:36px;height:36px;border-radius:50%;background:var(--surface-2);border:1px solid var(--line);display:grid;place-items:center;font:700 11px var(--body);color:var(--ink-3)}
 .badge.mute{background:var(--surface-2);color:var(--ink-2);border:1px solid var(--line)}
 .badge.pick{background:var(--cobalt);color:#fff}
@@ -120,7 +121,7 @@
 .ev summary .q{display:flex;flex-direction:column;align-items:flex-start;gap:6px}
 .ev summary:focus-visible{outline:2px solid var(--cobalt);outline-offset:2px;border-radius:18px}
 .badge.way{height:22px;font-size:11px}
-.badge.pick.way{background:var(--cobalt-50);color:var(--cobalt)}
+.badge.pick.way{background:var(--cobalt-50);color:var(--cobalt-ink)}
 .conf.calm{background:var(--good-bg);border-color:transparent}
 .conf p b{color:var(--ink)}
 .devs.many i{background:var(--warn-bg);border-color:var(--warn)}
@@ -144,7 +145,7 @@
 .verdict .big.weigh{font-size:40px;line-height:72px;letter-spacing:-.02em;color:var(--ink-2)}
 .verdict .big.pop,.conf .lab .t.pop{animation:pop .7s cubic-bezier(.2,.9,.3,1.2)}
 .verdict .big.pop{transform-origin:left center}
-@keyframes pop{0%{opacity:.2;transform:scale(.92)}55%{opacity:1;transform:scale(1.05);color:var(--cobalt)}100%{transform:none}}
+@keyframes pop{0%{opacity:.2;transform:scale(.92)}55%{opacity:1;transform:scale(1.05);color:var(--cobalt-ink)}100%{transform:none}}
 .replaying .ev{opacity:.38;transition:opacity .3s,box-shadow .3s,border-color .3s}
 .replaying .ev.seen{opacity:.7}
 .replaying .ev.lit{opacity:1;border-color:var(--cobalt);box-shadow:0 0 0 3px var(--cobalt-100)}

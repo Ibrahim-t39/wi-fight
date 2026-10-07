@@ -1,6 +1,7 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Wi-Fight · Are you getting the internet you pay for?</title>
-<link rel="icon" type="image/svg+xml" href="img/favicon.svg"><link rel="stylesheet" href="css/ds.css">
+<link rel="icon" type="image/svg+xml" href="img/favicon.svg">
+<script>try{var t=localStorage.getItem("wf.theme");if(t==="dark"||t==="light")document.documentElement.dataset.theme=t}catch(e){}</script><link rel="stylesheet" href="css/ds.css">
 <style>
 html{scroll-behavior:smooth;scroll-padding-top:24px}
 body{overflow-x:hidden}
@@ -13,8 +14,8 @@ a{text-decoration:none}
 .sec{padding:120px 0;position:relative}
 .sec.white{background:var(--surface)}
 .sec.dark{background:var(--bg);color:var(--ink)}
-.kicker{display:inline-flex;align-items:center;gap:10px;font:700 12px/1 var(--body);letter-spacing:.1em;text-transform:uppercase;color:var(--cobalt)}
-.kicker i{font-style:normal;display:grid;place-items:center;min-width:28px;height:22px;padding:0 7px;border-radius:999px;background:var(--cobalt-50);color:var(--cobalt);font:700 11px/1 var(--body);letter-spacing:.04em}
+.kicker{display:inline-flex;align-items:center;gap:10px;font:700 12px/1 var(--body);letter-spacing:.1em;text-transform:uppercase;color:var(--cobalt-ink)}
+.kicker i{font-style:normal;display:grid;place-items:center;min-width:28px;height:22px;padding:0 7px;border-radius:999px;background:var(--cobalt-50);color:var(--cobalt-ink);font:700 11px/1 var(--body);letter-spacing:.04em}
 .dark .kicker{color:#9DB0FF}.dark .kicker i{color:#B8C4FF;background:rgba(39,71,245,.26)}
 .sec-title{font:700 48px/1.06 var(--display);letter-spacing:-.028em;text-wrap:balance}
 .lead{font:400 19px/1.55 var(--body);color:var(--ink-2);text-wrap:pretty}
@@ -53,6 +54,7 @@ a{text-decoration:none}
 .hero-cta{display:flex;gap:12px;margin-top:34px;flex-wrap:wrap;align-items:center}
 .hero .btn.ghost{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.2)}
 .hero .btn.ghost:hover{background:rgba(255,255,255,.1)}
+.hero .themebtn{border-color:rgba(255,255,255,.2)}.hero .themebtn:hover{background:rgba(255,255,255,.1)}
 .btn{transition:transform .15s,background .15s,box-shadow .15s}
 .btn.primary:hover{background:#3555FF}
 
@@ -113,6 +115,7 @@ a{text-decoration:none}
 .chart .xlabels{gap:8px}
 .chart .fill{transition:height .9s cubic-bezier(.2,.7,.2,1)}
 .chart .val{top:26px;color:#fff;font-size:11.5px}
+.chart .bar.low .val{color:var(--on-status)}
 .chart .threshold span{top:-26px}
 .legend{display:flex;gap:6px 18px;flex-wrap:wrap;font:500 12.5px/1.3 var(--body);color:var(--ink-2);margin-top:8px}
 .legend span{display:inline-flex;align-items:center;gap:6px}
@@ -125,12 +128,12 @@ a{text-decoration:none}
 .step{display:flex;flex-direction:column;gap:14px;padding:12px;border-radius:28px;background:var(--bg);box-shadow:none}
 .step-vis{border-radius:18px;background:var(--surface);box-shadow:var(--shadow);padding:18px;min-height:204px;display:flex;flex-direction:column;justify-content:center;gap:10px}
 .step-body{padding:8px 14px 16px;display:flex;flex-direction:column;gap:10px}
-.step-n{display:inline-flex;align-items:center;gap:10px;font:700 12px/1 var(--body);letter-spacing:.1em;text-transform:uppercase;color:var(--cobalt)}
+.step-n{display:inline-flex;align-items:center;gap:10px;font:700 12px/1 var(--body);letter-spacing:.1em;text-transform:uppercase;color:var(--cobalt-ink)}
 .step-n b{width:30px;height:30px;border-radius:50%;background:var(--cobalt);color:#fff;display:grid;place-items:center;font:700 14px/1 var(--body);letter-spacing:0}
 .step h3{font:700 24px/1.15 var(--display);letter-spacing:-.015em;text-wrap:balance}
 .step p{font:400 15.5px/1.55 var(--body);color:var(--ink-2)}
 .ck{display:flex;align-items:center;gap:10px;font:600 14px/1.3 var(--body);padding:9px 12px;border-radius:12px;background:var(--surface-2);border:1px solid var(--line)}
-.ck .tick{width:20px;height:20px;border-radius:50%;background:var(--good);color:#fff;display:grid;place-items:center;font-size:12px;flex:none}
+.ck .tick{width:20px;height:20px;border-radius:50%;background:var(--good);color:var(--on-status);display:grid;place-items:center;font-size:12px;flex:none}
 .ck small{display:block;font:500 12px/1.3 var(--body);color:var(--ink-3)}
 .ck.ai{background:linear-gradient(var(--surface),var(--surface)) padding-box,var(--ai-grad) border-box;border:1.5px solid transparent}
 .step-vis .days{gap:8px 0;margin-top:6px}
@@ -146,7 +149,7 @@ a{text-decoration:none}
 .ai-title{font:700 68px/1.0 var(--display);letter-spacing:-.035em;text-wrap:balance}
 .ai-title b{background:var(--ai-grad);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:700}
 .ai-pill{display:inline-flex;align-items:center;gap:10px;height:36px;padding:0 16px 0 6px;border-radius:999px;background:linear-gradient(var(--surface),var(--surface)) padding-box,var(--ai-grad) border-box;border:1.5px solid transparent}
-.ai-pill i{font-style:normal;display:grid;place-items:center;min-width:28px;height:22px;padding:0 7px;border-radius:999px;background:var(--cobalt-50);color:var(--cobalt);font:700 11px/1 var(--body)}
+.ai-pill i{font-style:normal;display:grid;place-items:center;min-width:28px;height:22px;padding:0 7px;border-radius:999px;background:var(--cobalt-50);color:var(--cobalt-ink);font:700 11px/1 var(--body)}
 .ft{padding:26px;display:flex;flex-direction:column;gap:12px;min-height:100%;border-radius:28px}
 .ft h3{font:700 24px/1.15 var(--display);letter-spacing:-.015em;text-wrap:balance}
 .ft.big h3{font-size:28px}
@@ -160,7 +163,7 @@ a{text-decoration:none}
 .split-lab b{font:700 22px/1 var(--display);color:var(--ink);letter-spacing:-.02em;margin-right:6px}
 .evi{display:flex;flex-direction:column}
 .evi div{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px solid var(--line);font:500 14px/1.35 var(--body)}
-.evi div span.w{flex:none;font:700 12px/1 var(--body);color:var(--cobalt);background:var(--cobalt-50);border-radius:999px;padding:5px 9px;white-space:nowrap}
+.evi div span.w{flex:none;font:700 12px/1 var(--body);color:var(--cobalt-ink);background:var(--cobalt-50);border-radius:999px;padding:5px 9px;white-space:nowrap}
 .evi div.base{color:var(--ink-3)}
 .evi div.base span.w{background:var(--surface);color:var(--ink-3);border:1px solid var(--line)}
 .bill{display:flex;flex-direction:column}
@@ -192,8 +195,8 @@ a{text-decoration:none}
 .five{list-style:none;display:flex;flex-direction:column}
 .five li{display:flex;gap:14px;align-items:flex-start;padding:15px 0;border-top:1px solid var(--line);font:400 16px/1.55 var(--body);color:var(--ink-2)}
 .five li b{color:var(--ink);font-weight:700}
-.five li .ic{font-size:13px;color:#fff;background:var(--good);border-radius:50%;padding:5px;width:23px;height:23px;margin-top:1px}
-.more{display:inline-flex;align-items:center;gap:6px;margin-top:22px;font:600 16px/1 var(--body);color:var(--cobalt)}
+.five li .ic{font-size:13px;color:var(--on-status);background:var(--good);border-radius:50%;padding:5px;width:23px;height:23px;margin-top:1px}
+.more{display:inline-flex;align-items:center;gap:6px;margin-top:22px;font:600 16px/1 var(--body);color:var(--cobalt-ink)}
 .more:hover{text-decoration:underline;text-underline-offset:4px}
 .tryit{padding:24px;border-radius:28px;border:1px solid var(--line);display:flex;flex-direction:column;gap:16px}
 .live{display:inline-flex;align-items:center;gap:7px;font:700 11px/1 var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--good);white-space:nowrap}
@@ -225,7 +228,7 @@ a{text-decoration:none}
 .goal-lead{font-size:21px;color:var(--ink);line-height:1.5}
 .goal-lead b{font-weight:700}
 .tgt{display:flex;flex-direction:column;gap:10px;padding-top:22px;border-top:1px solid var(--line)}
-.tg-no{align-self:flex-start;font:700 13px/1 var(--body);letter-spacing:.04em;color:var(--cobalt);background:var(--cobalt-50);border-radius:999px;padding:8px 12px}
+.tg-no{align-self:flex-start;font:700 13px/1 var(--body);letter-spacing:.04em;color:var(--cobalt-ink);background:var(--cobalt-50);border-radius:999px;padding:8px 12px}
 .tgt p{font:400 16px/1.55 var(--body);color:var(--ink-2)}
 .tgt p b{color:var(--ink);font-weight:700}
 .photos{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}
@@ -238,7 +241,7 @@ a{text-decoration:none}
 .money p b{color:#fff;font-weight:700}
 .money .sample{color:#AEB5C6;border-color:#6E768A;margin-left:auto}
 .foot-note{font:500 12.5px/1.6 var(--body);color:var(--ink-3);max-width:760px;text-align:right}
-.foot-note a{color:var(--cobalt);font-weight:600;white-space:nowrap}
+.foot-note a{color:var(--cobalt-ink);font-weight:600;white-space:nowrap}
 
 /* ---------- final call to action and footer ---------- */
 .cta{border-radius:36px;background:var(--cobalt);color:#fff;padding:76px 40px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:18px;position:relative;overflow:hidden}
@@ -249,6 +252,13 @@ a{text-decoration:none}
 .cta-btns{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:10px}
 .cta .btn{background:#fff;color:var(--cobalt)}
 .cta .btn:hover{background:#EEF1FF}
+
+/* ---------- dark mode: the hero is already dark, so the sections after it need their own edges ---------- */
+:root[data-theme="dark"] .hero{border-bottom:1px solid var(--line)}
+:root[data-theme="dark"] .sec.white{border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+:root[data-theme="dark"] .sec.white .card{border:1px solid var(--line)}
+:root[data-theme="dark"] .split u{background:var(--ink-3)}
+:root[data-theme="dark"] .money{background:var(--surface);box-shadow:inset 0 0 0 1px var(--line)}
 .foot{display:flex;align-items:center;justify-content:space-between;gap:16px 32px;flex-wrap:wrap;padding:36px 0 44px}
 .foot .brand{padding:0;font-size:18px}
 .foot .brand .mark{width:30px;height:30px;border-radius:9px}
@@ -376,7 +386,7 @@ html.anim .rv:not(.in) .split i{width:0 !important}
     <nav class="lnav">
       <a class="brand" href="#top"><div class="mark"><svg><use href="#i-mark"/></svg></div><span>Wi-Fight</span></a>
       <div class="lnav-links"><a href="#label">The problem</a><a href="#how">How it works</a><a href="#ai">Proof AI</a><a href="#privacy">Security</a><a href="#goal">UN Goal 9</a></div>
-      <a class="btn primary sm" data-cta href="onboarding-consent.html">Get started</a>
+      <div class="row gap8"><button type="button" class="themebtn" data-theme-toggle data-icon-only aria-label="Switch between light and dark mode"></button><a class="btn primary sm" data-cta href="onboarding-consent.html">Get started</a></div>
     </nav>
 
     <div class="hero-grid">

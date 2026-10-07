@@ -1,9 +1,10 @@
 // Landing page. Public: it reads the store only to decide where the "Get started" buttons go.
 // Every figure on the page is computed here from the labelled sample two weeks by the same engine the app uses.
-import { Store, $, $$, bind, esc, badge, statusKind, setRing, barsHTML, xlabelsHTML, daysHTML, sha256 } from '../shell.js';
+import { Store, $, $$, bind, esc, badge, statusKind, setRing, barsHTML, xlabelsHTML, daysHTML, sha256, paintTheme } from '../shell.js';
 import { summarize, FAIR, SCHEDULE, fmtTime, fmtWeekday } from '../engine.js';
 import { buildSample, SAMPLE_PLAN, SAMPLE_BILL } from '../sample.js';
 import { modelStack, stackHTML } from '../models.js';
+paintTheme(); // draw the sun or moon on this page's light and dark toggle
 
 const sample = buildSample(14);
 const F = summarize({ plan: { ...SAMPLE_PLAN }, tests: sample.tests, startedAt: sample.startedAt, clock: sample.clock, sample: true });

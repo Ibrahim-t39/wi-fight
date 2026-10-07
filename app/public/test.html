@@ -1,6 +1,7 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Wi-Fight · Live test</title>
-<link rel="icon" type="image/svg+xml" href="img/favicon.svg"><link rel="stylesheet" href="css/ds.css">
+<link rel="icon" type="image/svg+xml" href="img/favicon.svg">
+<script>try{var t=localStorage.getItem("wf.theme");if(t==="dark"||t==="light")document.documentElement.dataset.theme=t}catch(e){}</script><link rel="stylesheet" href="css/ds.css">
 <style>
 html{background:#070A12}
 .stage{position:relative;min-height:100vh;background:var(--bg);color:var(--ink);overflow:hidden;display:flex;justify-content:center}
@@ -10,6 +11,7 @@ html{background:#070A12}
 .testnav .title{font:600 14px var(--body);color:var(--ink-2)}
 .testnav .title b{color:var(--ink);font-weight:700}
 .testnav .badge{justify-self:end}
+.testnav .themebtn{width:40px;height:40px}
 .ringbox{position:relative;width:390px;height:390px;margin-top:6px}
 .ringbox svg{width:100%;height:100%;display:block}
 .ringbox text{font:700 13px var(--body);fill:var(--ink-2)}
@@ -125,7 +127,7 @@ html{background:#070A12}
   <div class="column" data-wait>
 
     <div class="testnav">
-      <a class="iconbtn" aria-label="Close" href="dashboard.html" id="close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></a>
+      <div class="row gap8"><a class="iconbtn" aria-label="Close" href="dashboard.html" id="close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></a><button type="button" class="themebtn" data-theme-toggle data-icon-only aria-label="Switch between light and dark mode"></button></div>
       <div class="title" data-b="titleHtml"></div>
       <span class="badge lock"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span data-b="lock"></span></span>
     </div>

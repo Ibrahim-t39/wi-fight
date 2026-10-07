@@ -61,7 +61,7 @@ if (!facts.headline) {
 
   /* ---------- the document ---------- */
   const head = (n) => `<div class="sh-head"><div class="sh-brand"><span class="sh-mark">${MARK}</span>Wi-Fight</div><div class="sh-meta">Report ${reportId}<br>Page ${n} of 2</div></div>`;
-  const page1 = () => `<div class="paper" data-page="1">${head(1)}
+  const page1 = () => `<div class="paper light" data-page="1">${head(1)}
     <div class="sh-title">Wi-Fight speed report${facts.complete ? '' : ' (draft)'}</div>
     <div class="sh-info">
       <div><span>Prepared for</span><b>${esc(state.user.name || 'Customer')}</b></div>
@@ -94,7 +94,7 @@ if (!facts.headline) {
     facts.router.pairs ? `<div class="p2box" data-box="router"><span>Router check</span><b>${facts.router.near} <small>near</small> · ${facts.router.far} <small>far, Mbps</small></b><em>${routerNote}</em></div>` : '',
     hasTod ? `<div class="p2box" data-box="tod"><span>Time of day</span><b>${facts.evening.avg} <small>evening</small> · ${facts.daytime.avg} <small>day, Mbps</small></b><em>${todNote}</em></div>` : '',
   ].filter(Boolean);
-  const page2 = () => `<div class="paper" data-page="2">${head(2)}
+  const page2 = () => `<div class="paper light" data-page="2">${head(2)}
     ${boxes.length ? `<div class="sh-h" style="margin-top:20px">${H.status === 'below' ? 'Where the slowdown comes from' : 'Router and time of day'}</div><div class="p2grid">${boxes.join('')}</div>` : ''}
     <div class="sh-h"${boxes.length ? '' : ' style="margin-top:20px"'}>Daily results</div>
     <table class="p2t"><tr><th>Day</th><th>Date</th><th>Tests</th><th>Daily median</th><th>Result</th></tr>${measured.map((d) => `<tr><td>Day ${d.day}</td><td>${d.weekday}, ${d.label}</td><td>${d.n}</td><td>${d.median} Mbps</td><td class="${d.low ? 'lo' : ''}">${d.low ? 'Below fair line' : 'On plan'}</td></tr>`).join('')}</table>
