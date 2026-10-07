@@ -9,7 +9,16 @@ export const $ = (s, r = document) => r.querySelector(s);
 export const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
 export const esc = AI.esc;
 // Leave softly: the page fades out (ds.css, .wf-leaving) just before the next one loads and fades in.
-export const go = (page) => { document.documentElement.classList.add('wf-leaving'); setTimeout(() => { location.href = page; }, 160); };
+const tourOn = () => { try { const t = JSON.parse(localStorage.getItem('wf.tour.v1') || 'null'); return !!(t && t.on); } catch { return false; } };
+/** Draw the curtain over the page. Dark during the guided demo, so the next page can start behind the same dark. */
+export function curtain(dark) {
+  let c = document.querySelector('.wf-curtain');
+  if (!c) { c = document.createElement('div'); c.className = 'wf-curtain'; document.documentElement.appendChild(c); }
+  c.classList.toggle('dark', !!dark);
+  if (dark) { try { sessionStorage.setItem('wf.curtain', '1'); } catch { /* storage may be blocked */ } }
+  void c.offsetWidth; c.classList.add('on');
+}
+export const go = (page) => { curtain(tourOn()); setTimeout(() => { location.href = page; }, 230); };
 // Light or dark. The choice is kept in this browser, and a small script in each page's head applies it before paint.
 const MOON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 0 1 9.500 4a8 8 0 1 0 10.500 10.500z"/></svg>';
 const SUN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2.500v2M12 19.500v2M2.500 12h2M19.500 12h2M5.300 5.300l1.400 1.400M17.300 17.300l1.400 1.400M5.300 18.700l1.400-1.400M17.300 6.700l1.400-1.400"/></svg>';
@@ -19,7 +28,7 @@ export function setTheme(t) { document.documentElement.dataset.theme = t; try { 
 document.addEventListener('click', (e) => { if (e.target.closest('[data-theme-toggle]')) { e.preventDefault(); setTheme(isDark() ? 'light' : 'dark'); } });
 new MutationObserver(paintTheme).observe(document.documentElement, { childList: true, subtree: true });
 // coming back with the browser's Back button must not show a faded-out page
-addEventListener('pageshow', () => document.documentElement.classList.remove('wf-leaving'));
+addEventListener('pageshow', () => { const c = document.querySelector('.wf-curtain'); if (c) c.remove(); });
 
 const ROUTES = { 'Dashboard': 'dashboard.html', 'Home': 'dashboard.html', 'History': 'history.html', 'Report': 'report.html', 'Plans': 'plans.html', 'Ask Proof AI': 'chat.html', 'Proof AI': 'chat.html', 'Diagnosis': 'diagnosis.html', 'Privacy & data': 'privacy.html', 'Verdict': 'verdict.html', 'About': 'about.html' };
 const ICON = {

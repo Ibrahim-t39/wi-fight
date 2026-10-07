@@ -116,8 +116,20 @@ function spot(instant) {
 /** Leave the page softly: fade out, then go. */
 function leave(url) {
   if (spotEl) spotEl.style.opacity = '0';
-  document.documentElement.classList.add('wf-leaving');
-  setTimeout(() => { if (url) location.href = url; else location.reload(); }, 190);
+  try { sessionStorage.setItem('wf.curtain', '1'); } catch { /* storage may be blocked */ }
+  // a dark curtain fades in over the page; the next page starts behind the same dark and fades in from it
+  let c = document.querySelector('.wf-curtain');
+  if (!c) { c = document.createElement('div'); c.className = 'wf-curtain'; document.documentElement.appendChild(c); }
+  c.classList.add('dark'); void c.offsetWidth; c.classList.add('on');
+  setTimeout(() => { if (url) location.href = url; else location.reload(); }, 250);
+}
+/** Arriving behind the curtain: wait until the page has drawn itself, then let it fade in over the dark. */
+function arrive() {
+  const d = document.documentElement;
+  const lift = () => { d.classList.remove('wf-enter'); setTimeout(() => { d.style.background = ''; }, 520); };
+  if (!d.classList.contains('wf-enter')) { setTimeout(() => { d.style.background = ''; }, 300); return; }
+  const go = () => setTimeout(lift, 140);
+  if (document.readyState === 'complete') go(); else addEventListener('load', go, { once: true });
 }
 
 function render() {
@@ -221,6 +233,7 @@ export function startDialog() {
 }
 
 function init() {
+  arrive();
   const q = new URLSearchParams(location.search);
   if (q.get('tour') === '1' && !read()) { history.replaceState(null, '', location.pathname); startDialog(); }
   if (q.get('tour') === '0') { end(); history.replaceState(null, '', location.pathname); }

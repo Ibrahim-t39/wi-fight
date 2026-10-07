@@ -253,14 +253,12 @@ input,textarea{font-family:inherit}
 .mcard.off .mrole{color:var(--ink-2)}
 
 /* ---------- gentle page-to-page transitions ---------- */
-/* Each page fades in as it loads, and fades out when the app navigates (shell.js and tour.js add .wf-leaving). */
-body{animation:wf-in .34s ease both}
-html.wf-leaving body{animation:none;opacity:0;transition:opacity .18s ease}
+/* Leaving: a curtain fades in over the page (shell.js and tour.js add it). During the guided demo the curtain is
+   dark, the next page starts behind that same dark (.wf-enter, set by the script in each page's head before the
+   first paint), and then fades in. There is no white frame in between. */
+body{animation:wf-in .4s ease both}
+.wf-curtain{position:fixed;inset:0;z-index:2147483000;background:var(--bg);opacity:0;transition:opacity .22s ease;pointer-events:none}
+.wf-curtain.dark{background:#070A12}
+.wf-curtain.on{opacity:1}
 @keyframes wf-in{from{opacity:0}}
-@media (prefers-reduced-motion:reduce){body{animation:none}html.wf-leaving body{transition:none}}
-
-/* ---------- light and dark: the small round toggle on pages without a sidebar ---------- */
-.themebtn{width:38px;height:38px;border-radius:50%;flex:none;display:grid;place-items:center;padding:0;background:transparent;border:1px solid var(--line);color:var(--ink-2);cursor:pointer;transition:background .15s,color .15s,border-color .15s}
-.themebtn:hover{color:var(--ink);background:var(--surface-2)}
-.themebtn:focus-visible{outline:2px solid var(--cobalt-ink);outline-offset:2px}
-.themebtn svg{width:18px;height:18px;display:block}
+@media (prefers-reduced-motion:reduce){body{animation:none}.wf-curtain{transition:none}}

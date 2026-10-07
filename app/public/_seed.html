@@ -1,3 +1,4 @@
 <!doctype html><meta charset="utf-8"><title>Wi-Fight test seed</title>
 <link rel="icon" type="image/svg+xml" href="img/favicon.svg">
-<script>try{var t=localStorage.getItem("wf.theme");if(t==="dark"||t==="light")document.documentElement.dataset.theme=t}catch(e){}</script><p>Test helper page. Not part of the app.</p>
+<script>try{var d=document.documentElement,t=localStorage.getItem("wf.theme");if(t==="dark"||t==="light")d.dataset.theme=t;if(sessionStorage.getItem("wf.curtain")){sessionStorage.removeItem("wf.curtain");d.classList.add("wf-enter");d.style.background="#070A12";setTimeout(function(){d.classList.remove("wf-enter")},1800)}else{d.style.background=t==="dark"?"#070A12":"#F3F4F7"}}catch(e){}</script>
+<style>html.wf-enter body{opacity:0!important;animation:none!important}</style><p>Test helper page. Not part of the app.</p>

@@ -1,7 +1,8 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Wi-Fight · History</title>
 <link rel="icon" type="image/svg+xml" href="img/favicon.svg">
-<script>try{var t=localStorage.getItem("wf.theme");if(t==="dark"||t==="light")document.documentElement.dataset.theme=t}catch(e){}</script><link rel="stylesheet" href="css/ds.css">
+<script>try{var d=document.documentElement,t=localStorage.getItem("wf.theme");if(t==="dark"||t==="light")d.dataset.theme=t;if(sessionStorage.getItem("wf.curtain")){sessionStorage.removeItem("wf.curtain");d.classList.add("wf-enter");d.style.background="#070A12";setTimeout(function(){d.classList.remove("wf-enter")},1800)}else{d.style.background=t==="dark"?"#070A12":"#F3F4F7"}}catch(e){}</script>
+<style>html.wf-enter body{opacity:0!important;animation:none!important}</style><link rel="stylesheet" href="css/ds.css">
 <style>
 .sample{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 10px;border-radius:999px;border:1px dashed var(--ink-3);font:600 12px var(--body);color:var(--ink-2);white-space:nowrap}
 .headline{font:700 26px/1.2 var(--display);letter-spacing:-.015em;max-width:560px}
