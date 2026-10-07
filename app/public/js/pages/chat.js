@@ -274,8 +274,8 @@ function aiHTML(m, i, isLast) {
     ${m.stopped ? '<span class="stopmark"><i></i>Stopped</span>' : ''}
     ${m.cut ? '<div class="mmeta">The answer was cut off before it finished.</div>' : ''}
     ${bad.length ? `<div class="ground" role="note">${IC.warn}<span><b>Check this answer:</b> it mentions numbers that are not in your data (${esc(bad.slice(0, 6).join(', '))}).</span></div>` : ''}
-    ${guardHTML(m)}
-    <div class="mfoot"><div class="mmeta">${m.blocked ? esc(fmtTime(m.t)) : writerHTML(m)}</div>
+    ${m.blocked ? guardHTML(m) : ''}
+    <div class="mfoot"><div class="mmeta">${m.blocked ? esc(fmtTime(m.t)) : `<details class="mdet"><summary>${esc(fmtTime(m.t))} · How this was answered</summary><div class="mdetb">${guardHTML(m)}${writerHTML(m)}</div></details>`}</div>
     <div class="acts">${act('copy', 'Copy answer', IC.copy)}${act('up', 'Good answer', IC.up, m.rating === 'up')}${act('down', 'Bad answer', IC.down, m.rating === 'down')}${isLast ? act('regen', 'Write this answer again', IC.regen) : ''}</div></div>
   </article>`;
 }
@@ -292,7 +292,7 @@ function emptyHTML() {
     <span class="avatar" aria-hidden="true">${IC.spark}</span>
     <h2>What do you want to know about your internet?</h2>
     <p>${esc(line)}</p>
-    ${H ? '' : '<div class="row gap8" style="flex-wrap:wrap;justify-content:center;margin-top:4px"><button type="button" class="btn primary sm" data-href="test.html">Run a test</button><button type="button" class="btn ghost sm" data-demo>Load sample data</button></div>'}
+    ${H ? '' : '<div class="row gap8" style="flex-wrap:wrap;justify-content:center;margin-top:4px"><button type="button" class="btn primary sm" data-href="test.html">Run a test</button><button type="button" class="btn ghost sm" data-demo>Load data</button></div>'}
     <div class="sgrid">${starters().map((q) => `<button type="button" class="sgcard" data-ask="${esc(q)}"${on ? '' : ' disabled'}>${esc(q)}</button>`).join('')}</div>
   </div>`;
 }

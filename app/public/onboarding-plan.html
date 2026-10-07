@@ -1,5 +1,6 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Wi-Fight · Your plan</title><link rel="stylesheet" href="css/ds.css">
+<title>Wi-Fight · Your plan</title>
+<link rel="icon" type="image/svg+xml" href="img/favicon.svg"><link rel="stylesheet" href="css/ds.css">
 <style>
 .ob{display:grid;grid-template-columns:38% 1fr;min-height:100vh}
 .rail{position:relative;background:var(--bg);color:var(--ink);overflow:hidden}
@@ -69,6 +70,7 @@ button.more{align-self:flex-start;margin-top:-6px;background:none;border:0;paddi
 .radio-card{gap:12px}
 .pm b{color:var(--ink-2);font-weight:600}
 .price{text-align:right;flex:none}.price .num{font-size:22px;line-height:1}
+.source[hidden]{display:none}
 .source{display:flex;align-items:flex-start;gap:8px;font:500 13px/1.4 var(--body);color:var(--ink-3)}
 .source svg{flex:none;margin-top:2px}
 .or{display:flex;align-items:center;gap:14px;font:600 12px var(--body);letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3)}
@@ -149,7 +151,6 @@ button:focus-visible,.field:focus-within{outline:3px solid var(--cobalt-100);out
 .scard{display:flex;flex-direction:column;border-radius:16px;border:1px solid var(--line);background:var(--surface);overflow:hidden}
 .scard .pic{display:block;height:132px;overflow:hidden;background:#fff;border-bottom:1px solid var(--line);position:relative}
 .scard .pic img{display:block;width:100%;height:auto}
-.scard .pic::after{content:"Fictional sample";position:absolute;left:8px;top:8px;padding:4px 7px;border-radius:999px;background:rgba(11,15,26,.78);color:#fff;font:700 10px/1 var(--body);letter-spacing:.04em;text-transform:uppercase}
 .scard .sb{display:flex;flex-direction:column;gap:4px;padding:12px;flex:1}
 .scard .small{color:var(--ink-2)}
 .scard .sa{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:auto;padding-top:8px;flex-wrap:wrap}
@@ -181,9 +182,6 @@ button:focus-visible,.field:focus-within{outline:3px solid var(--cobalt-100);out
 .match.part{color:var(--warn)}
 .match svg{flex:none}
 .match span.q{font-weight:500;color:var(--ink-3)}
-.reader{display:flex;align-items:center;gap:6px 8px;flex-wrap:wrap;font:500 13.5px/1.45 var(--body);color:var(--ink-2)}
-.reader .mchip{height:26px;font-size:12px}
-.reader.off{display:block;padding:10px 12px;border-radius:12px;background:var(--warn-bg);border:1px solid rgba(199,119,0,.28);color:#4A3A12;font-weight:600;font-size:13px}
 .how{border-radius:14px;border:1px solid var(--line);background:var(--surface-2);padding:11px 14px}
 .how summary{display:flex;align-items:center;justify-content:space-between;gap:8px;cursor:pointer;list-style:none;font:700 14px var(--body);color:var(--cobalt)}
 .how summary::-webkit-details-marker{display:none}
@@ -227,7 +225,6 @@ button:focus-visible,.field:focus-within{outline:3px solid var(--cobalt-100);out
   #providers.all{max-height:none;overflow:visible;padding-right:0;margin-right:0}
   .field input{font-size:15px}#pcount{display:none}
   .scard{flex-direction:row}.scard .pic{width:104px;height:auto;min-height:132px;flex:none;border-bottom:0;border-right:1px solid var(--line)}
-  .scard .pic::after{content:"Sample";left:6px;top:6px}
 }
 @media (prefers-reduced-motion:reduce){.stage.reading .scanline{animation:none;top:39%}.hbox,.frow.pop{animation:none}.frow{transition:none}}
 </style></head><body>
@@ -235,7 +232,7 @@ button:focus-visible,.field:focus-within{outline:3px solid var(--cobalt-100);out
   <aside class="rail dark">
     <div class="glow"></div>
     <div class="railin">
-    <div class="brand"><div class="mark"><svg viewBox="0 -1.300 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.300 16.200A8.300 8.300 0 0 1 16.900 6.300"/><path d="M19.900 12.300a8.300 8.300 0 0 1-.6 3.900"/><path d="m8 12.600 3 3 8.400-9.700"/></svg></div><span>Wi-Fight</span></div>
+    <div class="brand"><div class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 10.8 6.9 20.2 10.5 12.6 14.1 20.2 21.5 4.4"/><circle cx="10.5" cy="6.5" r="2.25" fill="currentColor" stroke="none"/></svg></div><span>Wi-Fight</span></div>
     <div class="railbody">
       <div class="eyebrow">Set up · about 2 minutes</div>
       <div class="railhead">Four short steps to your first test.</div>
@@ -255,7 +252,7 @@ button:focus-visible,.field:focus-within{outline:3px solid var(--cobalt-100);out
 
   <div>
     <header class="mtop">
-      <div class="row between"><div class="brand"><div class="mark"><svg viewBox="0 -1.300 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.300 16.200A8.300 8.300 0 0 1 16.900 6.300"/><path d="M19.900 12.300a8.300 8.300 0 0 1-.6 3.900"/><path d="m8 12.600 3 3 8.400-9.700"/></svg></div><span>Wi-Fight</span></div><span class="stepn">Step 3 of 4 · Your plan</span></div>
+      <div class="row between"><div class="brand"><div class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 10.8 6.9 20.2 10.5 12.6 14.1 20.2 21.5 4.4"/><circle cx="10.5" cy="6.5" r="2.25" fill="currentColor" stroke="none"/></svg></div><span>Wi-Fight</span></div><span class="stepn">Step 3 of 4 · Your plan</span></div>
       <div class="progress"><i class="done"></i><i class="done"></i><i class="on"></i><i class=""></i></div>
     </header>
     <main class="pane">
@@ -287,9 +284,7 @@ button:focus-visible,.field:focus-within{outline:3px solid var(--cobalt-100);out
 
           <div id="scanIdle" class="col gap16" hidden>
             <p class="ai-text">Take one photo of your bill, and Proof AI fills in the price and each fee, then flags any fee that looks like a junk fee.</p>
-            <div class="reader" id="reader"></div>
             <button type="button" class="btn primary" id="choose"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.5" r="3.5"/></svg>Take or choose a photo</button>
-            <p class="small" style="color:var(--ink-3);margin:-4px 0 0;text-align:center">No bill handy? The repo's <b style="white-space:nowrap">demo-files</b> folder has fictional practice bills.</p>
           </div>
 
           <div id="scanWork" class="col gap16" hidden>
@@ -329,7 +324,7 @@ button:focus-visible,.field:focus-within{outline:3px solid var(--cobalt-100);out
               <li><b>The app's own code checks the reading without trusting the model.</b> If the model's own description does not mention a bill, nothing is filled in. Fees with no amount are dropped. The plan price, the equipment, and the fees must add up to the printed total, and a fee that breaks the sum is removed. The promo date must look like a month and a year.</li>
               <li><b>You have the last word.</b> You check every field and can edit it before anything is saved, and only the numbers you confirm are kept.</li>
             </ol>
-            <p class="ai-note">If the file is one of the practice bills from the repo's demo-files folder, the app also shows how many values the model got right. This is a general model that reads text in images, and it was not trained specially on bills, so it can make mistakes.</p>
+            <p class="ai-note">This is a general model that reads text in images, and it was not trained specially on bills, so it can make mistakes.</p>
             <div class="ai-note" id="photoHow"></div>
           </details>
         </section>
@@ -337,7 +332,7 @@ button:focus-visible,.field:focus-within{outline:3px solid var(--cobalt-100);out
         <div class="or">or pick your plan from the list</div>
 
         <section class="card col gap16" id="pick">
-          <div class="row between" style="gap:10px;flex-wrap:wrap"><div class="h2">Pick your plan</div><span class="badge warn">Fictional example values</span></div>
+          <div class="h2">Pick your plan</div>
           <label class="field" for="q"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.500-3.500"/></svg><input id="q" type="search" autocomplete="off" placeholder="Search provider, plan, or type" aria-controls="providers plans"><span class="small" id="pcount"></span></label>
           <div id="providers"></div>
           <button type="button" class="more" id="moreProv" hidden></button>
@@ -346,7 +341,7 @@ button:focus-visible,.field:focus-within{outline:3px solid var(--cobalt-100);out
             <div class="eyebrow" style="margin-bottom:4px" id="plansTitle"></div>
             <div class="col gap8" id="plans" role="radiogroup" aria-labelledby="plansTitle"></div>
           </div>
-          <div class="source"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg><span id="source"></span></div>
+          <div class="source" id="sourceRow" hidden><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg><span id="source"></span></div>
         </section>
 
         <section class="fair">

@@ -1,5 +1,6 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Wi-Fight · Sign in</title><link rel="stylesheet" href="css/ds.css">
+<title>Wi-Fight · Sign in</title>
+<link rel="icon" type="image/svg+xml" href="img/favicon.svg"><link rel="stylesheet" href="css/ds.css">
 <style>
 .ob{display:grid;grid-template-columns:38% 1fr;min-height:100vh}
 .rail{position:relative;background:var(--bg);color:var(--ink);overflow:hidden}
@@ -66,8 +67,6 @@
 .field:focus-within{border-color:var(--cobalt);box-shadow:0 0 0 4px var(--cobalt-100)}
 .field.bad{border-color:var(--bad)}
 .err{font:600 14px/1.4 var(--body);color:var(--bad)}
-.demo{padding:12px 14px;border-radius:14px;background:var(--warn-bg);border:1px solid rgba(199,119,0,.28);font:500 14px/1.45 var(--body);color:#4A3A12}
-.demo b{font:700 17px var(--display);letter-spacing:.08em;color:#2E2206;font-variant-numeric:tabular-nums}
 button.link{background:none;border:0;padding:0;font:inherit;font-weight:600;cursor:pointer}
 button.link.fillcode{font:600 13px var(--body);color:var(--ink-2);text-decoration:underline;text-underline-offset:3px}
 button.link.fillcode:hover{color:var(--cobalt)}
@@ -81,7 +80,7 @@ button.btn.pill2{font-family:var(--body)}
   <aside class="rail dark">
     <div class="glow"></div>
     <div class="railin">
-    <div class="brand"><div class="mark"><svg viewBox="0 -1.300 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.300 16.200A8.300 8.300 0 0 1 16.900 6.300"/><path d="M19.900 12.300a8.300 8.300 0 0 1-.6 3.900"/><path d="m8 12.600 3 3 8.400-9.700"/></svg></div><span>Wi-Fight</span></div>
+    <div class="brand"><div class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 10.8 6.9 20.2 10.5 12.6 14.1 20.2 21.5 4.4"/><circle cx="10.5" cy="6.5" r="2.25" fill="currentColor" stroke="none"/></svg></div><span>Wi-Fight</span></div>
     <div class="railbody">
       <div class="eyebrow">Set up · about 2 minutes</div>
       <div class="railhead">Four short steps to your first test.</div>
@@ -101,7 +100,7 @@ button.btn.pill2{font-family:var(--body)}
 
   <div>
     <header class="mtop">
-      <div class="row between"><div class="brand"><div class="mark"><svg viewBox="0 -1.300 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.300 16.200A8.300 8.300 0 0 1 16.900 6.300"/><path d="M19.900 12.300a8.300 8.300 0 0 1-.6 3.900"/><path d="m8 12.600 3 3 8.400-9.700"/></svg></div><span>Wi-Fight</span></div><span class="stepn">Step 2 of 4 · Sign in</span></div>
+      <div class="row between"><div class="brand"><div class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 10.8 6.9 20.2 10.5 12.6 14.1 20.2 21.5 4.4"/><circle cx="10.5" cy="6.5" r="2.25" fill="currentColor" stroke="none"/></svg></div><span>Wi-Fight</span></div><span class="stepn">Step 2 of 4 · Sign in</span></div>
       <div class="progress"><i class="done"></i><i class="on"></i><i class=""></i><i class=""></i></div>
     </header>
     <main class="pane">
@@ -126,14 +125,14 @@ button.btn.pill2{font-family:var(--body)}
           <div class="or">or</div>
           <button type="button" class="btn pill2 wide" id="passkey"><span>Use a passkey</span><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2M9 9.500V11M15 9.500V11M12 9.500V13h-1M9 15.500c1.800 1.400 4.200 1.400 6 0"/></svg></button>
           <div class="err" id="pkerr" role="alert" hidden></div>
-          <div class="small" style="text-align:center">A passkey uses your face, fingerprint, or screen lock. In this prototype it is created on this device and is not checked by a server.</div>
+          <div class="small" style="text-align:center">A passkey uses your face, fingerprint, or screen lock.</div>
         </section>
 
         <section class="card col gap16" id="codecard" hidden>
           <div class="row between"><div class="moment"><span class="m">2</span><span class="h3">Enter your code</span></div><span class="badge good"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7"/></svg>Code ready</span></div>
-          <div class="demo" id="demonote" role="status"></div>
           <p class="body">Enter the 6-digit code for <b style="color:var(--ink)" data-b="email"></b></p>
           <div class="otp" id="otp" role="group" aria-label="6-digit code"><input class="" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="1" aria-label="Digit 1 of 6"><input class="" type="text" inputmode="numeric" autocomplete="off" maxlength="1" aria-label="Digit 2 of 6"><input class="" type="text" inputmode="numeric" autocomplete="off" maxlength="1" aria-label="Digit 3 of 6"><input class="gap" type="text" inputmode="numeric" autocomplete="off" maxlength="1" aria-label="Digit 4 of 6"><input class="" type="text" inputmode="numeric" autocomplete="off" maxlength="1" aria-label="Digit 5 of 6"><input class="" type="text" inputmode="numeric" autocomplete="off" maxlength="1" aria-label="Digit 6 of 6"></div>
+          <div class="small" id="codehint">Enter any 6 digits to continue.</div>
           <div class="err" id="codeerr" role="alert" hidden></div>
           <div class="row between small" style="flex-wrap:wrap;gap:8px"><button type="button" class="link fillcode" id="fillcode">Fill the code for me</button><button type="button" class="link" id="resend">Start over</button></div>
           <button type="button" class="btn primary wide" id="verify">Verify and continue</button>

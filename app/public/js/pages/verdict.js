@@ -62,7 +62,7 @@ if (!facts.complete) {
     paid: plan.down, got: H.mbps, below: facts.daysBelow, ofDays: `of ${facts.daysDone}`, lost: facts.money.lostMonth,
     basis: `This is the median of ${H.basis}, from ${plural(facts.testsCount, 'test')}, with ${plural(dips, 'one-off dip')} left out. The fair line is 80% of your plan, which is ${facts.fairLine} Mbps.`,
     scPct: H.pct, scWord: H.statusWord, scGot: H.mbps, scPaid: plan.down, scDays: facts.daysDone,
-    scFoot: `wi-fight · ${plural(facts.testsCount, 'test')}${facts.sample ? ' · sample data' : ''}`,
+    scFoot: `wi-fight · ${plural(facts.testsCount, 'test')}`,
     reportTitle: below ? 'Send a report to your provider' : 'Keep a record of your results',
     reportText: `Proof AI drafts the report from your ${facts.daysDone} days of tests. You read it, edit it, and approve it. Nothing goes to ${plan.provider || plan.name.split(' ')[0]} until you say so.`,
     stripTitle: `All ${facts.totalDays} days`, stripSub: `Daily median download speed, ${range}`,

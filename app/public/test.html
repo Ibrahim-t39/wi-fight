@@ -1,5 +1,6 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Wi-Fight · Live test</title><link rel="stylesheet" href="css/ds.css">
+<title>Wi-Fight · Live test</title>
+<link rel="icon" type="image/svg+xml" href="img/favicon.svg"><link rel="stylesheet" href="css/ds.css">
 <style>
 html{background:#070A12}
 .stage{position:relative;min-height:100vh;background:var(--bg);color:var(--ink);overflow:hidden;display:flex;justify-content:center}
@@ -78,7 +79,6 @@ html{background:#070A12}
 .alertbox p{font:500 14.5px/1.45 var(--body);color:var(--ink);max-width:420px}
 .alertbox .btn{width:100%;max-width:360px}
 @keyframes alertin{from{opacity:0;transform:translateY(10px) scale(.97)}}
-.presenting{width:100%;max-width:420px;padding:10px 14px;border-radius:14px;border:1px dashed var(--line);font:600 13px/1.45 var(--body);color:var(--ink-2);text-align:center}
 .actions .btn.lead{flex:0 0 100%}
 @media (prefers-reduced-motion:reduce){.alertbox{animation:none}}
 /* layout: one centred column on a phone, dial beside the result on a wide screen so nothing important sits below the fold */
@@ -164,11 +164,10 @@ html{background:#070A12}
 
     <div class="status" id="status"><span class="live" id="livedot" hidden></span><span id="statusWord"></span></div>
     <p class="result" id="result" hidden></p>
-    <div class="notice warn" id="practiceLabel" hidden>Simulated test for this demo, not a real measurement</div>
     <div class="alertbox" id="fallback" role="alert" hidden>
       <div class="ah"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2.500 20h19z"/><path d="M12 10v4.500M12 17.300v.2"/></svg><span id="fallbackTitle"></span></div>
       <p id="fallbackText"></p>
-      <button class="btn primary" id="usePractice">Run a practice test instead</button>
+      <button class="btn primary" id="usePractice">Run a simulated test instead</button>
     </div>
 
     <div class="notice" id="paused" hidden>
@@ -188,8 +187,7 @@ html{background:#070A12}
       </div>
       <button class="btn primary" id="start"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 4 14h6l-1 8 9-12h-6z"/></svg>Start test</button>
       <button class="textbtn" id="practice">Use the real M-Lab test</button>
-      <p class="quiet" id="quiet">Start test runs a simulated test for this demo, so it works on any network and is not a real measurement.</p>
-      <p class="presenting" id="presenting" hidden>Start test runs a simulated test, so the demo works on any network. The real M-Lab test measures your actual connection, and M-Lab publishes the result with your IP address.</p>
+      <p class="quiet" id="quiet">M-Lab publishes the result with your IP address.</p>
     </div>
 
     <div class="slots" id="slots">
@@ -219,7 +217,7 @@ html{background:#070A12}
     </div>
 
     <button class="cancel" id="cancel" hidden>Cancel test</button>
-    <p class="foot" id="foot">The real test runs on M-Lab's open test, and M-Lab publishes its result together with your IP address.</p>
+    <p class="foot" id="foot" hidden></p>
     </div>
   </div>
 </div>

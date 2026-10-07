@@ -39,10 +39,12 @@ with sync_playwright() as p:
     cont.click(); page.wait_for_url('**/onboarding-signin.html')
     page.locator('input[type=email]').fill('maya@example.com')
     page.get_by_role('button', name=re.compile('Email me a code')).click(); page.wait_for_timeout(400)
-    ok('sign-in: labelled as a demo that takes any 6 digits', 'no email is sent' in page.inner_text('body').lower() and 'any 6 digits' in page.inner_text('body').lower())
+    body = page.inner_text('body').lower()
+    ok('sign-in: a short hint says any 6 digits work, with no demo notice', 'enter any 6 digits to continue' in body and 'prototype' not in body and 'demo' not in body)
     boxes = page.locator('.otp input')
     for i, ch in enumerate('135790'): boxes.nth(i).type(ch)
     page.wait_for_url('**/onboarding-plan.html')
+    page.fill('#q', 'Northstar'); page.wait_for_timeout(400)
     page.get_by_text('Northstar Fiber 500', exact=True).first.click(); page.wait_for_timeout(200)
     page.get_by_role('button', name=re.compile('Start checking my internet')).click(); page.wait_for_url('**/dashboard.html'); page.wait_for_timeout(700)
     st = state()
@@ -54,9 +56,10 @@ with sync_playwright() as p:
     # 2. a practice test
     page.goto(BASE + 'test.html'); page.wait_for_timeout(600)
     page.get_by_role('button', name=re.compile('Start test')).first.click()
-    page.wait_for_function("document.body.innerText.toLowerCase().includes('not a real measurement') && !document.body.innerText.includes('Measuring')", timeout=25000); page.wait_for_timeout(900)
+    page.wait_for_selector('#actions', state='visible', timeout=25000); page.wait_for_timeout(900)
     st = state()
-    ok('practice test saved and labelled', len(st['tests']) == 1 and st['tests'][0]['source'] == 'practice' and 'not a real measurement' in page.inner_text('body').lower())
+    chips = [c.strip() for c in page.locator('#read [data-b=readChipsHtml] > *').all_inner_texts()]
+    ok('practice test saved, with one quiet Simulated chip and no banner', len(st['tests']) == 1 and st['tests'][0]['source'] == 'practice' and chips.count('Simulated') == 1 and 'not a real measurement' not in page.inner_text('body').lower(), chips)
     page.screenshot(path=f'{OUT}/test-done-desktop.png')
     page.goto(BASE + 'dashboard.html'); page.wait_for_timeout(900)
     ok('dashboard now computes from the one test', 'day 1 of 14' in page.inner_text('body').lower() and page.locator('#grid').is_visible())
@@ -64,7 +67,7 @@ with sync_playwright() as p:
     # 3. demo data through the app's own Demo sheet
     page.locator('[data-demo]').first.click(); page.get_by_role('button', name=re.compile('skip to day 9')).click(); page.wait_for_timeout(4500); page.wait_for_url('**/dashboard.html', timeout=15000); page.wait_for_timeout(1200)
     t = page.inner_text('body')
-    ok('sample day 9: 78% of plan, 389 Mbps, Below plan, sample chip shown', all(x in t for x in ['78', '389', 'Below plan', 'Sample data']))
+    ok('sample day 9: 78% of plan, 389 Mbps, Below plan, one sample chip shown', all(x in t for x in ['78', '389', 'Below plan']) and t.count('Sample data') == 1, t.count('Sample data'))
     for name in PAGES:
         page.goto(BASE + ('' if name == 'index' else name + '.html')); page.wait_for_timeout(1100)
         page.screenshot(path=f'{OUT}/{name}-desktop.png', full_page=False)

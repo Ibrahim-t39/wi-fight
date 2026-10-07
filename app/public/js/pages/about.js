@@ -51,7 +51,7 @@ const MIN = Number(range.min), MAX = Number(range.max);
 
 // The demo always uses sample values, so its chip shows in every state.
 const chip = $('#demoSample'); chip.hidden = false; chip.classList.add('show');
-bind({ demoIntro: `These are the ${dayTests.length} tests from day ${DAY} of the sample two weeks. One of them, at ${fmtTime(dip.t)}, came in at ${original} Mbps. Change that number and watch the engine decide.` });
+bind({ demoIntro: `These are the ${dayTests.length} tests from day ${DAY} of the two weeks. One of them, at ${fmtTime(dip.t)}, came in at ${original} Mbps. Change that number and watch the engine decide.` });
 
 function render(value) {
   const v = Math.min(MAX, Math.max(MIN, Math.round(Number(value) || MIN)));

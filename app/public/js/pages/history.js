@@ -133,7 +133,7 @@ if (!facts.headline) {
   const cell = (label, v, unit, extra = '') => `<span><i class="lbl">${label}</i>${v == null ? '<span class="n" style="color:var(--ink-3)">n/a</span>' : `<span class="n${extra}">${v}<small>${unit}</small></span>`}</span>`;
   const row = (t) => {
     const sp = t.when.indexOf(' ');
-    const tags = (t.source === 'practice' ? '<span class="tag practice">Practice</span>' : '') + (t.location === 'near' ? '<span class="tag">Near router</span>' : t.location === 'far' ? '<span class="tag">Far room</span>' : '');
+    const tags = (t.source === 'practice' ? '<span class="tag practice">Simulated</span>' : '') + (t.location === 'near' ? '<span class="tag">Near router</span>' : t.location === 'far' ? '<span class="tag">Far room</span>' : '');
     const dl = t.ignored ? `<span><i class="lbl">Download</i><span class="n dl"><s>${t.down}</s><small>Mbps</small></span></span>` : cell('Download', t.down, 'Mbps');
     const stat = t.ignored ? IGN.replace('badge ign', 'badge ign stat') : badge(t.low ? 'bad' : 'good', t.low ? 'Below fair line' : 'On plan').replace('class="badge', 'class="stat badge');
     return `<div class="tr${t.ignored ? ' ignored' : ''}" data-id="${esc(t.id)}"><span class="when"><b>${esc(t.when.slice(0, sp))}</b><span>${esc(t.when.slice(sp + 1))}</span>${tags}</span>${dl}${cell('Upload', t.up, 'Mbps')}${cell('Response', t.latency, 'ms')}${stat}</div>`;

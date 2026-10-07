@@ -19,7 +19,7 @@ console.log('day 14:', f.headline, 'complete', f.complete, 'daysBelow', f.daysBe
 assert.ok(f.complete); assert.equal(f.headline.mbps, 389); assert.equal(f.daysBelow, 9); assert.equal(f.streak.len, 9);
 const r = recommend(f, catalog, mk(14).household);
 console.log('pick:', r.pick && r.pick.name, 'saves/yr', r.savingsYear, r.rows.map((x) => `${x.name} $${x.cost24} ${x.fits} (${x.note})`).join(' | '));
-assert.equal(r.pick.id, 'vl1000'); assert.equal(r.savingsYear, 120);
+assert.equal(r.pick.id, 'gf1000'); assert.equal(r.savingsYear, 120);
 // a healthy connection must not be flagged
 const ok = mk(9); ok.tests = ok.tests.map((t) => ({ ...t, down: t.location === 'normal' && t.down > 200 ? 470 + (t.down % 7) : t.down }));
 f = summarize(ok); console.log('healthy:', f.headline.statusWord, f.diagnosis.title, 'ignored', f.ignored.length);

@@ -33,7 +33,6 @@ bind({
   perDay: SCHEDULE.length === 4 ? 'four' : String(SCHEDULE.length),
   daysCap: `${F.totalDays - F.daysBelow} days on plan and ${F.daysBelow} days below the fair line`,
   verdictLine: `${H.statusWord} on ${F.daysBelow} of ${F.totalDays} days`,
-  fpShort: `sha256 · ${realPrint.slice(0, 16)}`,
   provPct: `${D.providerPct}%`, wifiPct: `${D.wifiPct}%`,
   lostYear: usd(M.lostYear), lostMonth: usd(M.lostMonth),
 });
@@ -85,21 +84,7 @@ else {
 }
 requestAnimationFrame(() => requestAnimationFrame(() => { $('#splitbar').style.width = `${D.providerPct}%`; }));
 
-/* ---------- 04 security: two protections running for real on this page ---------- */
-// Encryption: the example results are encrypted in this browser with a throwaway AES-GCM 256 key, the same method store.js uses.
-const plain = JSON.stringify(JSON.parse(reportData(H.mbps)), null, 1).replace(/^[{}]\n?/gm, '').replace(/^ /gm, '').replace(/,$/gm, '').trim();
-$('#plain').textContent = plain;
-async function encryptDemo() {
-  if (!(window.crypto && crypto.subtle)) { $('#cipher').textContent = ''; $('#encNote').textContent = 'This browser will not run the live encryption on this address, but the app still shows it on the Privacy and data page.'; $('#reenc').hidden = true; return; }
-  const key = await crypto.subtle.generateKey({ name: 'AES-GCM', length: 256 }, false, ['encrypt']);
-  const iv = crypto.getRandomValues(new Uint8Array(12));
-  const ct = new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, new TextEncoder().encode(reportData(H.mbps))));
-  $('#cipher').textContent = btoa(String.fromCharCode(...iv, ...ct));
-  $('#encNote').textContent = 'Your browser really did encrypt the example results just now, using a throwaway AES-GCM 256 key. Encrypt again and the saved text changes completely.';
-}
-await encryptDemo();
-$('#reenc').addEventListener('click', encryptDemo);
-
+/* ---------- 04 security: one protection running for real on this page ---------- */
 // Fingerprint: SHA-256 of the example report. Changing one number gives a fingerprint that no longer matches.
 let tampered = false;
 async function showPrint() {
@@ -107,10 +92,9 @@ async function showPrint() {
   const print = await sha256(reportData(mbps));
   $('#tamVal').textContent = mbps; $('#tamVal').classList.toggle('chg', tampered);
   $('#hash').textContent = print; $('#hash').classList.toggle('bad', print !== realPrint);
-  $('#tamState').innerHTML = print === realPrint ? badge('good', 'The two match, so nothing was changed') : badge('bad', 'They no longer match, so a number was changed');
+  $('#tamState').innerHTML = print === realPrint ? badge('good', 'Matches the original report') : badge('bad', 'No longer matches the original');
   $('#tamBtn').textContent = tampered ? 'Put it back' : 'Change one number';
 }
-$('#hash0').textContent = realPrint;
 await showPrint();
 $('#tamBtn').addEventListener('click', () => { tampered = !tampered; showPrint(); });
 

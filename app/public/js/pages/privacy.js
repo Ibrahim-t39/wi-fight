@@ -26,12 +26,12 @@ function glance() {
   const aiOn = set.aiAnalyze !== false;
   return [
     { key: 'consent', title: 'Consent recorded', kind: consentAt ? 'ok' : 'warn', word: consentAt ? 'Yes' : st.consent ? 'No date' : 'No',
-      detail: consentAt ? `${fmtDate(consentAt)} at ${fmtTime(consentAt)}${st.consent.viaSample ? ', with the sample data' : ''}` : 'No consent date is stored.' },
+      detail: consentAt ? `${fmtDate(consentAt)} at ${fmtTime(consentAt)}` : 'No consent date is stored.' },
     { key: 'encrypted', title: 'Encrypted on this device', kind: enc ? 'ok' : 'warn', word: enc ? 'Yes' : 'No',
       detail: enc ? 'AES-GCM, 256-bit key held by this browser' : 'This browser does not offer the encryption tools.' },
     { key: 'signin', title: 'Sign-in without a password', kind: method === 'code' || method === 'passkey' ? 'ok' : 'warn',
-      word: method === 'code' ? 'Email code' : method === 'passkey' ? 'Passkey' : method === 'sample' ? 'Demo sign-in' : 'Not known',
-      detail: method === 'sample' ? 'Sample data was loaded without signing in. No password exists.' : method === 'code' || method === 'passkey' ? 'No password is stored, so none can leak.' : 'The sign-in method was not recorded.' },
+      word: method === 'code' ? 'Email code' : method === 'passkey' ? 'Passkey' : method === 'sample' ? 'Not signed in' : 'Not known',
+      detail: method === 'sample' ? 'No password exists.' : method === 'code' || method === 'passkey' ? 'No password is stored, so none can leak.' : 'The sign-in method was not recorded.' },
     { key: 'sent', title: 'Nothing sent without approval', kind: 'ok', word: sent ? `${sent} sent` : 'Nothing sent',
       detail: sent ? `${plural(sent, 'report')} left, each one after you approved it.` : 'No report has left this device.' },
     { key: 'ai', title: 'Proof AI under your control', kind: aiOn ? 'ok' : 'off', word: aiOn ? 'On' : 'Off',
@@ -44,7 +44,7 @@ window.WF_PRIVACY = { glance };
 function paint() {
   const st = S(), enc = Store.isEncrypted(), sent = st.sent || [], set = st.settings || {};
   const method = st.user && st.user.method;
-  const signin = method === 'code' ? 'Signed in with an email code, no password stored' : method === 'passkey' ? 'Signed in with a passkey, no password stored' : method === 'sample' ? 'Demo sign-in for sample data, no password stored' : 'Signed in on this device, no password stored';
+  const signin = method === 'code' ? 'Signed in with an email code, no password stored' : method === 'passkey' ? 'Signed in with a passkey, no password stored' : method === 'sample' ? 'Not signed in, no password stored' : 'Signed in on this device, no password stored';
   const lastSent = sent[sent.length - 1];
   const chk = (ok, text) => `<div class="chk${ok ? '' : ' warn'}"><i>${ok ? CHECK : WARN}</i>${esc(text)}</div>`;
   bind({
@@ -64,7 +64,7 @@ function paint() {
     cTests: (st.tests || []).length, cPlan: st.plan ? 1 : 0, cBill: st.bill ? 1 : 0, cChat: userMsgs(), cAcct: st.user ? 1 : 0,
     dlNote: `One file with all ${plural((st.tests || []).length, 'result')} and your plan.`,
     sentNote: sent.length ? `${plural(sent.length, 'report')} opened in your email app.` : 'Nothing has been sent.',
-    consentWhen: st.consent && st.consent.at ? `Given on ${when(st.consent.at)}${st.consent.viaSample ? ', when sample data was loaded' : ''}.` : 'No date recorded.',
+    consentWhen: st.consent && st.consent.at ? `Given on ${when(st.consent.at)}.` : 'No date recorded.',
     consentWhat: `You agreed to: speed tests through M-Lab, which publishes results with the IP address${st.consent && st.consent.ai ? '; and Proof AI reading your results.' : '. You did not agree to Proof AI at sign-up.'}`,
   });
   $('.shieldbig').classList.toggle('warn', !enc);
@@ -92,7 +92,7 @@ $('#resume').onclick = async () => { await Store.update((s) => { s.settings = { 
 /* ---------- what we hold: View sheets ---------- */
 const done = '<button class="btn sm" data-close style="width:100%;margin-top:16px">Done</button>';
 const LOC = { normal: 'Regular', near: 'Near router', far: 'Far room' };
-const SRC = { mlab: 'M-Lab', practice: 'Practice', sample: 'Sample' };
+const SRC = { mlab: 'M-Lab', practice: 'Simulated', sample: 'Sample' };
 const VIEWS = {
   tests: () => { const t = (S().tests || []).slice().sort((a, b) => new Date(b.t) - new Date(a.t));
     return `<div class="h3">Speed results</div><p class="small" style="margin:4px 0 12px">${plural(t.length, 'result')}, newest first. Download, upload in Mbps. Response time in ms.</p>${t.length ? `<div class="vscroll"><table class="vt"><tr><th>When</th><th>Down</th><th>Up</th><th>Resp.</th><th>Where</th><th>Source</th></tr>${t.map((x) => `<tr><td>${fmtDate(x.t)}, ${fmtTime(x.t)}</td><td>${esc(x.down)}</td><td>${esc(x.up == null ? '' : x.up)}</td><td>${esc(x.latency == null ? '' : x.latency)}</td><td>${esc(LOC[x.location || 'normal'] || x.location)}</td><td>${esc(SRC[x.source] || x.source || '')}</td></tr>`).join('')}</table></div>` : '<p class="body">No speed results are stored.</p>'}`; },
@@ -100,7 +100,7 @@ const VIEWS = {
   photo: () => '<div class="h3">Bill photo</div><p class="body" style="margin-top:8px">Wi-Fight never stores a bill photo. A photo is read once to fill in the bill details, and only the details you confirm are kept.</p>',
   bill: () => { const b = S().bill; return `<div class="h3">Bill details</div>${b ? kv('Plan price', `$${b.planPrice}`) + kv('Equipment', `$${b.equipment}`) + (b.fees || []).map((f) => kv(`Fee: ${f.name}`, `$${f.amount}`)).join('') + kv('Total', `$${b.total}`) + kv('Promo ends', b.promoEnds) : '<p class="body" style="margin-top:8px">No bill details are stored.</p>'}`; },
   chat: () => { const c = allMsgs(); return `<div class="h3">Messages to Proof AI</div><p class="small" style="margin:4px 0 12px">${plural(userMsgs(), 'question')} from you and ${plural(c.length - userMsgs(), 'answer')}.</p>${c.length ? `<div class="vscroll col gap8">${c.map((m) => `<div class="msg"><b>${m.role === 'user' ? 'You' : 'Proof AI'} · ${fmtDate(m.t)}, ${fmtTime(m.t)}</b><div>${AI.html(m.text)}</div></div>`).join('')}</div>` : '<p class="body">No messages are stored.</p>'}`; },
-  account: () => { const u = S().user || {}; return `<div class="h3">Name and email</div>${kv('Name', u.name) + kv('Email', u.email) + kv('Sign-in', u.method === 'code' ? 'Email code' : u.method === 'passkey' ? 'Passkey' : u.method === 'sample' ? 'Demo sign-in' : u.method)}<p class="small" style="margin-top:10px">No password is stored.</p>`; },
+  account: () => { const u = S().user || {}; return `<div class="h3">Name and email</div>${kv('Name', u.name) + kv('Email', u.email) + kv('Sign-in', u.method === 'code' ? 'Email code' : u.method === 'passkey' ? 'Passkey' : u.method === 'sample' ? 'Not signed in' : u.method)}<p class="small" style="margin-top:10px">No password is stored.</p>`; },
   sent: () => { const x = S().sent || []; return `<div class="h3">What was sent</div>${x.length ? `<p class="small" style="margin:4px 0 12px">Wi-Fight did not send these itself. Each line is a message it opened in your email app.</p><div class="vscroll col gap8">${x.map((m) => `<div class="msg"><b>${when(m.at)}</b><div>To: ${esc(m.to || 'no address')}</div><div>Subject: ${esc(m.subject)}</div><div>Report fingerprint: <span class="monoi">${esc(String(m.hash || '').slice(0, 4))}…${esc(String(m.hash || '').slice(-4))}</span></div><div>FCC page offered: ${m.fcc ? 'Yes' : 'No'}</div></div>`).join('')}</div>` : '<p class="body" style="margin-top:8px">Nothing has been sent.</p>'}`; },
 };
 document.addEventListener('click', (e) => { const v = e.target.closest('[data-view]'); if (v && VIEWS[v.dataset.view]) { e.preventDefault(); openSheet(VIEWS[v.dataset.view]() + done); } });

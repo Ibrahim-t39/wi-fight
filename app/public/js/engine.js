@@ -204,11 +204,12 @@ export function recommend(facts, catalog, household = {}) {
   const needUp = uses.includes('Video calls') ? people * 15 : people * 5;
   const all = catalog.providers.flatMap((p) => p.plans.map((pl) => ({ ...pl, provider: p.name })));
   const rows = catalog.compare.map((id) => all.find((p) => p.id === id)).filter(Boolean).map((pl) => {
-    const cost24 = pl.price * Math.min(24, pl.promoMonths || 24) + (pl.promoMonths ? pl.afterPromo * (24 - pl.promoMonths) : 0);
+    const promo = Math.min(24, pl.promoMonths || 24); // a price promise longer than two years covers the whole comparison
+    const cost24 = pl.price * promo + pl.afterPromo * (24 - promo);
     const current = facts.plan && pl.id === facts.plan.id;
     let fits = 'yes', note = `Room for all ${people} of you`;
     if (current && facts.headline && facts.headline.status === 'below') { fits = 'partly'; note = 'Slow in the evening'; }
-    else if (pl.promoMonths) { fits = 'partly'; note = 'Price jumps in year two'; }
+    else if (pl.promoMonths && pl.promoMonths < 24) { fits = 'partly'; note = 'Price jumps in year two'; }
     else if (pl.up < needUp) { fits = 'partly'; note = 'Upload is tight for calls'; }
     else if (pl.down < needDown) { fits = 'partly'; note = 'Tight for your household'; }
     return { ...pl, cost24, current, fits, note };

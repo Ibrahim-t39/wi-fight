@@ -10,7 +10,7 @@ if (!state.user) { go('onboarding-signin.html'); await new Promise(() => {}); }
 
 const catalog = await (await fetch('data/plans.json')).json();
 const providers = catalog.providers;
-const allPlans = providers.flatMap((p) => p.plans.map((pl) => ({ ...pl, provider: p.name, providerId: p.id })));
+const allPlans = providers.flatMap((p) => p.plans.map((pl) => ({ ...pl, provider: p.name, providerId: p.id, demo: !!p.demo })));
 const n = (x) => Number(x).toLocaleString('en-US');
 const money = (x) => '$' + Number(x || 0).toFixed(2);
 const CHECK = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7"/></svg>';
@@ -61,7 +61,8 @@ function drawPick() {
   $('#plansTitle').textContent = cur ? `${cur.name} plans` : 'Plans';
   $('#plans').innerHTML = cur ? cur.shown.map((pl) => { const on = selected && selected.id === pl.id; return `<button type="button" class="radio-card${on ? ' on' : ''}" role="radio" aria-checked="${!!on}" data-plan="${esc(pl.id)}"><div class="row gap12"><span class="radio"></span><div><div class="dt">${esc(pl.name)}</div><div class="small pm">Typical download <b>${n(pl.down)} Mbps</b><span class="sep"> · </span><span class="up">upload <b>${n(pl.up)} Mbps</b></span></div></div></div><div class="price"><div class="num">$${n(pl.price)}</div><div class="small">a month</div></div></button>`; }).join('') : '';
   const shownPlan = selected && cur && selected.providerId === cur.id ? selected : null;
-  $('#source').textContent = shownPlan ? `These providers and plans are fictional example values, set out like a provider's broadband label. Typical response time ${shownPlan.latency} ms.` : 'These providers and plans are fictional example values, set out like a provider\'s broadband label. A real build would use each provider\'s own label.';
+  $('#source').textContent = shownPlan ? `${shownPlan.latency == null ? '' : `Typical response time ${shownPlan.latency} ms. `}${catalog.asOf && !shownPlan.demo ? `Price and speed as published by the provider, ${catalog.asOf}.` : ''}` : '';
+  $('#sourceRow').hidden = !shownPlan;
 }
 
 function drawFair() {
@@ -243,9 +244,9 @@ function addBox(sample, region, cls, tag) {
 /** One scan, the same for any uploaded photo. sample is set when the file is one of the demo bills. sample is the manifest entry, or null. */
 async function runScan({ src, getDataUrl, sample }) {
   const my = ++runId; bill = null; current = sample || null; takeOn = false; scanState = 'working';
-  thumb.src = src; thumb.alt = sample ? `${sample.title}, a fictional sample bill` : 'The bill photo you chose';
+  thumb.src = src; thumb.alt = sample ? sample.title : 'The bill photo you chose';
   stage.classList.toggle('up', false); stage.classList.add('reading'); boxes.innerHTML = '';
-  $('#billcap').textContent = sample ? 'Recognized as a fictional Wi-Fight demo bill. It is shown here only.' : 'Your bill photo, shown here only.';
+  $('#billcap').textContent = 'Your bill photo, shown here only.';
   show('scanWork');
   $('#scanErr').hidden = true; $('#scanActions').hidden = true; $('#frows').innerHTML = ''; $('#scanChips').innerHTML = ''; $('#scanNote').textContent = '';
   $('#scanMatch').hidden = true; $('#scanOffNote').hidden = true; $('#usePlan').hidden = true; $('#take').hidden = false;
@@ -267,7 +268,7 @@ async function runScan({ src, getDataUrl, sample }) {
   const fl = res.fields, live = res.mode === 'live';
   bill = { planPrice: num(fl.planPrice ?? 0), equipment: num(fl.equipment ?? 0), fees: (fl.fees || []).map((x) => ({ name: String(x.name || ''), amount: num(x.amount ?? 0), junk: !!x.junk, why: x.why ? String(x.why) : '' })), promoEnds: fl.promoEnds ? String(fl.promoEnds) : null, printedTotal: fl.total == null ? null : num(fl.total), provider: fl.provider ? String(fl.provider) : null, plan: fl.plan ? String(fl.plan) : null, mode: res.mode };
   drawFields();
-  $('#scanMeta').textContent = live ? 'Read just now · live' : sample ? 'Known sample values · offline mode' : 'Sample values · offline mode';
+  $('#scanMeta').textContent = live ? 'Read just now · live' : 'Offline mode';
   $('#scanText').textContent = live ? 'Here is what Proof AI read from the photo.' : 'Filling in the fields now.';
 
   // Reveal one value at a time. On a recognized demo bill, each value also gets a box on its line of the bill.
@@ -289,7 +290,7 @@ async function runScan({ src, getDataUrl, sample }) {
   // The takeaway, with honest labels.
   const found = 2 + bill.fees.length + 1 + (bill.promoEnds ? 1 : 0) + (bill.plan ? 1 : 0);
   if (live || sample) { takeOn = true; drawTake(); } else $('#scanText').innerHTML = AI.html(res.note || 'Offline mode cannot read a real photo. These are sample values.');
-  if (!live && sample) { $('#scanOffNote').textContent = res.note || 'Offline mode: no AI model is connected, so these are the known values of this demo bill, not an AI reading.'; $('#scanOffNote').hidden = false; }
+  if (!live && sample) { $('#scanOffNote').textContent = res.note || 'Offline mode: no AI model is connected, so this is not an AI reading.'; $('#scanOffNote').hidden = false; }
   if (live && sample) {
     // Proof that the model really read the image: its values against the sample's known values, counted for real.
     const c = compare(fl, sample.fields, lines);
@@ -297,7 +298,7 @@ async function runScan({ src, getDataUrl, sample }) {
     bad.forEach((key) => { const fl2 = $(`#frows [data-k="${key}"] .fl`); if (fl2 && !$('.chk', fl2)) fl2.insertAdjacentHTML('beforeend', '<span class="chk">check this</span>'); });
     const m = $('#scanMatch'); m.classList.toggle('part', c.ok !== c.of || c.extra.length > 0);
     m.dataset.ok = c.ok; m.dataset.of = c.of;
-    m.innerHTML = `${c.ok === c.of && !c.extra.length ? OKMARK : ''}<span>Matches this demo bill's known values: ${c.ok} of ${c.of}</span>${c.checks.some((x) => x.key === 'missingFee') ? '<span class="q">A fee on the bill was not read.</span>' : ''}${c.extra.length ? '<span class="q">The model also listed a fee that is not on the sample.</span>' : ''}`;
+    m.innerHTML = `${c.ok === c.of && !c.extra.length ? OKMARK : ''}<span>Matches the bill's known values: ${c.ok} of ${c.of}</span>${c.checks.some((x) => x.key === 'missingFee') ? '<span class="q">A fee on the bill was not read.</span>' : ''}${c.extra.length ? '<span class="q">The model also listed a fee that is not on the bill.</span>' : ''}`;
     m.hidden = false;
   }
   const hit = live || sample ? planFor(sample) : null;
@@ -306,11 +307,11 @@ async function runScan({ src, getDataUrl, sample }) {
   // a photo can be read by a different model than the one that writes text, so name the one that read it
   const readBy = live ? (res.model || (stack.photo && stack.photo.id) || status.model || '') : '';
   const chips = live ? [`Confidence: ${res.confidence}`, 'Based on 1 photo', `${found} fields found`]
-    : sample ? ['Confidence: none, not an AI reading', 'Known sample values', `${found} fields filled`]
-      : ['Confidence: none, sample values', 'Not read from your photo', `${found} fields filled`];
+    : sample ? ['Not an AI reading', `${found} fields filled`]
+      : ['Not read from your photo', `${found} fields filled`];
   $('#scanChips').innerHTML = (readBy ? `<span data-model="${esc(readBy)}">${modelChip(readBy)}</span>` : '') + chips.filter(Boolean).map((c) => `<span class="evidence">${esc(c)}</span>`).join('');
   const readNote = live ? `This photo was read by ${readBy ? modelChip(readBy, { maker: false }) : 'an AI model'}${stack.host ? `, hosted on ${esc(stack.host.name)}` : ''}. It can make mistakes, so check each value before you continue.` : esc(`${AI.note(res.mode)} Check each field before you continue.`);
-  $('#scanNote').innerHTML = `${readNote}${sample ? ' The outlines mark where each value sits on this demo bill.' : ''}`;
+  $('#scanNote').innerHTML = `${readNote}${sample ? ' The outlines mark where each value sits on the bill.' : ''}`;
   $('#scanActions').hidden = false; $('#billOk').hidden = false; $('#billEdit').hidden = false; $('#billOk').disabled = false; $('#billOk span').textContent = 'Looks right';
   $('#scan').dataset.mode = res.mode;
   scanState = 'done';
@@ -352,15 +353,11 @@ else {
   show('scanIdle');
   // Say exactly which model reads the photo, from what the server reports (models.js). Nothing is named by hand.
   const pm = stack.live ? stack.photo : null, where = stack.provider === 'local' ? 'on this computer' : stack.host ? `on ${esc(stack.host.name)}` : '';
-  const reader = $('#reader');
-  reader.classList.toggle('off', !pm); reader.dataset.model = pm ? pm.id : 'offline';
-  reader.innerHTML = pm ? `<span>Read by</span>${modelChip(pm.id)}<span>${where ? `${where}, ` : ''}then checked by the app's own code.</span>`
-    : 'No AI model is connected right now, so a photo cannot be read. A practice bill shows its known values instead.';
   $('#howSend').innerHTML = pm ? `Your browser shrinks the photo and sends it once to ${modelChip(pm.id, { maker: false })}, a vision-language model from ${esc(pm.maker)} that can read text in an image${where ? `, running ${where}` : ''}. Wi-Fight does not store the photo.`
     : 'When a model is connected, your browser shrinks the photo and sends it once to a vision-language model, which is a model that can read text in an image. Wi-Fight does not store the photo. No model is connected right now, so this step is skipped and nothing is sent.';
   $('#photoHow').textContent = status.provider === 'local' ? `The photo stays in this page while you check the fields. It is read once by a language model running on this computer (${status.model}), so it does not leave this device, and it is gone when you leave this page.`
     : status.live ? `The photo stays in this page while you check the fields. It is sent once to ${stack.photo ? `${stack.photo.name} (${stack.photo.maker})` : 'the AI service'}${stack.host ? `, hosted on ${stack.host.name}` : ''}, to be read, and it is gone when you leave this page.`
-      : 'The photo stays in this page while you check the fields and is gone when you leave. Proof AI is in offline mode, so the photo is not sent anywhere and cannot be read. A recognized demo bill shows its known values, and your own photo gets sample values to edit.';
+      : 'The photo stays in this page while you check the fields and is gone when you leave. Proof AI is in offline mode, so the photo is not sent anywhere and cannot be read.';
 }
 window.addEventListener('pagehide', () => { if (thumbUrl) URL.revokeObjectURL(thumbUrl); });
 

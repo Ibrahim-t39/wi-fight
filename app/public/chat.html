@@ -1,5 +1,6 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Wi-Fight · Ask Proof AI</title><link rel="stylesheet" href="css/ds.css">
+<title>Wi-Fight · Ask Proof AI</title>
+<link rel="icon" type="image/svg+xml" href="img/favicon.svg"><link rel="stylesheet" href="css/ds.css">
 <style>
 .badge svg{width:12px;height:12px;flex:none}.chip svg{width:14px;height:14px;flex:none}.btn svg{width:16px;height:16px;flex:none}
 html,body{overflow-x:hidden}
@@ -196,10 +197,17 @@ button.switch{border:0;padding:0;cursor:pointer}
 .composer .mic.busy{opacity:.55;cursor:progress}
 @keyframes micpulse{50%{box-shadow:0 0 0 7px rgba(229,72,77,.18)}}
 @media (prefers-reduced-motion:reduce){.composer .mic.on{animation:none}}
+
+/* the details under an answer stay folded away until someone asks */
+.mdet summary{cursor:pointer;list-style:none;color:var(--ink-3);font:500 12px/1.4 var(--body)}
+.mdet summary::-webkit-details-marker{display:none}
+.mdet summary:hover{color:var(--ink-2);text-decoration:underline;text-underline-offset:3px}
+.mdet .mdetb{display:flex;flex-direction:column;gap:6px;margin-top:8px;padding:10px 12px;border-radius:12px;background:var(--surface-2);border:1px solid var(--line)}
+.mdet .mdetb .mtime{display:none}
 </style></head><body>
 <div class="app">
   <aside class="sidebar">
-    <div class="brand"><div class="mark"><svg viewBox="0 -1.300 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.300 16.200A8.300 8.300 0 0 1 16.900 6.300"/><path d="M19.900 12.300a8.300 8.300 0 0 1-.6 3.900"/><path d="m8 12.600 3 3 8.400-9.700"/></svg></div><span>Wi-Fight</span></div>
+    <div class="brand"><div class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 10.8 6.9 20.2 10.5 12.6 14.1 20.2 21.5 4.4"/><circle cx="10.5" cy="6.5" r="2.25" fill="currentColor" stroke="none"/></svg></div><span>Wi-Fight</span></div>
     <a class="navitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span>Dashboard</span></a>
     <a class="navitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 20V10M12 20V4M19 20v-7"/></svg><span>History</span></a>
     <a class="navitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg><span>Report</span></a>

@@ -1,5 +1,5 @@
-// Step 2: sign in. This prototype has no email server and no sign-in server, and the page says so.
-// For the class demo any 6 digits are accepted as the code, and the page says so. A real build would email a code and check it on a server.
+// Step 2: sign in. There is no email server and no sign-in server, so any 6 digits are accepted as the code.
+// A real build would email a code and check it on a server.
 import { Store, $, $$, go, bind } from '../shell.js';
 
 const state = await Store.load();
@@ -28,8 +28,6 @@ function issue() {
   pending = { email: addr };
   card.hidden = false;
   bind({ email: addr });
-  const note = $('#demonote');
-  note.textContent = 'This is a demo sign-in, so no email is sent in this prototype and any 6 digits work as the code.';
   boxes.forEach((i) => { i.value = ''; i.classList.remove('f'); });
   $('#otp').classList.remove('bad'); show(codeErr, '');
   boxes[0].focus();

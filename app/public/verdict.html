@@ -1,5 +1,6 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Wi-Fight · Your verdict</title><link rel="stylesheet" href="css/ds.css">
+<title>Wi-Fight · Your verdict</title>
+<link rel="icon" type="image/svg+xml" href="img/favicon.svg"><link rel="stylesheet" href="css/ds.css">
 <style>
 /* ---------- dark reveal ---------- */
 .reveal{position:relative;overflow:hidden;border-radius:28px;background:var(--bg);color:var(--ink);padding:26px 36px 26px;display:flex;flex-direction:column;justify-content:space-between;gap:20px;min-height:100%}
@@ -139,7 +140,7 @@ button.quiet{background:none;border:0;cursor:pointer;padding:6px 2px}
 </style></head><body>
 <div class="app">
   <aside class="sidebar">
-    <div class="brand"><div class="mark"><svg viewBox="0 -1.300 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.300 16.200A8.300 8.300 0 0 1 16.900 6.300"/><path d="M19.900 12.300a8.300 8.300 0 0 1-.6 3.900"/><path d="m8 12.600 3 3 8.400-9.700"/></svg></div><span>Wi-Fight</span></div>
+    <div class="brand"><div class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 10.8 6.9 20.2 10.5 12.6 14.1 20.2 21.5 4.4"/><circle cx="10.5" cy="6.5" r="2.25" fill="currentColor" stroke="none"/></svg></div><span>Wi-Fight</span></div>
     <a class="navitem on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span>Dashboard</span></a>
     <a class="navitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 20V10M12 20V4M19 20v-7"/></svg><span>History</span></a>
     <a class="navitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg><span>Report</span></a>
@@ -180,7 +181,7 @@ button.quiet{background:none;border:0;cursor:pointer;padding:6px 2px}
         <div class="row gap12 small" style="flex-wrap:wrap"><span class="row gap4"><span class="dot" style="color:var(--good)"></span>On plan</span><span class="row gap4"><span class="dot" style="color:var(--bad)"></span>Below fair line</span></div>
         <div class="row gap12" style="flex-wrap:wrap;margin-top:auto">
           <button class="btn primary" data-href="test.html"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 4 14h6l-1 8 9-12h-6z"/></svg>Run a test</button>
-          <button class="btn ghost" data-demo>Load the finished sample</button>
+          <button class="btn ghost" data-demo>Load data</button>
         </div>
       </section>
       <section class="card span-5 col gap16" id="sofar">
@@ -331,7 +332,6 @@ button.quiet{background:none;border:0;cursor:pointer;padding:6px 2px}
         <span class="badge good"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.500"/></svg><span data-b="rewardBadge"></span></span>
       </section>
 
-      <div class="span-12 small" data-sample style="text-align:center;padding-top:4px"><b style="color:var(--ink-2)">Sample data.</b> These results are made up for the demo, not measured on your connection.</div>
     </div>
   </main>
 </div>

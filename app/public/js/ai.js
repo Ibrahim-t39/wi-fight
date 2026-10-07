@@ -216,7 +216,7 @@ export const AI = {
     } else if (/plan|switch|cheaper|deal/.test(q)) {
       const r = catalog ? recommend(f, catalog, state.household) : null;
       headline = r && r.pick ? `Possibly. ${r.pick.name} fits your household and costs $${r.pick.price} a month, about $${r.savingsYear} a year less.` : 'I do not have plan data loaded to compare.';
-      paragraphs = r && r.pick ? [P(`**Why that one.** It has room for ${r.people} people, and its upload speed handles video calls. The cheapest plan, ${r.cheapest.name}, is tighter on upload.`, 'plans near you'), P('**Check before you switch.** Plan details can change, so read the provider\'s label first. Plan values in this demo are sample values.', 'plans near you')] : [];
+      paragraphs = r && r.pick ? [P(`**Why that one.** It has room for ${r.people} people, and its upload speed handles video calls. The cheapest plan, ${r.cheapest.name}, is tighter on upload.`, 'plans near you'), P('**Check before you switch.** Plan details can change, so read the provider\'s label first. ', 'plans near you')] : [];
       followups = ['How much am I overpaying?', 'Why is it slow at night?', 'What should I say to my provider?'];
     } else if (/overpay|money|cost|bill|much/.test(q)) {
       headline = `About $${f.money.lostMonth} a month of your $${f.money.price} bill pays for speed you did not receive.`;
@@ -263,7 +263,7 @@ export const AI = {
     // the model says when the photo is not a bill; an empty reading counts as that too
     if (l && (l.isBill === false || (l.planPrice == null && l.total == null && !(l.fees || []).length))) return { fields: { planPrice: null, equipment: null, fees: [], total: null, promoEnds: null, provider: null, plan: null }, confidence: 'low', mode: 'live', notBill: true };
     if (l) return { fields: { planPrice: l.planPrice, equipment: l.equipment, fees: l.fees, total: l.total, promoEnds: l.promoEnds, provider: l.provider, plan: l.plan }, confidence: l.confidence, mode: 'live', model: l.model };
-    if (known) return { fields: JSON.parse(JSON.stringify(known)), confidence: 'known', mode: 'offline', note: 'Offline mode: no AI model is connected, so these are the known values of this demo bill, not an AI reading.' };
-    return { fields: { planPrice: 65, equipment: 10, fees: [{ name: 'Network enhancement fee', amount: 5, junk: true, why: 'A company fee, not a government tax.' }], total: 80, promoEnds: 'Jan 2027' }, confidence: 'sample', mode: 'offline', note: 'Offline mode cannot read a real photo. These are sample values so you can see how the step works. Edit them to match your bill.' };
+    if (known) return { fields: JSON.parse(JSON.stringify(known)), confidence: 'known', mode: 'offline', note: 'Offline mode: these are the bill\'s known values, not an AI reading.' };
+    return { fields: { planPrice: 65, equipment: 10, fees: [{ name: 'Network enhancement fee', amount: 5, junk: true, why: 'A company fee, not a government tax.' }], total: 80, promoEnds: 'Jan 2027' }, confidence: 'sample', mode: 'offline', note: 'Offline mode cannot read a photo. Edit these values to match your bill.' };
   },
 };

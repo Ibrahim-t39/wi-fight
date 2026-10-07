@@ -1,52 +1,47 @@
 {
-  "note": "Fictional providers and plan values for the class demo, modeled on the kinds of home internet sold in the U.S. (fiber, cable, 5G home internet, fixed wireless, DSL, satellite). A real build uses hand-checked values from each provider's broadband label.",
+  "asOf": "October 2026",
+  "area": "Huntsville, Alabama",
+  "note": "Real providers that serve Huntsville, Alabama, with plan prices and speeds as each provider published them in October 2026 (provider pages and broadband labels, or a comparison site where the provider page could not be read). Prices are for new customers with autopay and exclude taxes. T-Mobile speeds are the middle of the published range. A null response time means the provider did not publish one. Northstar Fiber and Pinecrest are not real companies: they exist only to match the practice bills in demo-files.",
   "providers": [
-    {"id": "northstar", "name": "Northstar Fiber", "type": "Fiber", "plans": [
-      {"id": "ns300", "name": "Northstar Fiber 300", "down": 300, "up": 20, "latency": 30, "price": 55, "promoMonths": 0, "afterPromo": 55, "equipmentFee": 10},
-      {"id": "ns500", "name": "Northstar Fiber 500", "down": 500, "up": 20, "latency": 30, "price": 80, "promoMonths": 0, "afterPromo": 80, "equipmentFee": 10},
-      {"id": "ns1000", "name": "Northstar Fiber 1 Gig", "down": 1000, "up": 20, "latency": 30, "price": 110, "promoMonths": 0, "afterPromo": 110, "equipmentFee": 10}
+    {"id": "googlefiber", "name": "Google Fiber", "type": "Fiber", "source": "https://gfiber.com", "plans": [
+      {"id": "gf1000", "name": "gFiber Core 1 Gig", "down": 1000, "up": 1000, "latency": 13, "price": 70, "promoMonths": 0, "afterPromo": 70, "equipmentFee": 0, "speedKind": "advertised"},
+      {"id": "gf3000", "name": "gFiber Home 3 Gig", "down": 3000, "up": 3000, "latency": 13, "price": 100, "promoMonths": 0, "afterPromo": 100, "equipmentFee": 0, "speedKind": "advertised"},
+      {"id": "gf8000", "name": "gFiber Edge 8 Gig", "down": 8000, "up": 8000, "latency": 13, "price": 150, "promoMonths": 0, "afterPromo": 150, "equipmentFee": 0, "speedKind": "advertised"}
     ]},
-    {"id": "valleylink", "name": "ValleyLink", "type": "Fiber", "plans": [
-      {"id": "vl500", "name": "ValleyLink 500", "down": 500, "up": 500, "latency": 20, "price": 60, "promoMonths": 0, "afterPromo": 60, "equipmentFee": 0},
-      {"id": "vl1000", "name": "ValleyLink 1 Gig", "down": 1000, "up": 1000, "latency": 20, "price": 70, "promoMonths": 0, "afterPromo": 70, "equipmentFee": 0}
+    {"id": "att", "name": "AT&T Fiber", "type": "Fiber", "source": "https://www.att.com/local/fiber/alabama/huntsville", "plans": [
+      {"id": "att300", "name": "AT&T Internet 300", "down": 300, "up": 300, "latency": null, "price": 35, "promoMonths": 12, "afterPromo": 50, "equipmentFee": 0, "speedKind": "advertised"},
+      {"id": "att500", "name": "AT&T Internet 500", "down": 500, "up": 500, "latency": null, "price": 50, "promoMonths": 12, "afterPromo": 65, "equipmentFee": 0, "speedKind": "advertised"},
+      {"id": "att1000", "name": "AT&T Internet 1000", "down": 1000, "up": 1000, "latency": null, "price": 65, "promoMonths": 0, "afterPromo": 65, "equipmentFee": 0, "speedKind": "advertised"}
     ]},
-    {"id": "pinecrest", "name": "Pinecrest", "type": "Cable", "plans": [
-      {"id": "pc300", "name": "Pinecrest Internet 300", "down": 300, "up": 10, "latency": 35, "price": 50, "promoMonths": 12, "afterPromo": 75, "equipmentFee": 0},
-      {"id": "pc500", "name": "Pinecrest Internet 500", "down": 500, "up": 20, "latency": 35, "price": 65, "promoMonths": 12, "afterPromo": 90, "equipmentFee": 0}
+    {"id": "xfinity", "name": "Xfinity", "type": "Cable", "source": "https://www.xfinity.com/local/al/huntsville", "plans": [
+      {"id": "xf300", "name": "Xfinity 300 Mbps", "down": 300, "up": 35, "latency": null, "price": 45, "promoMonths": 60, "afterPromo": 75, "equipmentFee": 0, "speedKind": "advertised"},
+      {"id": "xf500", "name": "Xfinity 500 Mbps", "down": 500, "up": 35, "latency": null, "price": 60, "promoMonths": 60, "afterPromo": 85, "equipmentFee": 0, "speedKind": "advertised"}
     ]},
-    {"id": "redstone", "name": "Redstone", "type": "Cable", "plans": [
-      {"id": "rs600", "name": "Redstone 600", "down": 600, "up": 35, "latency": 32, "price": 60, "promoMonths": 0, "afterPromo": 60, "equipmentFee": 0}
+    {"id": "wow", "name": "WOW! Internet", "type": "Cable", "source": "https://www.wowway.com/internet/alabama/huntsville", "plans": [
+      {"id": "wow300", "name": "WOW! Internet 300", "down": 350, "up": 20, "latency": 21, "price": 30, "promoMonths": 0, "afterPromo": 30, "equipmentFee": 0, "speedKind": "typical"},
+      {"id": "wow600", "name": "WOW! Internet 600", "down": 650, "up": 47, "latency": 13, "price": 45, "promoMonths": 0, "afterPromo": 45, "equipmentFee": 0, "speedKind": "typical"},
+      {"id": "wow1000", "name": "WOW! Internet 1 Gig", "down": 1093, "up": 43, "latency": 22, "price": 60, "promoMonths": 0, "afterPromo": 60, "equipmentFee": 0, "speedKind": "typical"}
     ]},
-    {"id": "magnolia", "name": "Magnolia Fiber", "type": "Fiber", "plans": [
-      {"id": "mg300", "name": "Magnolia Fiber 300", "down": 300, "up": 300, "latency": 12, "price": 50, "promoMonths": 0, "afterPromo": 50, "equipmentFee": 0},
-      {"id": "mg1000", "name": "Magnolia Fiber 1 Gig", "down": 1000, "up": 1000, "latency": 12, "price": 75, "promoMonths": 0, "afterPromo": 75, "equipmentFee": 0},
-      {"id": "mg2000", "name": "Magnolia Fiber 2 Gig", "down": 2000, "up": 2000, "latency": 12, "price": 100, "promoMonths": 0, "afterPromo": 100, "equipmentFee": 0}
+    {"id": "tmobile", "name": "T-Mobile 5G Home Internet", "type": "5G home internet", "source": "https://www.t-mobile.com/home-internet", "plans": [
+      {"id": "tmrely", "name": "T-Mobile Rely Home Internet", "down": 244, "up": 34, "latency": 22, "price": 50, "promoMonths": 0, "afterPromo": 50, "equipmentFee": 0, "speedKind": "typical"},
+      {"id": "tmamp", "name": "T-Mobile Amplified Home Internet", "down": 334, "up": 34, "latency": 22, "price": 60, "promoMonths": 0, "afterPromo": 60, "equipmentFee": 0, "speedKind": "typical"}
     ]},
-    {"id": "bluewater", "name": "Bluewater Cable", "type": "Cable", "plans": [
-      {"id": "bw100", "name": "Bluewater Connect 100", "down": 100, "up": 10, "latency": 28, "price": 35, "promoMonths": 12, "afterPromo": 55, "equipmentFee": 14},
-      {"id": "bw400", "name": "Bluewater Fast 400", "down": 400, "up": 20, "latency": 28, "price": 55, "promoMonths": 12, "afterPromo": 80, "equipmentFee": 14},
-      {"id": "bw1000", "name": "Bluewater Gig", "down": 1000, "up": 35, "latency": 28, "price": 80, "promoMonths": 24, "afterPromo": 110, "equipmentFee": 14}
+    {"id": "attair", "name": "AT&T Internet Air", "type": "5G home internet", "source": "https://www.att.com/internet/internet-air/", "plans": [
+      {"id": "attair", "name": "AT&T Internet Air", "down": 150, "up": 20, "latency": null, "price": 55, "promoMonths": 0, "afterPromo": 55, "equipmentFee": 0, "speedKind": "typical"}
     ]},
-    {"id": "summit", "name": "Summit Home 5G", "type": "5G home internet", "plans": [
-      {"id": "sm5g", "name": "Summit Home 5G", "down": 180, "up": 20, "latency": 45, "price": 50, "promoMonths": 0, "afterPromo": 50, "equipmentFee": 0},
-      {"id": "sm5gplus", "name": "Summit Home 5G Plus", "down": 300, "up": 30, "latency": 42, "price": 70, "promoMonths": 0, "afterPromo": 70, "equipmentFee": 0}
+    {"id": "starlink", "name": "Starlink", "type": "Satellite", "source": "https://www.starlink.com", "plans": [
+      {"id": "sl100", "name": "Starlink Residential 100 Mbps", "down": 100, "up": 35, "latency": 43, "price": 55, "promoMonths": 0, "afterPromo": 55, "equipmentFee": 0, "speedKind": "advertised"},
+      {"id": "sl200", "name": "Starlink Residential 200 Mbps", "down": 200, "up": 35, "latency": 43, "price": 85, "promoMonths": 0, "afterPromo": 85, "equipmentFee": 0, "speedKind": "advertised"}
     ]},
-    {"id": "cedarridge", "name": "Cedar Ridge Wireless", "type": "Fixed wireless", "plans": [
-      {"id": "cr50", "name": "Cedar Ridge 50", "down": 50, "up": 10, "latency": 40, "price": 45, "promoMonths": 0, "afterPromo": 45, "equipmentFee": 10},
-      {"id": "cr100", "name": "Cedar Ridge 100", "down": 100, "up": 15, "latency": 40, "price": 65, "promoMonths": 0, "afterPromo": 65, "equipmentFee": 10}
+    {"id": "northstar", "name": "Northstar Fiber", "type": "Practice bill", "demo": true, "plans": [
+      {"id": "ns300", "name": "Northstar Fiber 300", "down": 300, "up": 20, "latency": 30, "price": 55, "promoMonths": 0, "afterPromo": 55, "equipmentFee": 10, "speedKind": "advertised"},
+      {"id": "ns500", "name": "Northstar Fiber 500", "down": 500, "up": 20, "latency": 30, "price": 80, "promoMonths": 0, "afterPromo": 80, "equipmentFee": 10, "speedKind": "advertised"},
+      {"id": "ns1000", "name": "Northstar Fiber 1 Gig", "down": 1000, "up": 20, "latency": 30, "price": 110, "promoMonths": 0, "afterPromo": 110, "equipmentFee": 10, "speedKind": "advertised"}
     ]},
-    {"id": "tricounty", "name": "Tri-County Telephone", "type": "DSL", "plans": [
-      {"id": "tc25", "name": "Tri-County Internet 25", "down": 25, "up": 3, "latency": 48, "price": 40, "promoMonths": 0, "afterPromo": 40, "equipmentFee": 8},
-      {"id": "tc75", "name": "Tri-County Internet 75", "down": 75, "up": 8, "latency": 45, "price": 50, "promoMonths": 0, "afterPromo": 50, "equipmentFee": 8}
-    ]},
-    {"id": "orbitlink", "name": "OrbitLink", "type": "Satellite", "plans": [
-      {"id": "ol100", "name": "OrbitLink Home", "down": 100, "up": 12, "latency": 55, "price": 90, "promoMonths": 0, "afterPromo": 90, "equipmentFee": 15},
-      {"id": "ol200", "name": "OrbitLink Home Priority", "down": 200, "up": 20, "latency": 50, "price": 120, "promoMonths": 0, "afterPromo": 120, "equipmentFee": 15}
-    ]},
-    {"id": "campus", "name": "Campus Connect", "type": "Fiber, student housing", "plans": [
-      {"id": "cc200", "name": "Campus Connect 200", "down": 200, "up": 200, "latency": 15, "price": 45, "promoMonths": 0, "afterPromo": 45, "equipmentFee": 0},
-      {"id": "cc500", "name": "Campus Connect 500", "down": 500, "up": 500, "latency": 15, "price": 60, "promoMonths": 0, "afterPromo": 60, "equipmentFee": 0}
+    {"id": "pinecrest", "name": "Pinecrest", "type": "Practice bill", "demo": true, "plans": [
+      {"id": "pc300", "name": "Pinecrest Internet 300", "down": 300, "up": 10, "latency": 35, "price": 50, "promoMonths": 12, "afterPromo": 75, "equipmentFee": 0, "speedKind": "advertised"},
+      {"id": "pc500", "name": "Pinecrest Internet 500", "down": 500, "up": 20, "latency": 35, "price": 65, "promoMonths": 12, "afterPromo": 90, "equipmentFee": 0, "speedKind": "advertised"}
     ]}
   ],
-  "compare": ["vl1000", "ns500", "pc500", "rs600"]
+  "compare": ["gf1000", "ns500", "xf500", "tmrely"]
 }

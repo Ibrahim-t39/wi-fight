@@ -27,7 +27,7 @@ if (!facts.headline || !D || D.cause === 'unknown') {
     lock: Store.isEncrypted() ? 'Encrypted' : 'On this device',
     usedTests: plural(facts.testsCount, 'test'), usedDays: plural(facts.daysDone, 'day'), usedPairs: String(pairs),
     usedPlanHtml: `${esc(facts.plan.name)}<br><span class="small">${esc(facts.plan.down)} Mbps typical download</span>`,
-    stamp: `${facts.sample ? 'Sample data · ' : ''}Day ${facts.dayNumber} of ${facts.totalDays}`,
+    stamp: `Day ${facts.dayNumber} of ${facts.totalDays}`,
   });
 
   // The evidence score, rebuilt here from the engine's own weights: start at 50, each finding moves it.

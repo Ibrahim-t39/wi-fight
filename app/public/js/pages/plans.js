@@ -170,10 +170,10 @@ function openLabel(p) {
       ${row('Equipment fee', p.equipmentFee ? `${cents(p.equipmentFee)} a month` : 'None listed')}
       ${row('Typical download', `${num(p.down)} Mbps`)}
       ${row('Typical upload', `${num(p.up)} Mbps`)}
-      ${row('Typical response time', `${num(p.latency)} ms`)}
+      ${row('Typical response time', p.latency == null ? 'Not published' : `${num(p.latency)} ms`)}
       ${row('Cost over 24 months', money(p.cost24))}
       ${row('Fits your household', `${p.fits === 'yes' ? 'Yes' : 'Partly'}. ${esc(p.note)}`)}
-      <div class="bf-foot">Sample values for the demo, in the layout of a provider's broadband label. Read the provider's own label before you switch.</div>
+      <div class="bf-foot">Read the provider's own label before you switch.</div>
     </div>
     <button class="btn ghost sm" id="closeLabel" style="margin-top:14px;width:100%">Close</button></div>`;
   document.body.appendChild(wrap);

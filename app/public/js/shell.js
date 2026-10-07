@@ -8,7 +8,10 @@ import { modelName } from './models.js';
 export const $ = (s, r = document) => r.querySelector(s);
 export const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
 export const esc = AI.esc;
-export const go = (page) => { location.href = page; };
+// Leave softly: the page fades out (ds.css, .wf-leaving) just before the next one loads and fades in.
+export const go = (page) => { document.documentElement.classList.add('wf-leaving'); setTimeout(() => { location.href = page; }, 160); };
+// coming back with the browser's Back button must not show a faded-out page
+addEventListener('pageshow', () => document.documentElement.classList.remove('wf-leaving'));
 
 const ROUTES = { 'Dashboard': 'dashboard.html', 'Home': 'dashboard.html', 'History': 'history.html', 'Report': 'report.html', 'Plans': 'plans.html', 'Ask Proof AI': 'chat.html', 'Proof AI': 'chat.html', 'Diagnosis': 'diagnosis.html', 'Privacy & data': 'privacy.html', 'Verdict': 'verdict.html', 'About': 'about.html' };
 const ICON = {
@@ -126,7 +129,7 @@ export async function simulate(days = 14) {
     <div style="font:700 76px/1 var(--display,system-ui);letter-spacing:-.03em;margin:18px 0 6px">Day <span data-d>1</span></div>
     <div style="font:500 16px/1.4 var(--body,system-ui);color:#AEB5C6"><span data-n>4</span> speed tests recorded</div>
     <div style="height:8px;border-radius:99px;background:#1B2233;margin:26px 0 18px;overflow:hidden"><i data-b style="display:block;height:100%;width:0;background:#2747F5;border-radius:99px;transition:width .16s linear"></i></div>
-    <div style="font:500 13.5px/1.45 var(--body,system-ui);color:#7C859B">A real check runs 4 tests a day for 14 days. This skips the wait with sample data, which is labelled on every page.</div></div>`;
+    <div style="font:500 13.5px/1.45 var(--body,system-ui);color:#7C859B">A real check runs 4 tests a day for 14 days. This skips the wait.</div></div>`;
   document.body.appendChild(ov);
   const st = Store.get() || {};
   const keepUser = st.user && st.user.method !== 'sample' ? { ...st.user } : null;
@@ -143,7 +146,7 @@ document.addEventListener('click', (e) => { const b = e.target.closest('[data-si
 
 export function openDemo() {
   const w = sheet(`<div class="h3">Demo data</div>
-    <p class="small" style="margin:6px 0 14px;color:var(--ink-2)">A real check takes two weeks. For a demo, simulate it with labelled sample data so every page has results to show. Sample data is marked on every page.</p>
+    <p class="small" style="margin:6px 0 14px;color:var(--ink-2)">A real check takes two weeks. Skip ahead so every page has results to show.</p>
     <div class="col gap8">
       <button class="btn primary" data-tour-start>Start the guided demo</button>
       <button class="btn" data-simulate="9">Simulate: skip to day 9</button>
@@ -209,7 +212,7 @@ export { Store, AI, summarize };
 export function labelHTML(facts) {
   const p = facts.plan; if (!p) return '';
   const got = facts.headline ? facts.headline.mbps : null;
-  const row = (name, promised, measured, unit, ok) => `<div class="bf-row"><span class="bf-k">${name}</span><span class="bf-p">${promised}${unit ? ' ' + unit : ''}</span><span class="bf-m ${measured == null ? '' : ok ? 'ok' : 'low'}">${measured == null ? 'Not measured yet' : measured + (unit ? ' ' + unit : '')}${measured == null ? '' : `<em>${ok ? 'On plan' : 'Below'}</em>`}</span></div>`;
+  const row = (name, promised, measured, unit, ok) => `<div class="bf-row"><span class="bf-k">${name}</span><span class="bf-p">${promised == null ? 'Not published' : promised + (unit ? ' ' + unit : '')}</span><span class="bf-m ${measured == null ? '' : ok ? 'ok' : 'low'}">${measured == null ? 'Not measured yet' : measured + (unit ? ' ' + unit : '')}${measured == null ? '' : `<em>${ok ? 'On plan' : 'Below'}</em>`}</span></div>`;
   return `<div class="bf" role="table" aria-label="Broadband Facts: promised and measured">
     <div class="bf-title">Broadband Facts</div>
     <div class="bf-sub">${esc(p.provider || '')}<b>${esc(p.name)}</b></div>

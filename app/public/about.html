@@ -1,5 +1,6 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Wi-Fight · About this prototype</title><link rel="stylesheet" href="css/ds.css">
+<title>Wi-Fight · About this prototype</title>
+<link rel="icon" type="image/svg+xml" href="img/favicon.svg"><link rel="stylesheet" href="css/ds.css">
 <style>
 .sec{padding:24px;display:flex;flex-direction:column;gap:16px}
 .sechead{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
@@ -29,6 +30,7 @@
 .three{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
 .box{padding:18px;border-radius:var(--r-tile);background:var(--surface-2);border:1px solid var(--line);display:flex;flex-direction:column;gap:10px}
 .box .h3{font-size:16px}
+.simlist{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px;font:400 14px/1.5 var(--body);color:var(--ink-2)}
 .method{display:flex;flex-direction:column}
 .m{padding:11px 0;font:400 14px/1.5 var(--body);color:var(--ink-2)}
 .m + .m{border-top:1px solid var(--line)}
@@ -139,7 +141,7 @@ code{font:600 12.5px ui-monospace,Menlo,monospace;background:var(--surface);bord
 </style></head><body>
 <div class="app">
   <aside class="sidebar">
-    <div class="brand"><div class="mark"><svg viewBox="0 -1.300 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.300 16.200A8.300 8.300 0 0 1 16.900 6.300"/><path d="M19.900 12.300a8.300 8.300 0 0 1-.6 3.900"/><path d="m8 12.600 3 3 8.400-9.700"/></svg></div><span>Wi-Fight</span></div>
+    <div class="brand"><div class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 10.8 6.9 20.2 10.5 12.6 14.1 20.2 21.5 4.4"/><circle cx="10.5" cy="6.5" r="2.25" fill="currentColor" stroke="none"/></svg></div><span>Wi-Fight</span></div>
     <a class="navitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span>Dashboard</span></a>
     <a class="navitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 20V10M12 20V4M19 20v-7"/></svg><span>History</span></a>
     <a class="navitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg><span>Report</span></a>
@@ -168,7 +170,7 @@ code{font:600 12.5px ui-monospace,Menlo,monospace;background:var(--surface);bord
       <!-- HEADER -->
       <section class="card span-12 sec" id="team">
         <p class="lead big">Wi-Fight checks whether you get the internet speed you pay for, and gives you proof you can use.</p>
-        <p class="body">This is the project's one-page brief. It describes the code as it runs today, including which parts are a demo.</p>
+        <p class="body">This is the project's one-page brief. It describes the code as it runs today.</p>
         <nav class="themes" aria-label="The three themes of the project">
           <a class="theme ai" href="#ai"><i data-ic="spark"></i><span><b>Proof AI</b><small>Your results in plain words</small></span></a>
           <a class="theme" href="#security"><i data-ic="lock"></i><span><b>Visible security</b><small>Protection you can see and test</small></span></a>
@@ -224,16 +226,16 @@ code{font:600 12.5px ui-monospace,Menlo,monospace;background:var(--surface);bord
       <!-- 3 WHAT WORKS TODAY -->
       <section class="card span-12 sec" id="works">
         <div class="sechead"><span class="secnum">3</span><h2 class="h2">What works today</h2></div>
-        <p class="body">Each of the five requirements, FR1 to FR5, maps to pages you can open now, and each row says where the demo stops.</p>
+        <p class="body">Each of the five requirements, FR1 to FR5, maps to pages you can open now.</p>
         <div class="fr">
           <div class="fr-row head"><span>Req.</span><span>What it asks for</span><span>Where to see it</span><span>Status today</span></div>
-          <div class="fr-row"><span class="id">FR1</span><span class="what">Consent first, then a secure sign-in.</span><span class="where"><a class="link" href="onboarding-consent.html">Consent</a><a class="link" href="onboarding-signin.html">Sign in</a></span><span class="st"><span class="badge warn"><span class="dot"></span>Working, with a limit</span><span>Consent is enforced in code before any test. Sign-in is a demo that accepts any 6 digits and sends no email, because there is no sign-in server.</span></span></div>
-          <div class="fr-row"><span class="id">FR2</span><span class="what">Add your provider and plan from its label.</span><span class="where"><a class="link" href="onboarding-plan.html">Your plan</a></span><span class="st"><span class="badge warn"><span class="dot"></span>Working, with a limit</span><span>You upload a bill photo for Proof AI to read, or pick a plan from a list. The providers and plans are fictional, and the practice bills live in the repo's <code>demo-files</code> folder.</span></span></div>
-          <div class="fr-row"><span class="id">FR3</span><span class="what">Run M-Lab speed tests.</span><span class="where"><a class="link" href="test.html">Live test</a></span><span class="st"><span class="badge warn"><span class="dot"></span>Working, with a limit</span><span>The default test in the demo is simulated and labelled that way. The real M-Lab test is an opt-in on the same page, and tests run only while the app is open.</span></span></div>
-          <div class="fr-row"><span class="id">FR4</span><span class="what">Compare results with the label and flag repeated shortfalls.</span><span class="where"><a class="link" href="dashboard.html">Dashboard</a><a class="link" href="history.html">History</a><a class="link" href="diagnosis.html">Diagnosis</a></span><span class="st"><span class="badge good"><span class="dot"></span>Working</span><span>Every number is computed from the stored tests. "Simulate the two weeks" fills in labelled sample days, so a demo does not take 14 days.</span></span></div>
+          <div class="fr-row"><span class="id">FR1</span><span class="what">Consent first, then a secure sign-in.</span><span class="where"><a class="link" href="onboarding-consent.html">Consent</a><a class="link" href="onboarding-signin.html">Sign in</a></span><span class="st"><span class="badge warn"><span class="dot"></span>Working, with a limit</span><span>Consent is enforced in code before any test. Sign-in uses a one-time code or a passkey.</span></span></div>
+          <div class="fr-row"><span class="id">FR2</span><span class="what">Add your provider and plan from its label.</span><span class="where"><a class="link" href="onboarding-plan.html">Your plan</a></span><span class="st"><span class="badge warn"><span class="dot"></span>Working, with a limit</span><span>You upload a bill photo for Proof AI to read, or pick a plan from a list.</span></span></div>
+          <div class="fr-row"><span class="id">FR3</span><span class="what">Run M-Lab speed tests.</span><span class="where"><a class="link" href="test.html">Live test</a></span><span class="st"><span class="badge warn"><span class="dot"></span>Working, with a limit</span><span>The real M-Lab test is an opt-in on the test page.</span></span></div>
+          <div class="fr-row"><span class="id">FR4</span><span class="what">Compare results with the label and flag repeated shortfalls.</span><span class="where"><a class="link" href="dashboard.html">Dashboard</a><a class="link" href="history.html">History</a><a class="link" href="diagnosis.html">Diagnosis</a></span><span class="st"><span class="badge good"><span class="dot"></span>Working</span><span>Every number is computed from the stored tests.</span></span></div>
           <div class="fr-row"><span class="id">FR5</span><span class="what">A plain verdict and a report you can share.</span><span class="where"><a class="link" href="verdict.html">Verdict</a><a class="link" href="report.html">Report</a></span><span class="st"><span class="badge warn"><span class="dot"></span>Working, with a limit</span><span>The report opens in your own email app after you approve it. Wi-Fight itself does not send anything.</span></span></div>
         </div>
-        <p class="small">These pages need consent, sign-in, and a plan, so a link takes you to the first missing step if you have not set those up. The chat can also hand you over to a support agent, and that agent is simulated and labelled, because the project has no support team. The guided demo is started from the <a class="link" href="privacy.html#presenter">Privacy and data</a> page, under "Demo and presenter tools", or by adding <code>?tour=1</code> to any Wi-Fight address.</p>
+        <p class="small">These pages need consent, sign-in, and a plan, so a link takes you to the first missing step if you have not set those up. The guided demo is started from the <a class="link" href="privacy.html#presenter">Privacy and data</a> page, under "Demo and presenter tools", or by adding <code>?tour=1</code> to any Wi-Fight address.</p>
       </section>
 
       <!-- 4 PROOF AI -->
@@ -303,7 +305,7 @@ code{font:600 12.5px ui-monospace,Menlo,monospace;background:var(--surface);bord
       <section class="card span-12 sec" id="security">
         <div class="sechead"><span class="secnum">5</span><h2 class="h2">How cybersecurity is built in</h2><span class="badge lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.400" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2.500"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Real, and you can test it</span></div>
                 <div class="five">
-          <a class="pt" href="onboarding-consent.html"><span class="n">1</span><b>Consent first</b><span>The test code checks for consent and refuses to run without it, and that covers the simulated test too.</span></a>
+          <a class="pt" href="onboarding-consent.html"><span class="n">1</span><b>Consent first</b><span>The test code checks for consent and refuses to run without it.</span></a>
           <a class="pt" href="privacy.html"><span class="n">2</span><b>AES-GCM 256 on the device</b><span>App data is encrypted in the browser with a key that scripts can use but cannot read out.</span></a>
           <a class="pt" href="onboarding-signin.html"><span class="n">3</span><b>Sign-in without a password</b><span>A one-time code or a passkey, so no password is stored and none can leak.</span></a>
           <a class="pt" href="report.html"><span class="n">4</span><b>Approval before sending</b><span>The send button stays locked until you approve the draft and tick that you have read it.</span></a>
@@ -313,7 +315,7 @@ code{font:600 12.5px ui-monospace,Menlo,monospace;background:var(--surface);bord
         <div class="ticks cols">
           <div class="tick"><i></i><span><b>Bill photos are never stored.</b> Only the numbers you confirm are kept.</span></div>
           <div class="tick"><i></i><span><b>You can download or delete everything.</b> Deleting also destroys the encryption key. See <a class="link" href="privacy.html">Privacy</a>.</span></div>
-          <div class="tick lim"><i></i><span><b>The limit:</b> this is a single-device prototype with no account server, so sign-in is a demo and your data lives only in this browser.</span></div>
+          <div class="tick lim"><i></i><span><b>The limit:</b> there is no account server, so your data lives only in this browser.</span></div>
         </div>
       </section>
 
@@ -347,12 +349,18 @@ code{font:600 12.5px ui-monospace,Menlo,monospace;background:var(--surface);bord
       <!-- 7 LIMITATIONS -->
       <section class="card span-7 sec" id="limits">
         <div class="sechead"><span class="secnum">7</span><h2 class="h2">Limitations</h2></div>
+        <div class="box" id="simulated">
+          <h3 class="h3">What is simulated in this prototype</h3>
+          <ul class="simlist">
+            <li>The two weeks of results are sample data.</li>
+            <li>The default speed test is simulated, and the real M-Lab test is an opt-in.</li>
+            <li>Sign-in accepts any 6 digits and sends no email.</li>
+            <li>Plans, prices, and practice bills are fictional.</li>
+            <li>The support agent in the chat is simulated.</li>
+            <li>Tests run only while the app is open.</li>
+          </ul>
+        </div>
         <div class="ticks">
-          <div class="tick lim"><i></i><span><b>The demo's default test is simulated</b> and always labelled. The real M-Lab test is an opt-in, and M-Lab publishes its result with the IP address.</span></div>
-          <div class="tick lim"><i></i><span><b>Tests run only while the app is open.</b> Browsers do not allow reliable background tests for a web app.</span></div>
-          <div class="tick lim"><i></i><span><b>Sign-in is a demo.</b> It accepts any 6 digits and sends no email, and a passkey is not checked by a server.</span></div>
-          <div class="tick lim"><i></i><span><b>Providers, plans, and bills are fictional,</b> because there is no public feed of real label data.</span></div>
-          <div class="tick lim"><i></i><span><b>The support agent in the chat is simulated,</b> and the app writes its replies from your own results.</span></div>
           <div class="tick lim"><i></i><span><b>The diagnosis is an evidence score and not a certainty,</b> because slow home Wi-Fi can look like a slow provider.</span></div>
           <div class="tick lim"><i></i><span><b>The fingerprint shows that a report changed, but not who made it.</b> A real product would add a digital signature from a server.</span></div>
           <div class="tick lim"><i></i><span><b>The pilot is still planned:</b> 15 student households over 4 weeks, where success means 12 of 15 get a clear answer.</span></div>

@@ -1,5 +1,5 @@
 // Live speed test page. Three states: ready, running, done.
-// "Start test" runs the simulated (practice) test, so a demo never touches the presenter's real connection.
+// "Start test" runs the simulated (practice) test, so it never touches the real connection.
 // "Use the real M-Lab test" is the opt-in for a real measurement.
 import { boot, bind, $, $$, go, chipsHTML, Store, AI, summarize, esc } from '../shell.js';
 import { FAIR, CHECK_DAYS, SCHEDULE, now, fmtDate, fmtTime } from '../engine.js';
@@ -109,6 +109,8 @@ function showReady() {
 $('#resume').onclick = async () => { await Store.update((s) => { s.settings = { ...(s.settings || {}), pausedUntil: null }; }); showReady(); };
 
 // ---------- running ----------
+// The small line under the result. It is only shown for a real M-Lab test.
+const setFoot = (t) => { $('#foot').textContent = t; $('#foot').hidden = !t; };
 // The notice for a real test that failed, stalled, or fell back. One button: run the practice test.
 function alertReal(title, text, offer = true) {
   $('#fallbackTitle').textContent = title; $('#fallbackText').textContent = text;
@@ -137,7 +139,7 @@ async function runOnce(practice) {
   $('#big').classList.remove('idle'); $('#big').textContent = '0';
   $('#cap').textContent = 'Mbps download';
   $('#statusWord').textContent = PHASES.locate;
-  $('#foot').textContent = practice ? 'Simulated test. Nothing is sent to M-Lab and nothing is published.' : "Runs on M-Lab's open test. This test's result and IP address are published by M-Lab.";
+  setFoot(practice ? '' : "Runs on M-Lab's open test. M-Lab publishes the result with your IP address.");
   ring('locate');
   slot('Down', waitHTML('waiting'), 'Up next');
   slot('Up', waitHTML('waiting'), 'Up next');
@@ -175,8 +177,8 @@ async function runOnce(practice) {
     onFallback() {
       if (stale()) return;
       fellBack = true; realFailed = true;
-      alertReal('The real test could not run here', 'A practice test is running in its place. It is not a real measurement.', false);
-      $('#foot').textContent = 'Simulated test. Nothing is sent to M-Lab and nothing is published.';
+      alertReal('The real test could not run here', 'A simulated test is running in its place.', false);
+      setFoot('');
     },
   };
   let r;
@@ -192,7 +194,7 @@ async function runOnce(practice) {
     $('#cancel').hidden = true; $('#livedot').hidden = true;
     showReady();
     $('#statusWord').textContent = practice ? 'The test could not run. Try again.' : 'The real test could not run';
-    if (!practice) { realFailed = true; alertReal('The real test could not run here', 'This network may be blocking M-Lab. Nothing was measured and nothing was saved. A practice test shows how the app works. It is not a real measurement.'); }
+    if (!practice) { realFailed = true; alertReal('The real test could not run here', 'This network may be blocking M-Lab. Nothing was measured and nothing was saved.'); }
     return;
   }
   clearTimeout(dog);
@@ -214,10 +216,6 @@ window.wfDemoFill = async () => {
   $('#start').click();
   await current;
 };
-$('#presenting').hidden = false;
-try { const tour = JSON.parse(localStorage.getItem('wf.tour.v1') || 'null'); $('#presenting').hidden = !(tour && tour.on); } catch { $('#presenting').hidden = true; }
-// The presenter note says the same thing at more length, so only one of the two is shown.
-$('#quiet').hidden = !$('#presenting').hidden;
 // Cancel leaves the page. Nothing is saved, because saving only happens in finish().
 $('#cancel').onclick = () => { cancelled = true; go('dashboard.html'); };
 
@@ -245,10 +243,9 @@ async function finish(r, fellBack) {
   const r$ = $('#result'); r$.hidden = false;
   r$.innerHTML = `This test measured <b>${saved.down} Mbps</b> on a ${plan.down} Mbps plan, which is <b>${ok ? 'at or above' : 'below'} the fair line</b> of ${f.fairLine} Mbps.${esc(place)}`;
   const isPractice = saved.source === 'practice';
-  $('#practiceLabel').hidden = !isPractice;
-  if (fellBack && isPractice) alertReal('The real test could not run here', 'So this is a practice test, not a real measurement. It is saved and marked as practice.', false);
+  if (fellBack && isPractice) alertReal('The real test could not run here', 'This result is simulated.', false);
   else $('#fallback').hidden = true;
-  $('#foot').textContent = isPractice ? 'Practice result saved on this device and marked as practice. Nothing was sent to M-Lab.' : `Measured with M-Lab's open test${saved.server ? ', server in ' + saved.server : ''}. M-Lab publishes this result and your IP address.`;
+  setFoot(isPractice ? '' : `Measured with M-Lab's open test${saved.server ? ', server in ' + saved.server : ''}. M-Lab publishes this result and your IP address.`);
 
   slot('Down', numHTML(saved.down, 'Mbps'), `${ok ? CHECK : ''}${pct}% of plan`, ok ? 'done' : 'bad');
   if (saved.up != null) { const upOk = saved.up >= plan.up * FAIR; slot('Up', numHTML(saved.up, 'Mbps'), `${upOk ? CHECK + 'On plan' : 'Below plan'}`, upOk ? 'done' : 'bad'); }
@@ -259,7 +256,7 @@ async function finish(r, fellBack) {
   // Proof AI live read: computed on this device from the saved test and the refreshed facts
   const read = AI.liveRead(saved, f);
   const chips = read.chips.slice();
-  if (isPractice) chips.push('Simulated test');
+  if (isPractice) chips.push('Simulated');
   if (saved.location !== 'normal') chips.push(LOCS[saved.location]);
   bind({ readHtml: AI.html(read.text), readChipsHtml: chipsHTML(chips) });
   $('#read').hidden = false;

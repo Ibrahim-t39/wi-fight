@@ -1,6 +1,6 @@
 // Report: a document built from the facts, a SHA-256 fingerprint of its data, an AI draft,
 // and an approve-before-send gate that is enforced in code (see canSend and send).
-// This prototype has no mail server. "Approve and send" opens the user's own email app.
+// There is no mail server. "Approve and send" opens the user's own email app.
 import { boot, bind, $, $$, esc, toast, AI, Store, sha256 } from '../shell.js';
 import { fmtDate, fmtTime, dayKey } from '../engine.js';
 import { paintSwitch, copyText, pause, bringIntoView } from './ui-sheet.js';
@@ -8,7 +8,7 @@ import { modelChip } from '../models.js';
 
 const { state, facts, ai: status } = await boot({ need: 'plan' });
 const FCC_URL = 'https://consumercomplaints.fcc.gov/';
-const MARK = '<svg viewBox="0 -1.300 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.300 16.200A8.300 8.300 0 0 1 16.900 6.300"/><path d="M19.900 12.300a8.300 8.300 0 0 1-.6 3.900"/><path d="m8 12.600 3 3 8.400-9.700"/></svg>';
+const MARK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 10.8 6.9 20.2 10.5 12.6 14.1 20.2 21.5 4.4"/><circle cx="10.5" cy="6.5" r="2.25" fill="currentColor" stroke="none"/></svg>';
 const SEAL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4.5 6v6c0 4.5 3.2 7.6 7.5 9 4.3-1.4 7.5-4.5 7.5-9V6z"/><path d="m9 12 2 2 4-4"/></svg>';
 const CROSS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>';
 const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>';
@@ -82,7 +82,7 @@ if (!facts.headline) {
     <div class="sh-x">${facts.days.map((d) => `<span>${d.day}</span>`).join('')}</div>
     <div class="sh-cap">Each bar is one day. Dark bars fell below the fair line. The top of the chart is the ${plan.down} Mbps plan.${facts.daysDone < facts.totalDays ? ' Days without a bar are not measured yet.' : ''}</div>
     <div class="sh-h">How this was measured</div>
-    <p class="sh-p">Wi-Fight recorded ${facts.testsCount} test${facts.testsCount === 1 ? '' : 's'} over ${facts.daysDone} day${facts.daysDone === 1 ? '' : 's'}: ${regular} regular test${regular === 1 ? '' : 's'}${routerTests ? ` and ${routerTests} router check test${routerTests === 1 ? '' : 's'}` : ''}. ${facts.sample ? 'These are labelled sample results for a demo, not real measurements.' : sources.includes('practice') ? 'Tests use the M-Lab open speed test. Some results came from practice mode, used when M-Lab could not be reached.' : 'Tests use the M-Lab open speed test.'} Each day is scored by its daily median, so one bad test cannot decide a day. ${facts.ignored.length} one-off dip${facts.ignored.length === 1 ? ' was' : 's were'} set aside by the outlier check. The fair line is 80% of the speed on the plan label, which is ${facts.fairLine} Mbps for this plan.</p>
+    <p class="sh-p">Wi-Fight recorded ${facts.testsCount} test${facts.testsCount === 1 ? '' : 's'} over ${facts.daysDone} day${facts.daysDone === 1 ? '' : 's'}: ${regular} regular test${regular === 1 ? '' : 's'}${routerTests ? ` and ${routerTests} router check test${routerTests === 1 ? '' : 's'}` : ''}. ${facts.sample ? 'These are sample results.' : sources.includes('practice') ? 'Tests use the M-Lab open speed test. Some results are simulated.' : 'Tests use the M-Lab open speed test.'} Each day is scored by its daily median, so one bad test cannot decide a day. ${facts.ignored.length} one-off dip${facts.ignored.length === 1 ? ' was' : 's were'} set aside by the outlier check. The fair line is 80% of the speed on the plan label, which is ${facts.fairLine} Mbps for this plan.</p>
     <div class="sh-sign"><span class="sh-seal">${SEAL}</span><div><b>Fingerprinted with SHA-256, so any change to these numbers can be detected</b><code data-short>sha256 · ${short}</code></div></div>
   </div>`;
 

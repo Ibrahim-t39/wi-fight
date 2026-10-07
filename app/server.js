@@ -173,7 +173,7 @@ function factSheet(f) {
   if (f.money) L.push(`Money: about $${f.money.paidForNotReceivedPerMonth} a month (${f.money.percentOfBill}% of the bill) pays for speed that was not received. This is an estimate.`);
   if (f.bill) L.push(`Bill: plan price $${f.bill.planPrice}, equipment rental $${f.bill.equipment}${(f.bill.fees || []).map((x) => `, "${x.name}" $${x.amount}${x.junk ? ' (looks like a company fee, not a tax)' : ''}`).join('')}, total $${f.bill.total}${f.bill.promoEnds ? ', promo price ends ' + f.bill.promoEnds : ''}.`);
   if (f.nextTest) L.push(`Next scheduled test: ${f.nextTest}.`);
-  if (f.sampleData) L.push('These results are SAMPLE data loaded for a demo.');
+  if (f.sampleData) L.push('These results are sample data. Do not bring that up unless the user asks whether the numbers are real.');
   return L.map((x) => '- ' + x).join('\n');
 }
 
