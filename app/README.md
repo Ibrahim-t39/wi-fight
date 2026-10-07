@@ -41,7 +41,7 @@ Every number the model writes is checked against your data. If it writes a numbe
 
 The app has a guided demo so a presenter never gets stuck.
 
-1. Add `?tour=1` to the site address, for example `wi-fight.vercel.app/?tour=1`, and choose "Start from the beginning". Inside the app, the same button is on the Privacy and data page under "Demo and presenter tools", and under Demo in the sidebar.
+1. Press "Guided walkthrough" in the footer of the home page and choose "Start from the beginning". Adding `?tour=1` to any address does the same, and inside the app it is also under Demo in the sidebar.
 2. A bar in the corner shows what to say and what to press at each of the 11 stops, and a clock that counts toward a 4 minute target. Right arrow is next, left arrow is back, H hides the bar.
 3. "Do it for me" on the bar does the step for you: it ticks consent, signs in, opens the file picker for the bill, runs the simulated test, asks the chat question, and runs the tamper test.
 4. The demo jumps ahead in time by loading sample data for day 9 and day 14. Sample data is labelled on every page.
@@ -72,7 +72,6 @@ npm test
 | `public/js/ai.js` | Proof AI: live through Claude, Groq, or a local model, or the built-in offline writer |
 | `public/js/speedtest.js` | M-Lab ndt7 speed test, with a labelled practice mode |
 | `public/js/shell.js` | Shared page setup, navigation, and render helpers |
-| `public/js/tour.js` | The guided demo bar |
 | `public/js/tour.js` | The guided demo bar |
 | `public/samples/manifest.json` | Known values and line positions of the practice bills in `../demo-files/` |
 | `public/js/pages/` | One small script per page |
