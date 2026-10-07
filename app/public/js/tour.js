@@ -157,12 +157,27 @@ function render() {
 function toggleMin() { const s = read(); if (!s) return; s.min = !s.min; write(s); render(); }
 function end() { localStorage.removeItem(KEY); render(); spot(); }
 
+/** Pressing Next must always move on, even if the presenter skipped the page's own action. The setup pages send a
+ *  visitor back until consent, sign-in and a plan exist, so fill in whatever is still missing for the stop we are heading to. */
+const SETUP = ['onboarding-consent.html', 'onboarding-signin.html', 'onboarding-plan.html'];
+async function ensureSetup(page) {
+  const need = SETUP.includes(page) ? SETUP.indexOf(page) : SETUP.length; // how many setup pages come before this one
+  if (page === 'index.html' || need === 0) return;
+  await Store.load();
+  await Store.update((x) => {
+    if (need >= 1 && !(x.consent && x.consent.mlab)) x.consent = { mlab: true, ai: true, at: new Date().toISOString() };
+    if (need >= 2 && !(x.user && (x.user.email || x.user.method))) x.user = { name: 'Jordan', email: 'jordan@example.com', method: 'code' };
+    if (need >= 3 && !x.plan) x.plan = { id: 'ns500', provider: 'Northstar Fiber', name: 'Northstar Fiber 500', down: 500, up: 20, latency: 30, price: 80, source: 'picked' };
+  });
+}
+
 /** Move to step i. Steps with "prep" skip ahead in time by loading the labelled sample data. */
 async function go(i) {
   const s = read(); if (!s) return;
   if (i >= STEPS.length) { localStorage.removeItem(KEY); leave('dashboard.html'); return; }
   const step = STEPS[i];
   s.i = i; write(s);
+  await ensureSetup(step.page);
   if (step.prep) {
     await Store.load();
     const st = Store.get();
