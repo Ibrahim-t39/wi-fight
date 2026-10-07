@@ -216,6 +216,8 @@ window.wfDemoFill = async () => {
 };
 $('#presenting').hidden = false;
 try { const tour = JSON.parse(localStorage.getItem('wf.tour.v1') || 'null'); $('#presenting').hidden = !(tour && tour.on); } catch { $('#presenting').hidden = true; }
+// The presenter note says the same thing at more length, so only one of the two is shown.
+$('#quiet').hidden = !$('#presenting').hidden;
 // Cancel leaves the page. Nothing is saved, because saving only happens in finish().
 $('#cancel').onclick = () => { cancelled = true; go('dashboard.html'); };
 
@@ -231,16 +233,17 @@ async function finish(r, fellBack) {
   const color = ok ? 'var(--good)' : 'var(--bad)';
 
   ring('solid', saved.down, color);
-  $('#glow').style.background = `radial-gradient(520px 420px at 50% 300px,${ok ? 'rgba(61,220,151,.22)' : 'rgba(255,107,107,.26)'},transparent 72%)`;
+  $('#glow').style.setProperty('--glowc', ok ? 'rgba(61,220,151,.22)' : 'rgba(255,107,107,.26)');
   $('#big').textContent = saved.down; $('#cap').textContent = 'Mbps download';
   $('#ringsvg').setAttribute('aria-label', `${saved.down} Mbps download, ${pct}% of a ${plan.down} Mbps plan`);
   $('#livedot').hidden = true; $('#cancel').hidden = true;
-  $('#statusWord').textContent = PHASES.done;
+  // The result is the headline of the finished state: the share of the plan this test delivered.
+  $('#statusWord').textContent = `${pct}% of your plan`;
   $('#status').classList.add(ok ? 'good' : 'bad');
 
-  const place = saved.location === 'near' ? ' Router check: next to the router.' : saved.location === 'far' ? ' Router check: far room.' : '';
+  const place = saved.location === 'near' ? ' It was a router check, taken next to the router.' : saved.location === 'far' ? ' It was a router check, taken in a far room.' : '';
   const r$ = $('#result'); r$.hidden = false;
-  r$.innerHTML = `<b>${saved.down} Mbps</b> is <b>${pct}% of your plan</b>, ${ok ? 'at or above' : 'below'} the fair line of ${f.fairLine} Mbps.${esc(place)}`;
+  r$.innerHTML = `This test measured <b>${saved.down} Mbps</b> on a ${plan.down} Mbps plan, which is <b>${ok ? 'at or above' : 'below'} the fair line</b> of ${f.fairLine} Mbps.${esc(place)}`;
   const isPractice = saved.source === 'practice';
   $('#practiceLabel').hidden = !isPractice;
   if (fellBack && isPractice) alertReal('The real test could not run here', 'So this is a practice test, not a real measurement. It is saved and marked as practice.', false);

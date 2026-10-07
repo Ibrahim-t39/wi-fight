@@ -5,6 +5,7 @@
 import { boot, $, $$, esc, toast, closeSheet, AI, Store } from '../shell.js';
 import { fmtTime, fmtDate } from '../engine.js';
 import { openSheet, switchHTML, copyText, pause } from './ui-sheet.js';
+import { modelChip, hostInfo } from '../models.js';
 
 const { facts, ai: status } = await boot({ need: 'plan' });
 const S = () => Store.get();
@@ -112,14 +113,16 @@ function followupsFor(conv) {
   return out.slice(0, 3);
 }
 // Who wrote the words, by provider: 'claude', 'groq', 'local', none (the built-in writer), or any other service.
+// The model is named from the id saved with the message (m.model), through models.js, so the name and logo follow the server.
 const SENT = 'Your first name, your question, and your numbers were sent to that service.';
-function writer(m) {
-  const model = m.model || status.model || 'model not named';
-  if (m.mode !== 'live' || !m.provider) return 'Built-in writer, offline mode.';
-  if (m.provider === 'local') return `Written by a language model on this computer (${model}). Nothing left this device.`;
-  if (m.provider === 'groq') return `Written by AI on Groq (${model}). ${SENT}`;
-  if (m.provider === 'claude') return `Written by Claude. ${SENT}`;
-  return `Written by AI (${model}).`;
+function writerHTML(m) {
+  const time = `<span class="mtime">${esc(fmtTime(m.t))}</span>`;
+  if (m.mode !== 'live' || !m.provider) return `<div data-writer="offline">Written by the built-in writer, because Proof AI is in offline mode. ${time}</div>`;
+  const id = m.model || status.model || '';
+  const chip = id ? modelChip(id) : '<b>an AI model</b>';
+  const host = hostInfo(m.provider);
+  const where = m.provider === 'local' ? 'on this computer' : host ? `on ${esc(host.name)}` : '';
+  return `<div class="mby" data-writer="live" data-model="${esc(id)}"><span>Written by</span>${chip}<span>${where}</span>${time}</div><div>${m.provider === 'local' ? 'Nothing left this device.' : SENT}</div>`;
 }
 function relDate(t) {
   const d = new Date(t), mins = Math.floor((Date.now() - d.getTime()) / 60000);
@@ -136,12 +139,10 @@ function scopeHTML() {
   const st = S(), on = aiOn(), r = facts.router || { pairs: 0 };
   const row = (icon, t, s) => `<div class="lrow"><div class="itile">${icon}</div><div><div class="t">${esc(t)}</div><div class="s">${esc(s)}</div></div></div>`;
   const goes = 'Your first name, your questions, and the numbers above go to that service.';
-  const name = status.model || 'model not named';
-  const model = !status.live || !status.provider ? 'Offline mode: answers come from the built-in writer.'
-    : status.provider === 'local' ? `Running on this computer: ${name}. Your questions stay on this device.`
-    : status.provider === 'groq' ? `Running on Groq: ${name}. ${goes}`
-    : status.provider === 'claude' ? `Running on Claude. ${goes}`
-    : `Running on an AI service: ${name}. ${goes}`;
+  const host = hostInfo(status.provider);
+  const chip = status.model ? modelChip(status.model) : '';
+  const model = !status.live || !status.provider ? `<span class="avatar">${IC.spark}</span><span>Proof AI is in offline mode, so answers come from the built-in writer.</span>`
+    : `<div class="col gap8" style="min-width:0"><div class="mwho"><span>Answers are written by</span>${chip || '<b>an AI model</b>'}</div><span>${status.provider === 'local' ? 'It runs on this computer, so your questions stay on this device.' : `It runs ${host ? `on ${esc(host.name)}` : 'on an AI service'}. ${goes}`}</span></div>`;
   return `<div class="scopehead"><div class="col gap4"><div class="h3">What Proof AI can see</div><div class="small">Only this data is used to answer you.</div></div><button type="button" class="hidepanel" data-hidepanel aria-label="Hide this panel">Hide</button></div>
     <div data-scope-rows>
       ${row(IC.bars, `${plural(facts.testsCount, 'speed test')}, ${plural(facts.daysDone || 0, 'day')}`, 'Download, upload, response time')}
@@ -149,14 +150,14 @@ function scopeHTML() {
       ${row(IC.wifi, `${r.pairs || 0} near and far router check${r.pairs === 1 ? '' : 's'}`, r.pairs ? `${r.near} Mbps near, ${r.far} Mbps far` : 'None yet. Run one from the Diagnosis page.')}
       ${row(IC.money, st.bill ? 'Your bill details' : 'No bill stored', st.bill ? 'Price, fees, promo end date. No photo is kept.' : 'Add one on the Plans page if you want it used.')}
     </div>
-    <div class="cant">${IC.lock}<span>It cannot see the sites you visit.</span></div>
-    <div class="modelline" data-model><span class="avatar">${IC.spark}</span><span>${esc(model)}</span></div>
+    <div class="cant">${IC.lock}<span>Proof AI cannot see the sites you visit.</span></div>
+    <div class="modelline" data-model="${esc(status.model || 'offline')}">${model}</div>
     <div class="divider"></div>
     <div class="consent">
       <div><div style="font:600 14px/1.3 var(--body)">Let Proof AI use my data</div><div class="small" data-ai-word style="color:${on ? 'var(--good)' : 'var(--ink-3)'};font-weight:700;margin-top:3px">${on ? 'On' : 'Off'}</div></div>
       ${switchHTML('aiAnalyze', on, 'Let Proof AI use my data')}
     </div>
-    <div class="small">${on ? 'Turn this off any time, here or in <a href="privacy.html" style="color:var(--cobalt);font-weight:600">Privacy &amp; data</a>.' : 'Off. Proof AI reads nothing and your questions are not sent. Turn it on here to ask again.'}</div>`;
+    <div class="small">${on ? 'Turn this off any time, here or in <a href="privacy.html" style="color:var(--cobalt);font-weight:600">Privacy &amp; data</a>.' : 'While this is off, Proof AI reads nothing and your questions are not sent. Turn it on here to ask again.'}</div>`;
 }
 
 /* ---------- saved chats ---------- */
@@ -248,10 +249,10 @@ async function leaveHuman(conv) {
 const SIM = '<span class="simtag">Simulated for this demo</span>';
 function noteHTML(m, i, isLast) {
   if (m.kind === 'status') return `<div class="hstatus" data-i="${i}"><span>${esc(m.text)}</span></div>`;
-  if (m.kind === 'offer') return `<div class="hoffer" data-i="${i}"><div class="ht"><b>Want to talk to a person?</b><span>${esc(m.text)}</span></div>${isLast && !cur.agent ? '<div class="row gap8" style="flex-wrap:wrap"><button type="button" class="btn primary sm" data-human-yes>Connect me to an agent</button><button type="button" class="btn ghost sm" data-human-no>No thanks</button></div>' : ''}<div class="mmeta">This prototype has no real support team. The agent is simulated.</div></div>`;
+  if (m.kind === 'offer') return `<div class="hoffer" data-i="${i}"><div class="ht"><b>Want to talk to a person?</b><span>${esc(m.text)}</span></div>${isLast && !cur.agent ? '<div class="row gap8" style="flex-wrap:wrap"><button type="button" class="btn primary sm" data-human-yes>Connect me to an agent</button><button type="button" class="btn ghost sm" data-human-no>No thanks</button></div>' : ''}<div class="mmeta">This prototype has no real support team, so the agent is simulated.</div></div>`;
   return `<article class="turn ai agent" data-i="${i}"><div class="who"><span class="avatar agentav" aria-hidden="true">${esc(AGENT.name[0])}</span><span class="agentname">${esc(AGENT.name)} · ${esc(AGENT.role)}</span>${SIM}</div>
     <div class="mbody"><p>${esc(m.text)}</p></div>
-    <div class="mfoot"><div class="mmeta">Not a real person. Written by the app from your own results. ${esc(fmtTime(m.t))}</div></div></article>`;
+    <div class="mfoot"><div class="mmeta">${esc(AGENT.name)} is not a real person. The app wrote this from your own results. ${esc(fmtTime(m.t))}</div></div></article>`;
 }
 const agentTypingHTML = () => `<article class="turn ai agent"><div class="who"><span class="avatar agentav" aria-hidden="true">${esc(AGENT.name[0])}</span><span class="agentname">${esc(AGENT.name)} · ${esc(AGENT.role)}</span>${SIM}</div><div class="thinking" role="status"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span>${esc(AGENT.name)} is typing...</span></div></article>`;
 
@@ -265,7 +266,7 @@ function aiHTML(m, i, isLast) {
     ${m.stopped ? '<span class="stopmark"><i></i>Stopped</span>' : ''}
     ${m.cut ? '<div class="mmeta">The answer was cut off before it finished.</div>' : ''}
     ${bad.length ? `<div class="ground" role="note">${IC.warn}<span><b>Check this answer:</b> it mentions numbers that are not in your data (${esc(bad.slice(0, 6).join(', '))}).</span></div>` : ''}
-    <div class="mfoot"><div class="mmeta">${esc(writer(m))} ${esc(fmtTime(m.t))}</div>
+    <div class="mfoot"><div class="mmeta">${writerHTML(m)}</div>
     <div class="acts">${act('copy', 'Copy answer', IC.copy)}${act('up', 'Good answer', IC.up, m.rating === 'up')}${act('down', 'Bad answer', IC.down, m.rating === 'down')}${isLast ? act('regen', 'Write this answer again', IC.regen) : ''}</div></div>
   </article>`;
 }

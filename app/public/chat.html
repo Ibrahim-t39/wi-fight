@@ -43,8 +43,8 @@ button{color:inherit}
 .chatmain.nopanel .showpanel{display:inline-flex}
 .scopechip{display:none}
 
-.msgs{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain}
-.thread{max-width:816px;margin:0 auto;padding:8px 28px 28px;display:flex;flex-direction:column;gap:22px}
+.msgs{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 14px);mask-image:linear-gradient(to bottom,transparent 0,#000 14px)}
+.thread{max-width:816px;margin:0 auto;padding:14px 28px 28px;display:flex;flex-direction:column;gap:22px}
 .turn.me{display:flex;justify-content:flex-end}
 .bubble.me{max-width:82%;font:500 15.5px/1.45 var(--body);padding:11px 16px;white-space:pre-wrap;overflow-wrap:anywhere}
 .turn.ai{display:flex;flex-direction:column;gap:10px;min-width:0}
@@ -68,6 +68,12 @@ button{color:inherit}
 .ground b{font-weight:700}
 .mfoot{display:flex;flex-direction:column;gap:4px}
 .mmeta{font:500 12px/1.45 var(--body);color:var(--ink-3)}
+.mmeta .mby{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:4px;color:var(--ink-2)}
+.mmeta .mby .mtime::before{content:"·";margin-right:6px}
+.mmeta .mchip,.modelline .mchip{height:24px;font-size:11.5px;padding:0 9px 0 6px;gap:5px;margin:0}
+.mmeta .mico,.modelline .mico{width:14px;height:14px;align-self:center}
+.mmeta .mtime{white-space:nowrap}
+@media (max-height:760px) and (min-width:1101px){.scopecol{padding-top:16px;padding-bottom:16px}.scope{gap:12px;padding:18px}.scope .lrow{padding:8px 0}.cant{padding:10px 12px}}
 .stopmark{display:inline-flex;align-items:center;gap:6px;align-self:flex-start;height:24px;padding:0 9px;border-radius:999px;background:var(--surface);border:1px solid var(--line);font:700 12px var(--body);color:var(--ink-2)}
 .stopmark i{width:8px;height:8px;border-radius:2px;background:var(--ink-3)}
 .acts{display:flex;gap:2px;margin-left:-8px}
@@ -85,8 +91,8 @@ button{color:inherit}
 .hello{display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;padding:5vh 0 0}
 .hello .avatar{width:44px;height:44px;border-radius:14px}
 .hello .avatar svg{width:22px;height:22px}
-.hello h2{font:700 28px/1.15 var(--display);letter-spacing:-.02em;max-width:520px}
-.hello p{font:400 15px/1.5 var(--body);color:var(--ink-2);max-width:520px}
+.hello h2{font:700 28px/1.15 var(--display);letter-spacing:-.02em;max-width:520px;text-wrap:balance}
+.hello p{font:400 15px/1.5 var(--body);color:var(--ink-2);max-width:520px;text-wrap:balance}
 .sgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;width:100%;margin-top:14px}
 .sgcard{text-align:left;border-radius:var(--r-tile);background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);padding:14px 16px;font:600 14.5px/1.35 var(--body);color:var(--ink)}
 .sgcard:disabled,.follow .chip:disabled{opacity:.5;cursor:not-allowed}
@@ -103,19 +109,22 @@ button{color:inherit}
 button.send{border:0;flex:none;margin-left:0}
 button.send:disabled{background:var(--line);color:var(--ink-3);cursor:not-allowed}
 button.send.stop{background:var(--ink)}
-.docknote{text-align:center}
+.docknote{text-align:center;text-wrap:balance}
 .offnote{display:flex;align-items:center;gap:12px;justify-content:space-between;flex-wrap:wrap;border-radius:var(--r-tile);background:var(--warn-bg);padding:12px 14px;font:500 13.5px/1.45 var(--body);color:var(--ink)}
 .offnote span{flex:1;min-width:200px}
 
 /* what Proof AI can see */
 .scopecol{padding:24px 24px 24px 0;overflow-y:auto;min-height:0;min-width:0}
-.scope{padding:20px}
-.scope .lrow,.scope-sheet .lrow{padding:11px 0;align-items:flex-start}
+.scope{padding:20px;gap:14px}
+.scope .lrow,.scope-sheet .lrow{padding:10px 0;align-items:flex-start}
+.scope .lrow:first-child{padding-top:2px}.scope .lrow:last-child{padding-bottom:2px}
 .scope .lrow .t,.scope-sheet .lrow .t{font:600 14px/1.3 var(--body);color:var(--ink)}
 .scope .lrow .s,.scope-sheet .lrow .s{font:500 12.5px/1.35 var(--body);color:var(--ink-3);margin-top:2px}
 .cant{border-radius:14px;background:var(--surface-2);border:1px solid var(--line);padding:12px;display:flex;gap:10px;align-items:flex-start;font:600 13px/1.4 var(--body);color:var(--ink)}
 .cant svg{width:16px;height:16px;flex:none;margin-top:1px;color:var(--cobalt)}
 .modelline{display:flex;gap:10px;align-items:flex-start;font:500 12.5px/1.45 var(--body);color:var(--ink-2)}
+.modelline .mwho{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font:600 12.5px/1.3 var(--body);color:var(--ink)}
+.modelline .mwho .mchip{margin:0}
 .modelline .avatar{width:22px;height:22px;border-radius:7px}
 .modelline .avatar svg{width:12px;height:12px}
 .consent{display:flex;align-items:center;gap:10px;justify-content:space-between}
@@ -171,7 +180,8 @@ button.switch{border:0;padding:0;cursor:pointer}
 .turn.agent .agentav{background:var(--good);color:#fff;font:700 14px/1 var(--body);display:grid;place-items:center}
 .agentname{font:700 13px/1 var(--body);color:var(--ink)}
 .simtag{font:600 11px/1 var(--body);color:var(--warn);background:var(--warn-bg);border-radius:99px;padding:5px 9px;margin-left:8px;white-space:nowrap}
-.hbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;border-radius:14px;background:var(--surface-2);border:1px solid var(--line);padding:10px 13px;font:500 13.5px/1.4 var(--body);color:var(--ink-2)}
+.hbar span{flex:1;min-width:0}.hbar .btn{flex:none}
+.hbar{display:flex;align-items:center;justify-content:space-between;gap:12px;border-radius:14px;background:var(--surface-2);border:1px solid var(--line);padding:10px 13px;font:500 13.5px/1.4 var(--body);color:var(--ink-2)}
 </style></head><body>
 <div class="app">
   <aside class="sidebar">
@@ -218,14 +228,14 @@ button.switch{border:0;padding:0;cursor:pointer}
       <div class="dock">
         <button type="button" class="jump" id="jump" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M6 13l6 6 6-6"/></svg>Jump to latest</button>
         <div class="offnote" id="offnote" hidden>
-          <span><b>Proof AI is off.</b> It is not reading your results, and nothing you type is sent anywhere. To ask a question, turn on "Let Proof AI use my data".</span>
+          <span><b>Proof AI is off,</b> so it is not reading your results and nothing you type is sent anywhere. To ask a question, turn on "Let Proof AI use my data".</span>
           <button type="button" class="btn sm" data-ai-on>Turn it on</button>
         </div>
         <form class="composer" id="composer" autocomplete="off">
           <textarea id="q" rows="1" maxlength="2000" placeholder="Ask about your internet" aria-label="Ask Proof AI about your internet" enterkeyhint="send"></textarea>
           <button class="send" id="send" type="button" aria-label="Send question" disabled></button>
         </form>
-        <div class="ai-note docknote">Proof AI can make mistakes. It answers from your own results and general knowledge about internet service. <button type="button" class="link humanlink" data-human>Talk to a person</button></div>
+        <div class="ai-note docknote">Proof AI answers from your own results and can make mistakes. <button type="button" class="link humanlink" data-human>Talk to a person</button></div>
       </div>
     </section>
 

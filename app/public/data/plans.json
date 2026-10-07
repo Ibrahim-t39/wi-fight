@@ -1,21 +1,51 @@
 {
-  "note": "Fictional providers and plan values for the class demo. A real build uses hand-checked values from each provider's broadband label.",
+  "note": "Fictional providers and plan values for the class demo, modeled on the kinds of home internet sold in the U.S. (fiber, cable, 5G home internet, fixed wireless, DSL, satellite). A real build uses hand-checked values from each provider's broadband label.",
   "providers": [
-    {"id": "northstar", "name": "Northstar Fiber", "plans": [
+    {"id": "northstar", "name": "Northstar Fiber", "type": "Fiber", "plans": [
       {"id": "ns300", "name": "Northstar Fiber 300", "down": 300, "up": 20, "latency": 30, "price": 55, "promoMonths": 0, "afterPromo": 55, "equipmentFee": 10},
       {"id": "ns500", "name": "Northstar Fiber 500", "down": 500, "up": 20, "latency": 30, "price": 80, "promoMonths": 0, "afterPromo": 80, "equipmentFee": 10},
       {"id": "ns1000", "name": "Northstar Fiber 1 Gig", "down": 1000, "up": 20, "latency": 30, "price": 110, "promoMonths": 0, "afterPromo": 110, "equipmentFee": 10}
     ]},
-    {"id": "valleylink", "name": "ValleyLink", "plans": [
+    {"id": "valleylink", "name": "ValleyLink", "type": "Fiber", "plans": [
       {"id": "vl500", "name": "ValleyLink 500", "down": 500, "up": 500, "latency": 20, "price": 60, "promoMonths": 0, "afterPromo": 60, "equipmentFee": 0},
       {"id": "vl1000", "name": "ValleyLink 1 Gig", "down": 1000, "up": 1000, "latency": 20, "price": 70, "promoMonths": 0, "afterPromo": 70, "equipmentFee": 0}
     ]},
-    {"id": "pinecrest", "name": "Pinecrest", "plans": [
+    {"id": "pinecrest", "name": "Pinecrest", "type": "Cable", "plans": [
       {"id": "pc300", "name": "Pinecrest Internet 300", "down": 300, "up": 10, "latency": 35, "price": 50, "promoMonths": 12, "afterPromo": 75, "equipmentFee": 0},
       {"id": "pc500", "name": "Pinecrest Internet 500", "down": 500, "up": 20, "latency": 35, "price": 65, "promoMonths": 12, "afterPromo": 90, "equipmentFee": 0}
     ]},
-    {"id": "redstone", "name": "Redstone", "plans": [
+    {"id": "redstone", "name": "Redstone", "type": "Cable", "plans": [
       {"id": "rs600", "name": "Redstone 600", "down": 600, "up": 35, "latency": 32, "price": 60, "promoMonths": 0, "afterPromo": 60, "equipmentFee": 0}
+    ]},
+    {"id": "magnolia", "name": "Magnolia Fiber", "type": "Fiber", "plans": [
+      {"id": "mg300", "name": "Magnolia Fiber 300", "down": 300, "up": 300, "latency": 12, "price": 50, "promoMonths": 0, "afterPromo": 50, "equipmentFee": 0},
+      {"id": "mg1000", "name": "Magnolia Fiber 1 Gig", "down": 1000, "up": 1000, "latency": 12, "price": 75, "promoMonths": 0, "afterPromo": 75, "equipmentFee": 0},
+      {"id": "mg2000", "name": "Magnolia Fiber 2 Gig", "down": 2000, "up": 2000, "latency": 12, "price": 100, "promoMonths": 0, "afterPromo": 100, "equipmentFee": 0}
+    ]},
+    {"id": "bluewater", "name": "Bluewater Cable", "type": "Cable", "plans": [
+      {"id": "bw100", "name": "Bluewater Connect 100", "down": 100, "up": 10, "latency": 28, "price": 35, "promoMonths": 12, "afterPromo": 55, "equipmentFee": 14},
+      {"id": "bw400", "name": "Bluewater Fast 400", "down": 400, "up": 20, "latency": 28, "price": 55, "promoMonths": 12, "afterPromo": 80, "equipmentFee": 14},
+      {"id": "bw1000", "name": "Bluewater Gig", "down": 1000, "up": 35, "latency": 28, "price": 80, "promoMonths": 24, "afterPromo": 110, "equipmentFee": 14}
+    ]},
+    {"id": "summit", "name": "Summit Home 5G", "type": "5G home internet", "plans": [
+      {"id": "sm5g", "name": "Summit Home 5G", "down": 180, "up": 20, "latency": 45, "price": 50, "promoMonths": 0, "afterPromo": 50, "equipmentFee": 0},
+      {"id": "sm5gplus", "name": "Summit Home 5G Plus", "down": 300, "up": 30, "latency": 42, "price": 70, "promoMonths": 0, "afterPromo": 70, "equipmentFee": 0}
+    ]},
+    {"id": "cedarridge", "name": "Cedar Ridge Wireless", "type": "Fixed wireless", "plans": [
+      {"id": "cr50", "name": "Cedar Ridge 50", "down": 50, "up": 10, "latency": 40, "price": 45, "promoMonths": 0, "afterPromo": 45, "equipmentFee": 10},
+      {"id": "cr100", "name": "Cedar Ridge 100", "down": 100, "up": 15, "latency": 40, "price": 65, "promoMonths": 0, "afterPromo": 65, "equipmentFee": 10}
+    ]},
+    {"id": "tricounty", "name": "Tri-County Telephone", "type": "DSL", "plans": [
+      {"id": "tc25", "name": "Tri-County Internet 25", "down": 25, "up": 3, "latency": 48, "price": 40, "promoMonths": 0, "afterPromo": 40, "equipmentFee": 8},
+      {"id": "tc75", "name": "Tri-County Internet 75", "down": 75, "up": 8, "latency": 45, "price": 50, "promoMonths": 0, "afterPromo": 50, "equipmentFee": 8}
+    ]},
+    {"id": "orbitlink", "name": "OrbitLink", "type": "Satellite", "plans": [
+      {"id": "ol100", "name": "OrbitLink Home", "down": 100, "up": 12, "latency": 55, "price": 90, "promoMonths": 0, "afterPromo": 90, "equipmentFee": 15},
+      {"id": "ol200", "name": "OrbitLink Home Priority", "down": 200, "up": 20, "latency": 50, "price": 120, "promoMonths": 0, "afterPromo": 120, "equipmentFee": 15}
+    ]},
+    {"id": "campus", "name": "Campus Connect", "type": "Fiber, student housing", "plans": [
+      {"id": "cc200", "name": "Campus Connect 200", "down": 200, "up": 200, "latency": 15, "price": 45, "promoMonths": 0, "afterPromo": 45, "equipmentFee": 0},
+      {"id": "cc500", "name": "Campus Connect 500", "down": 500, "up": 500, "latency": 15, "price": 60, "promoMonths": 0, "afterPromo": 60, "equipmentFee": 0}
     ]}
   ],
   "compare": ["vl1000", "ns500", "pc500", "rs600"]

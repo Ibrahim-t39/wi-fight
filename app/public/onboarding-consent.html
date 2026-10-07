@@ -29,7 +29,7 @@
 .mtop{display:none}
 .rail .brand span,.mtop .brand span{display:inline}
 .nw{white-space:nowrap}
-.head{font:700 38px/1.06 var(--display);letter-spacing:-.025em}
+.head{font:700 38px/1.06 var(--display);letter-spacing:-.025em;text-wrap:balance}
 .lede{font:400 17px/1.5 var(--body);color:var(--ink-2);margin-top:12px}
 .card{padding:22px}
 .label{font:600 13px var(--body);color:var(--ink-2)}
@@ -79,6 +79,12 @@
 .never .more{background:var(--surface)}
 .actions{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .actions .btn{width:100%}
+.jump{display:inline-flex;align-items:center;gap:8px;margin-top:16px;height:40px;padding:0 16px;border-radius:999px;border:1px solid var(--line);background:var(--surface);font:600 14px var(--body);color:var(--ink);cursor:pointer;box-shadow:var(--shadow)}
+.jump svg{color:var(--cobalt);flex:none}
+.jump:focus-visible{outline:3px solid var(--cobalt-100);outline-offset:2px}
+#choices{scroll-margin-top:96px}
+.hints{display:flex;flex-direction:column;gap:4px;align-items:center;text-align:center}
+.notice .demo{margin-top:10px;padding-top:10px;border-top:1px solid rgba(199,119,0,.28);font-size:14px}
 @media (max-width:860px){.actions{grid-template-columns:1fr}.notice{padding:16px;flex-direction:column;gap:10px}}
 </style></head><body>
 <div class="ob">
@@ -115,7 +121,8 @@
         <div>
           <span class="badge lock"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4.5 6v6c0 4.5 3.2 7.600 7.5 9 4.300-1.400 7.500-4.500 7.500-9V6z"/><path d="m9 12 2 2 4-4"/></svg>Your consent comes first</span>
           <h1 class="head" style="margin-top:14px">Before we test anything, here is exactly what happens.</h1>
-          <p class="lede">Read it once. Nothing runs and nothing is stored until you agree.</p>
+          <p class="lede">Nothing runs and nothing is stored until you agree, so take a minute to read what you are agreeing to.</p>
+          <button type="button" class="jump" id="jump"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M6 13l6 6 6-6"/></svg>Go to your two choices</button>
         </div>
 
         <section class="card">
@@ -128,9 +135,9 @@
 
         <section class="card never">
           <div class="chead"><div class="ring mute"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6 6 18"/></svg></div><div><div class="h3">What Wi-Fight never collects</div><div class="small">We do not ask for it and we cannot see it</div></div></div>
-          <div class="lrow drow"><div class="itile mute"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.5 3 14.5 0 18M12 3c-3 3.5-3 14.5 0 18"/></svg></div><div class="grow"><div class="dt">The sites you visit</div><div class="ds">We measure speed. We never look at what you do online.</div><div class="ds more" id="info-sites" hidden>A speed test sends and receives test data only. Wi-Fight has no way to see your browsing, your apps, or anything else on your network.</div></div><button type="button" class="ibtn" aria-expanded="false" aria-controls="info-sites" aria-label="More about this" data-info="sites">i</button></div>
+          <div class="lrow drow"><div class="itile mute"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.5 3 14.5 0 18M12 3c-3 3.5-3 14.5 0 18"/></svg></div><div class="grow"><div class="dt">The sites you visit</div><div class="ds">We measure speed, and we never look at what you do online.</div><div class="ds more" id="info-sites" hidden>A speed test sends and receives test data only. Wi-Fight has no way to see your browsing, your apps, or anything else on your network.</div></div><button type="button" class="ibtn" aria-expanded="false" aria-controls="info-sites" aria-label="More about this" data-info="sites">i</button></div>
           <div class="lrow drow"><div class="itile mute"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg></div><div class="grow"><div class="dt">Your home address</div><div class="ds">We do not ask where you live.</div><div class="ds more" id="info-address" hidden>Wi-Fight never asks for a street address or uses your location. Note that the IP address M-Lab publishes can show your provider and rough area, which is why we ask you first.</div></div><button type="button" class="ibtn" aria-expanded="false" aria-controls="info-address" aria-label="More about this" data-info="address">i</button></div>
-          <div class="lrow drow"><div class="itile mute"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M16 7l3 3"/></svg></div><div class="grow"><div class="dt">Your passwords or account logins</div><div class="ds">Not for your provider, not for anything else.</div><div class="ds more" id="info-passwords" hidden>Sign-in uses a one-time code or a passkey, so there is no password. Wi-Fight never asks for your provider account login.</div></div><button type="button" class="ibtn" aria-expanded="false" aria-controls="info-passwords" aria-label="More about this" data-info="passwords">i</button></div>
+          <div class="lrow drow"><div class="itile mute"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M16 7l3 3"/></svg></div><div class="grow"><div class="dt">Your passwords or account logins</div><div class="ds">We never ask for them, for your provider or for anything else.</div><div class="ds more" id="info-passwords" hidden>Sign-in uses a one-time code or a passkey, so there is no password. Wi-Fight never asks for your provider account login.</div></div><button type="button" class="ibtn" aria-expanded="false" aria-controls="info-passwords" aria-label="More about this" data-info="passwords">i</button></div>
         </section>
 
         <section class="notice">
@@ -138,28 +145,29 @@
           <div>
             <div class="row gap8" style="flex-wrap:wrap"><div class="h3">One thing you should know</div><span class="badge warn">Public record</span></div>
             <p>Speed tests run on <b class="nw">M-Lab</b>, an open research platform. <span class="nw">M-Lab</span> <b>publishes each test's results, time, and IP address</b>, and keeps them. That is how open internet research works, and it is why we ask first.</p>
+            <p class="demo">In this demo the default test is simulated and publishes nothing. The real M-Lab test is a separate choice on the test page.</p>
           </div>
         </section>
 
         <section class="card promises">
           <div class="eyebrow" style="margin-bottom:6px">Our promises</div>
-          <div class="lrow"><div class="itile"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></div><span>Encrypted when stored on this device.</span></div>
+          <div class="lrow"><div class="itile"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></div><span>Your data is encrypted when it is stored on this device.</span></div>
           <div class="lrow"><div class="itile"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4.5 6v6c0 4.5 3.2 7.600 7.5 9 4.300-1.400 7.500-4.500 7.500-9V6z"/><path d="m9 12 2 2 4-4"/></svg></div><span>Nothing is sent to your provider or the FCC unless you approve it.</span></div>
-          <div class="lrow"><div class="itile"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg></div><span>Pause tests or delete everything any time.</span></div>
+          <div class="lrow"><div class="itile"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg></div><span>You can pause tests or delete everything at any time.</span></div>
         </section>
 
-        <div class="col gap12">
+        <div class="col gap12" id="choices">
           <div class="h3">Your choices</div>
-          <label class="check" for="c-mlab"><input type="checkbox" id="c-mlab" aria-describedby="c-mlab-d"><span class="box"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7"/></svg></span><span><span class="ct">I agree to run speed tests on M-Lab</span><span class="cs" id="c-mlab-d">Needed to test. Each test's results, time, and IP address become public.</span></span></label>
-          <label class="check" for="c-ai"><input type="checkbox" id="c-ai" aria-describedby="c-ai-d"><span class="box"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7"/></svg></span><span><span class="ct">I agree to let Proof AI analyze my results</span><span class="cs" id="c-ai-d">Optional. Proof AI explains your numbers in plain words. Without it you still get the numbers.</span></span></label>
+          <label class="check" for="c-mlab"><input type="checkbox" id="c-mlab" aria-describedby="c-mlab-d"><span class="box"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7"/></svg></span><span><span class="ct">I agree to run speed tests on M-Lab</span><span class="cs" id="c-mlab-d">This one is needed to test. Each real test's results, time, and IP address become public.</span></span></label>
+          <label class="check" for="c-ai"><input type="checkbox" id="c-ai" aria-describedby="c-ai-d"><span class="box"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7"/></svg></span><span><span class="ct">I agree to let Proof AI analyze my results</span><span class="cs" id="c-ai-d">This one is optional. Proof AI explains your numbers in plain words, and without it you still get the numbers.</span></span></label>
         </div>
 
         <div class="actions">
           <button type="button" class="btn primary" id="agree" disabled aria-describedby="agree-hint">I agree, continue</button>
           <a class="btn ghost" id="notnow" href="index.html">Not now</a>
         </div>
-        <div class="secure" id="agree-hint" role="status" style="justify-content:center;text-align:center">Check the M-Lab box to continue.</div>
-        <div class="secure" style="justify-content:center;text-align:center">You can change either choice later in Privacy &amp; data.</div>
+        <div class="hints"><div class="secure" id="agree-hint" role="status">Check the M-Lab box to continue.</div>
+        <div class="secure">You can change either choice later in Privacy &amp; data.</div></div>
 
       </div>
     </main>

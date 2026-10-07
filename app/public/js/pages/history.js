@@ -28,7 +28,7 @@ if (!facts.headline) {
   bind({
     headlineHtml: B.day === W.day
       ? `You have one day of results so far: <span class="${cls(B)}">${cap(dayName(B))}</span> at <span class="${cls(B)}">${B.median} Mbps</span>.`
-      : `Your best day was <span class="${cls(B)}">${dayName(B)}</span> at <span class="${cls(B)}">${B.median} Mbps</span>. Your worst was <span class="${cls(W)}">${dayName(W)}</span> at <span class="${cls(W)}">${W.median} Mbps</span>.`,
+      : `Your best day was <span class="${cls(B)}">${dayName(B)}</span> at <span class="${cls(B)}">${B.median} Mbps</span>, and your worst was <span class="${cls(W)}">${dayName(W)}</span> at <span class="${cls(W)}">${W.median} Mbps</span>.`,
   });
 
   // ----- chart -----
@@ -105,18 +105,18 @@ if (!facts.headline) {
     keptHtml: lowDays.length
       ? `<b style="color:var(--ink)">Kept:</b> ${esc(list(lowDays.map((d) => `${d.today ? 'Today' : d.weekday + ' (Day ' + d.day + ')'} ${d.median}`)))} Mbps. ${lowDays.length === 1 ? 'The whole day' : 'Each whole day'} stayed under ${fair}, so ${lowDays.length === 1 ? 'it counts' : 'they count'}.${facts.daysBelow !== keptN ? ` That is ${facts.daysBelow} low days in total.` : ''}`
       : `<b style="color:var(--ink)">Kept:</b> every other test. No whole day had a median under the ${fair} Mbps fair line.`,
-    chipsHtml: chipsHTML(['Method: median + outlier check', `${facts.testsCount} ${plural(facts.testsCount, 'test', 'tests')}`, `${facts.daysDone} ${plural(facts.daysDone, 'day', 'days')}`]),
+    chipsHtml: chipsHTML(['Method: median + outlier check']),
   });
   $('#dips').innerHTML = ign.length
     ? ign.map((x) => `<div class="dip"><div class="itile mute">${PULSE}</div><div class="grow">
         <div class="top"><span class="when">${esc(x.when)} · <span class="strike">${x.down} Mbps</span></span>${IGN}</div>
-        <div class="why">${esc(x.reason)}. Tests around it had a median of ${x.localMedian} Mbps.</div></div></div>`).join('')
+        <div class="why">${esc(x.reason)}, while the tests around it had a median of ${x.localMedian} Mbps.</div></div></div>`).join('')
     : '<div class="why small" style="padding:8px 0">A dip is ignored only when one result is far below the tests around it.</div>';
 
   // ----- time of day -----
   const lowB = facts.timeOfDay.filter((b) => b.low).map((b) => b.label.toLowerCase());
   bind({
-    todSub: `Average download speed over ${facts.daysDone} ${plural(facts.daysDone, 'day', 'days')}, one-off dips left out`,
+    todSub: `Average download speed over ${facts.daysDone} ${plural(facts.daysDone, 'day', 'days')}, with one-off dips left out`,
     todNote: `The dashed mark is the ${fair} Mbps fair line. ${lowB.length === 0 ? 'No time of day falls under it.' : lowB.length === facts.timeOfDay.filter((b) => b.avg != null).length ? 'Every time of day with tests falls under it.' : `${cap(list(lowB))} ${lowB.length === 1 ? 'falls' : 'fall'} under it.`}`,
   });
   $('#tod').innerHTML = facts.timeOfDay.map((b) => {

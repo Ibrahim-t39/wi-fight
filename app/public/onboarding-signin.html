@@ -29,7 +29,7 @@
 .mtop{display:none}
 .rail .brand span,.mtop .brand span{display:inline}
 .nw{white-space:nowrap}
-.head{font:700 38px/1.06 var(--display);letter-spacing:-.025em}
+.head{font:700 38px/1.06 var(--display);letter-spacing:-.025em;text-wrap:balance}
 .lede{font:400 17px/1.5 var(--body);color:var(--ink-2);margin-top:12px}
 .card{padding:22px}
 .label{font:600 13px var(--body);color:var(--ink-2)}
@@ -69,7 +69,7 @@
 .demo{padding:12px 14px;border-radius:14px;background:var(--warn-bg);border:1px solid rgba(199,119,0,.28);font:500 14px/1.45 var(--body);color:#4A3A12}
 .demo b{font:700 17px var(--display);letter-spacing:.08em;color:#2E2206;font-variant-numeric:tabular-nums}
 button.link{background:none;border:0;padding:0;font:inherit;font-weight:600;cursor:pointer}
-button.link.fillcode{align-self:flex-start;margin-top:-8px;font:600 13px var(--body);color:var(--ink-3);text-decoration:underline;text-underline-offset:3px}
+button.link.fillcode{font:600 13px var(--body);color:var(--ink-2);text-decoration:underline;text-underline-offset:3px}
 button.link.fillcode:hover{color:var(--cobalt)}
 button.btn.pill2{font-family:var(--body)}
 .otp .gap{margin-left:6px}
@@ -110,7 +110,7 @@ button.btn.pill2{font-family:var(--body)}
 
         <div>
           <h1 class="head">Sign in without a password.</h1>
-          <p class="lede">Use a one-time code or a passkey. Either way, there is no password to remember.</p>
+          <p class="lede">Use a one-time code or a passkey, so there is no password to remember and none that can leak.</p>
         </div>
 
         <section class="card col gap16">
@@ -126,17 +126,16 @@ button.btn.pill2{font-family:var(--body)}
           <div class="or">or</div>
           <button type="button" class="btn pill2 wide" id="passkey"><span>Use a passkey</span><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2M9 9.500V11M15 9.500V11M12 9.500V13h-1M9 15.500c1.800 1.400 4.200 1.400 6 0"/></svg></button>
           <div class="err" id="pkerr" role="alert" hidden></div>
-          <div class="small" style="text-align:center">A passkey uses your face, fingerprint, or screen lock. In this prototype the passkey is created on this device and is not checked by a server.</div>
+          <div class="small" style="text-align:center">A passkey uses your face, fingerprint, or screen lock. In this prototype it is created on this device and is not checked by a server.</div>
         </section>
 
         <section class="card col gap16" id="codecard" hidden>
           <div class="row between"><div class="moment"><span class="m">2</span><span class="h3">Enter your code</span></div><span class="badge good"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7"/></svg>Code ready</span></div>
           <div class="demo" id="demonote" role="status"></div>
-          <button type="button" class="link fillcode" id="fillcode">Fill the code for me</button>
           <p class="body">Enter the 6-digit code for <b style="color:var(--ink)" data-b="email"></b></p>
           <div class="otp" id="otp" role="group" aria-label="6-digit code"><input class="" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="1" aria-label="Digit 1 of 6"><input class="" type="text" inputmode="numeric" autocomplete="off" maxlength="1" aria-label="Digit 2 of 6"><input class="" type="text" inputmode="numeric" autocomplete="off" maxlength="1" aria-label="Digit 3 of 6"><input class="gap" type="text" inputmode="numeric" autocomplete="off" maxlength="1" aria-label="Digit 4 of 6"><input class="" type="text" inputmode="numeric" autocomplete="off" maxlength="1" aria-label="Digit 5 of 6"><input class="" type="text" inputmode="numeric" autocomplete="off" maxlength="1" aria-label="Digit 6 of 6"></div>
           <div class="err" id="codeerr" role="alert" hidden></div>
-          <div class="row between small" style="flex-wrap:wrap;gap:8px"><span>For this demo any 6 digits work.</span><button type="button" class="link" id="resend">Start over</button></div>
+          <div class="row between small" style="flex-wrap:wrap;gap:8px"><button type="button" class="link fillcode" id="fillcode">Fill the code for me</button><button type="button" class="link" id="resend">Start over</button></div>
           <button type="button" class="btn primary wide" id="verify">Verify and continue</button>
         </section>
 

@@ -29,7 +29,7 @@
 .mtop{display:none}
 .rail .brand span,.mtop .brand span{display:inline}
 .nw{white-space:nowrap}
-.head{font:700 38px/1.06 var(--display);letter-spacing:-.025em}
+.head{font:700 38px/1.06 var(--display);letter-spacing:-.025em;text-wrap:balance}
 .lede{font:400 17px/1.5 var(--body);color:var(--ink-2);margin-top:12px}
 .card{padding:22px}
 .label{font:600 13px var(--body);color:var(--ink-2)}
@@ -59,13 +59,18 @@
 .field.filled{color:var(--ink)}
 .dt{font:600 15px/1.3 var(--body)}
 .prow{padding:10px 0}
+.pname{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ptype{display:inline-flex;align-items:center;height:20px;padding:0 8px;border-radius:999px;background:var(--surface-2);border:1px solid var(--line);font:600 11px/1 var(--body);color:var(--ink-2);white-space:nowrap}
+#providers.all{max-height:296px;overflow-y:auto;overscroll-behavior:contain;padding-right:10px;margin-right:-10px}
+button.more{align-self:flex-start;margin-top:-6px;background:none;border:0;padding:4px 0;font:600 14px var(--body);color:var(--cobalt);cursor:pointer;text-decoration:underline;text-underline-offset:3px}
 .pcheck{width:24px;height:24px;border-radius:50%;background:var(--cobalt);color:#fff;display:grid;place-items:center;flex:none}
 .radio{width:22px;height:22px;border-radius:50%;border:2px solid #B9BECB;flex:none;background:var(--surface)}
 .radio-card.on .radio{border:7px solid var(--cobalt)}
 .radio-card{gap:12px}
 .pm b{color:var(--ink-2);font-weight:600}
 .price{text-align:right;flex:none}.price .num{font-size:22px;line-height:1}
-.source{display:flex;align-items:center;gap:8px;font:500 13px/1.4 var(--body);color:var(--ink-3)}
+.source{display:flex;align-items:flex-start;gap:8px;font:500 13px/1.4 var(--body);color:var(--ink-3)}
+.source svg{flex:none;margin-top:2px}
 .or{display:flex;align-items:center;gap:14px;font:600 12px var(--body);letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3)}
 .or::before,.or::after{content:"";flex:1;height:1px;background:var(--line)}
 .ai-card{padding:22px}
@@ -73,7 +78,7 @@
 .aistep{display:flex;align-items:center;gap:10px;height:38px;font:600 14px var(--body);color:var(--ink)}
 .aistep + .aistep{border-top:1px solid var(--line)}
 .aistep em{margin-left:auto;font:600 12px var(--body);font-style:normal;color:var(--good)}
-.aistep i{width:18px;height:18px;border-radius:50%;background:var(--good);color:#fff;display:grid;place-items:center}
+.aistep i{width:18px;height:18px;border-radius:50%;background:var(--good);color:#fff;display:grid;place-items:center;flex:none}
 .scan{display:grid;grid-template-columns:minmax(0,1fr);gap:16px;align-items:start}
 .billwrap{display:flex;flex-direction:column;gap:8px;min-width:0}
 .bill{background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px 11px;box-shadow:0 6px 16px rgba(11,15,26,.10);display:flex;flex-direction:column;gap:6px;transform:rotate(-1.500deg);aspect-ratio:3/4}
@@ -120,7 +125,7 @@ button:focus-visible,.field:focus-within{outline:3px solid var(--cobalt-100);out
 .bill.photo img{width:100%;height:100%;object-fit:cover;display:block}
 .frow label.fl{cursor:text}
 .frow .fv input{width:84px;height:32px;border-radius:9px;border:1px solid var(--line);background:var(--surface-2);padding:0 8px;text-align:right;font:700 15px var(--body);font-variant-numeric:tabular-nums;color:var(--ink)}
-.frow .fv input.txt{width:112px}
+.frow .fv input.txt{width:138px}
 .frow .fl input{width:100%;height:28px;border-radius:8px;border:1px solid var(--line);background:var(--surface-2);padding:0 8px;font:500 14px var(--body);color:var(--ink)}
 .frow .fl{flex:1;min-width:0}
 .frow input:focus{outline:none;border-color:var(--cobalt);box-shadow:0 0 0 3px var(--cobalt-100)}
@@ -176,13 +181,34 @@ button:focus-visible,.field:focus-within{outline:3px solid var(--cobalt-100);out
 .match.part{color:var(--warn)}
 .match svg{flex:none}
 .match span.q{font-weight:500;color:var(--ink-3)}
+.reader{display:flex;align-items:center;gap:6px 8px;flex-wrap:wrap;font:500 13.5px/1.45 var(--body);color:var(--ink-2)}
+.reader .mchip{height:26px;font-size:12px}
+.reader.off{display:block;padding:10px 12px;border-radius:12px;background:var(--warn-bg);border:1px solid rgba(199,119,0,.28);color:#4A3A12;font-weight:600;font-size:13px}
+.how{border-radius:14px;border:1px solid var(--line);background:var(--surface-2);padding:11px 14px}
+.how summary{display:flex;align-items:center;justify-content:space-between;gap:8px;cursor:pointer;list-style:none;font:700 14px var(--body);color:var(--cobalt)}
+.how summary::-webkit-details-marker{display:none}
+.how summary svg{flex:none;color:var(--ink-3);transition:transform .2s}
+.how[open] summary svg{transform:rotate(180deg)}
+.how summary:focus-visible{outline:3px solid var(--cobalt-100);outline-offset:3px;border-radius:6px}
+.howlist{margin:12px 0 10px;padding:0;list-style:none;counter-reset:how;display:flex;flex-direction:column;gap:10px}
+.howlist li{counter-increment:how;position:relative;padding-left:32px;font:400 14px/1.5 var(--body);color:var(--ink-2)}
+.howlist li::before{content:counter(how);position:absolute;left:0;top:1px;width:22px;height:22px;border-radius:50%;background:var(--cobalt-50);color:var(--cobalt);display:grid;place-items:center;font:700 12px var(--body)}
+.howlist li b{color:var(--ink);font-weight:600}
+.how .ai-note{font-size:12px;line-height:1.5}
+.how .ai-note + .ai-note{margin-top:6px}
+.howlist .mchip{height:24px;font-size:11.5px;padding:0 9px 0 6px;gap:5px;vertical-align:-6px}.howlist .mico{width:14px;height:14px}
+#scanChips{align-items:center}
+#scanNote .mchip,#photoHow .mchip{height:24px;font-size:11.5px;padding:0 9px 0 6px;gap:5px;vertical-align:-6px}
+#scanNote .mico,#photoHow .mico{width:14px;height:14px}
+#scanNote,#photoHow{line-height:1.7}
 .offnote{padding:10px 12px;border-radius:12px;background:var(--warn-bg);border:1px solid rgba(199,119,0,.28);font:600 13px/1.4 var(--body);color:#4A3A12}
 @media (min-width:1160px){
   .ai-card.wide{width:min(820px,calc(62vw - 80px));align-self:center}
   .ai-card.wide .scan{grid-template-columns:minmax(0,44%) minmax(0,1fr);gap:20px}
   .ai-card.wide .take{min-height:78px}
   .ai-card.wide .aisteps{flex-direction:row;padding:0 4px}
-  .ai-card.wide .aistep{flex:1;min-width:0;padding:0 10px;font-size:13px;white-space:nowrap}
+  .ai-card.wide .aistep{flex:1 1 auto;min-width:0;padding:0 10px;gap:8px;font-size:13px;white-space:nowrap}
+  .ai-card.wide .aistep em{padding-left:6px}
   .ai-card.wide .aistep + .aistep{border-top:0;border-left:1px solid var(--line)}
 }
 @media (max-width:1159px){
@@ -194,7 +220,12 @@ button:focus-visible,.field:focus-within{outline:3px solid var(--cobalt-100);out
   #scan{scroll-margin-top:84px}
   .stage{max-width:290px}
   .billcap{font-size:12px}
+  .frow{padding-left:12px}
+  .frow .fv input{width:72px}.frow .fv input.txt{width:132px}
+  .frow .fl input{font-size:13.5px;padding:0 7px;letter-spacing:-.01em}
   .samples-grid{grid-template-columns:1fr}
+  #providers.all{max-height:none;overflow:visible;padding-right:0;margin-right:0}
+  .field input{font-size:15px}#pcount{display:none}
   .scard{flex-direction:row}.scard .pic{width:104px;height:auto;min-height:132px;flex:none;border-bottom:0;border-right:1px solid var(--line)}
   .scard .pic::after{content:"Sample";left:6px;top:6px}
 }
@@ -217,7 +248,7 @@ button:focus-visible,.field:focus-within{outline:3px solid var(--cobalt-100);out
     </div>
     <div class="railfoot">
       <span class="badge lock" style="align-self:flex-start"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Encrypted</span>
-      <p>Your bill photo is read once and never stored. Only the numbers are kept.</p>
+      <p>Your bill photo is read once and never stored, so only the numbers are kept.</p>
     </div>
     </div>
   </aside>
@@ -233,27 +264,13 @@ button:focus-visible,.field:focus-within{outline:3px solid var(--cobalt-100);out
 
         <div>
           <h1 class="head">Tell us what you pay for.</h1>
-          <p class="lede">We compare every test with this plan. There are two ways to add it.</p>
+          <p class="lede">Every test is compared with this plan. Let Proof AI read it from your bill, or pick it from the list.</p>
         </div>
 
         <div class="ways">
-          <button type="button" class="way on" data-way="pick"><div class="itile"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.500-3.500"/></svg></div><div>Pick your plan<div class="k">Search and choose</div></div></button>
           <button type="button" class="way ai" data-way="scan"><div class="itile aiic"><svg viewBox="0 0 24 24" fill="#8B5CF6"><path d="M12 2l1.900 5.600a3 3 0 0 0 1.900 1.900L21.400 11.400l-5.600 1.900a3 3 0 0 0-1.900 1.900L12 20.800l-1.900-5.600a3 3 0 0 0-1.900-1.900L2.600 11.400l5.600-1.900a3 3 0 0 0 1.900-1.900z"/></svg></div><div>Scan your bill with Proof AI<div class="k">One photo, no typing</div></div></button>
+          <button type="button" class="way" data-way="pick"><div class="itile"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.500-3.500"/></svg></div><div>Pick your plan<div class="k">Search and choose</div></div></button>
         </div>
-
-        <section class="card col gap16" id="pick">
-          <div class="row between"><div class="h2">Pick your plan</div><span class="small">Demo provider list</span></div>
-          <label class="field" for="q"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.500-3.500"/></svg><input id="q" type="search" autocomplete="off" placeholder="Search plans" aria-controls="providers plans"><span class="small" id="pcount"></span></label>
-          <div id="providers"></div>
-          <div class="divider"></div>
-          <div class="col gap8">
-            <div class="eyebrow" style="margin-bottom:4px" id="plansTitle"></div>
-            <div class="col gap8" id="plans" role="radiogroup" aria-labelledby="plansTitle"></div>
-          </div>
-          <div class="source"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg><span id="source"></span></div>
-        </section>
-
-        <div class="or">or let Proof AI read it for you</div>
 
         <section class="ai-card col gap16" id="scan">
           <div class="row between" style="gap:10px;flex-wrap:wrap">
@@ -269,9 +286,10 @@ button:focus-visible,.field:focus-within{outline:3px solid var(--cobalt-100);out
           </div>
 
           <div id="scanIdle" class="col gap16" hidden>
-            <p class="ai-text">Take one photo of your bill. Proof AI finds the plan price, equipment rental, and extra fees, and points out any fee that looks like a junk fee.</p>
+            <p class="ai-text">Take one photo of your bill, and Proof AI fills in the price and each fee, then flags any fee that looks like a junk fee.</p>
+            <div class="reader" id="reader"></div>
             <button type="button" class="btn primary" id="choose"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.5" r="3.5"/></svg>Take or choose a photo</button>
-            <p class="small" style="color:var(--ink-3);margin:0">No bill handy? The project repo has fictional practice bills in its demo-files folder.</p>
+            <p class="small" style="color:var(--ink-3);margin:-4px 0 0;text-align:center">No bill handy? The repo's <b style="white-space:nowrap">demo-files</b> folder has fictional practice bills.</p>
           </div>
 
           <div id="scanWork" class="col gap16" hidden>
@@ -288,7 +306,7 @@ button:focus-visible,.field:focus-within{outline:3px solid var(--cobalt-100);out
             <div class="scan">
               <div class="billwrap">
                 <div class="stage" id="stage"><img id="thumb" alt="The bill photo you chose"><div class="scanline"></div><div id="boxes"></div></div>
-                <div class="billcap" id="billcap">Your bill photo. Shown here only.</div>
+                <div class="billcap" id="billcap">Your bill photo, shown here only.</div>
               </div>
               <div class="frows" id="frows"></div>
             </div>
@@ -301,8 +319,34 @@ button:focus-visible,.field:focus-within{outline:3px solid var(--cobalt-100);out
             <div class="ai-note" id="scanNote"></div>
           </div>
 
-          <div class="deleted" id="photoNote"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4.5 6v6c0 4.5 3.2 7.600 7.5 9 4.300-1.400 7.500-4.500 7.500-9V6z"/><path d="m9 12 2 2 4-4"/></svg><span>Your photo is not stored. Only the numbers you confirm are saved.</span></div>
-          <div class="ai-note" id="photoHow"></div>
+          <div class="deleted" id="photoNote"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4.5 6v6c0 4.5 3.2 7.600 7.5 9 4.300-1.400 7.500-4.500 7.500-9V6z"/><path d="m9 12 2 2 4-4"/></svg><span>Your photo is never stored, and only the numbers you confirm are saved.</span></div>
+          <details class="how" id="how">
+            <summary><span>How Proof AI reads a bill</span><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></summary>
+            <ol class="howlist">
+              <li><b>The photo goes to a model that can read images.</b> <span id="howSend"></span></li>
+              <li><b>The model describes what it sees before it reads any number.</b> It decides whether the photo is an internet bill at all, and only then returns a fixed set of fields: the provider, the plan name, the monthly plan price, the equipment rental, each extra fee with its amount, the printed total, and the month the promo price ends.</li>
+              <li><b>It sorts each fee.</b> For every fee it marks whether the company adds it or whether it is a government tax. Fees with names such as "network enhancement", "infrastructure", "regulatory recovery", and "administrative" are company fees, and the app labels those as possible junk fees.</li>
+              <li><b>The app's own code checks the reading without trusting the model.</b> If the model's own description does not mention a bill, nothing is filled in. Fees with no amount are dropped. The plan price, the equipment, and the fees must add up to the printed total, and a fee that breaks the sum is removed. The promo date must look like a month and a year.</li>
+              <li><b>You have the last word.</b> You check every field and can edit it before anything is saved, and only the numbers you confirm are kept.</li>
+            </ol>
+            <p class="ai-note">If the file is one of the practice bills from the repo's demo-files folder, the app also shows how many values the model got right. This is a general model that reads text in images, and it was not trained specially on bills, so it can make mistakes.</p>
+            <div class="ai-note" id="photoHow"></div>
+          </details>
+        </section>
+
+        <div class="or">or pick your plan from the list</div>
+
+        <section class="card col gap16" id="pick">
+          <div class="row between" style="gap:10px;flex-wrap:wrap"><div class="h2">Pick your plan</div><span class="badge warn">Fictional example values</span></div>
+          <label class="field" for="q"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.500-3.500"/></svg><input id="q" type="search" autocomplete="off" placeholder="Search provider, plan, or type" aria-controls="providers plans"><span class="small" id="pcount"></span></label>
+          <div id="providers"></div>
+          <button type="button" class="more" id="moreProv" hidden></button>
+          <div class="divider"></div>
+          <div class="col gap8">
+            <div class="eyebrow" style="margin-bottom:4px" id="plansTitle"></div>
+            <div class="col gap8" id="plans" role="radiogroup" aria-labelledby="plansTitle"></div>
+          </div>
+          <div class="source"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg><span id="source"></span></div>
         </section>
 
         <section class="fair">
@@ -314,7 +358,7 @@ button:focus-visible,.field:focus-within{outline:3px solid var(--cobalt-100);out
           </div>
           <button type="button" class="btn primary" id="start" disabled>Start checking my internet<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
         </section>
-        <div class="secure" style="justify-content:center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Your plan details are encrypted. You can change them later.</div>
+        <div class="secure" style="justify-content:center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Your plan details are encrypted, and you can change them later.</div>
 
       </div>
     </main>

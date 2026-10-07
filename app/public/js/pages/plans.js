@@ -19,7 +19,7 @@ $('#empty').hidden = !!H;
 bind({
   nowBadgeHtml: H ? badge(statusKind(H.status), H.statusWord) : '',
   planName: plan.name, planPay: `${money(plan.price)} a month`,
-  planLine: H ? `You pay for ${plan.down} Mbps. Over ${H.basis} you got ${H.mbps} Mbps.` : `You pay for ${plan.down} Mbps. No tests yet, so Wi-Fight cannot say what you really get.`,
+  planLine: H ? `You pay for ${plan.down} Mbps, and over ${H.basis} you got ${H.mbps} Mbps.` : `You pay for ${plan.down} Mbps. There are no tests yet, so Wi-Fight cannot say what you really get.`,
 });
 if (bill) {
   const fees = (bill.fees || []).map((f) => `<div class="kv"><span class="k row gap8" style="flex-wrap:wrap">${esc(f.name)}${f.junk ? ' <span class="badge warn">Possible junk fee</span>' : ''}</span><span class="v">${cents(f.amount)}</span></div>`).join('');
@@ -33,8 +33,8 @@ if (bill) {
 if (facts.money) {
   $('#lost').hidden = false;
   const m = facts.money;
-  if (m.lostMonth > 0) bind({ lostHtml: `<b>About ${money(m.lostMonth)} a month</b> pays for speed you did not receive. That is ${m.pctLost}% of your ${money(m.price)} bill, estimated.` });
-  else { $('#lostIcon').className = 'itile good'; bind({ lostHtml: '<b>You are getting the speed you pay for.</b> None of your bill is paying for speed that did not arrive.' }); }
+  if (m.lostMonth > 0) bind({ lostHtml: `<b>About ${money(m.lostMonth)} a month</b> pays for speed you did not receive. That is ${m.pctLost}% of your ${money(m.price)} bill, and it is an estimate.` });
+  else { $('#lost').classList.add('fine'); $('#lostIcon').className = 'itile good'; bind({ lostHtml: '<b>You are getting the speed you pay for.</b> None of your bill is paying for speed that did not arrive.' }); }
 }
 
 // ---------- pick, household, table ----------
@@ -60,7 +60,7 @@ function render() {
     needLine: `${people(house.people)} with ${usesText}: about ${r.needDown} Mbps download and ${r.needUp} Mbps upload at the same time.`,
     cmpTitle: `Compare all ${n} plans`,
     confChip: `Confidence: ${H ? 'medium' : 'low'}`,
-    confText: H ? "Plan details can change. Check the provider's label before switching." : "No tests yet, so this uses your household only. Check the provider's label before switching.",
+    confText: H ? "Plan details can change, so check the provider's own label before you switch." : "No tests yet, so this uses your household only. Check the provider's label before switching.",
   });
 
   if (!shown) {
@@ -77,10 +77,10 @@ function render() {
     const curRow = r.rows.find((x) => x.current);
     const nowEquip = billEquip != null ? `You pay ${money(billEquip)} a month for equipment rental today.` : curRow && curRow.equipmentFee ? `Your plan now lists ${money(curRow.equipmentFee)} a month.` : '';
     $('#reasons').innerHTML = [
-      `<b>Enough speed for your household.</b> ${people(house.people)} need about ${r.needDown} Mbps download and ${r.needUp} Mbps upload at once. This plan lists ${num(shown.down)} and ${num(shown.up)}.`,
-      diff > 0 ? `<b>${money(diff)} a month less than you pay now.</b> ${money(shown.price)} instead of ${money(plan.price)}. That is about ${money(year)} a year.`
-        : diff < 0 ? `<b>${money(-diff)} a month more than you pay now.</b> ${money(shown.price)} instead of ${money(plan.price)}. That is about ${money(-year)} a year more.`
-        : `<b>The same price you pay now.</b> ${money(shown.price)} a month.`,
+      `<b>Enough speed for your household.</b> ${people(house.people)} ${house.people === 1 ? 'needs' : 'need'} about ${r.needDown} Mbps download and ${r.needUp} Mbps upload at once, and this plan lists ${num(shown.down)} and ${num(shown.up)}.`,
+      diff > 0 ? `<b>${money(diff)} a month less than you pay now.</b> You would pay ${money(shown.price)} instead of ${money(plan.price)}, which is about ${money(year)} a year.`
+        : diff < 0 ? `<b>${money(-diff)} a month more than you pay now.</b> You would pay ${money(shown.price)} instead of ${money(plan.price)}, which is about ${money(-year)} a year more.`
+        : `<b>The same price you pay now.</b> It costs ${money(shown.price)} a month, just like your plan today.`,
       shown.equipmentFee ? `<b>Equipment fee of ${money(shown.equipmentFee)} a month listed.</b> ${esc(nowEquip)}` : `<b>No equipment fee listed.</b> ${esc(nowEquip)}`,
     ].map((t) => `<div><span>${t}</span></div>`).join('');
     const ch = r.cheapest;

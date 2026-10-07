@@ -24,7 +24,6 @@ if (!facts.headline || !D || D.cause === 'unknown') {
   bind({
     updated: `${plural(facts.testsCount, 'test')} · day ${facts.dayNumber} of ${facts.totalDays}`,
     title: D.title, sub: D.sub || '',
-    chipsHtml: [plural(facts.testsCount, 'test'), plural(facts.daysDone, 'day'), `${plural(pairs, 'paired near and far check')}`].map((c) => `<span class="evidence">${esc(c)}</span>`).join(''),
     lock: Store.isEncrypted() ? 'Encrypted' : 'On this device',
     usedTests: plural(facts.testsCount, 'test'), usedDays: plural(facts.daysDone, 'day'), usedPairs: String(pairs),
     usedPlanHtml: `${esc(facts.plan.name)}<br><span class="small">${esc(facts.plan.down)} Mbps typical download</span>`,
@@ -141,14 +140,6 @@ if (!facts.headline || !D || D.cause === 'unknown') {
         <summary><div class="itile${cls}">${svg}</div><span class="q"><span>${esc(e.title)}</span>${tag(e.supports)}</span><span class="n">${i + 1} OF ${n}</span><span class="chev">${ICON.chev}</span></summary>
         <div class="evbody">${visual(e)}<p>${AI.html(e.detail)}</p></div>
       </details>`; }).join('');
-  }
-
-  // The score, shown only when the listed weights really add up to the result
-  if (!quiet && n) {
-    if (exact) {
-      $('#score').hidden = false;
-      $('#score').innerHTML = `<span class="small">Provider score</span><b>50${moves.map((m) => ` ${m < 0 ? 'minus' : 'plus'} ${Math.abs(m)}`).join('')} = ${D.providerPct}%</b><span class="small">Starts at 50, an even chance. Wi-Fi gets the rest: ${D.wifiPct}%.</span>`;
-    }
   }
 
   // Router check card

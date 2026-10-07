@@ -2,6 +2,7 @@
 // The bill photo lives in this page's memory only. It is never written to the store.
 import { Store, AI, $, $$, go, toast, esc } from '../shell.js';
 import { FAIR } from '../engine.js';
+import { modelChip, modelStack } from '../models.js';
 
 const state = await Store.load();
 if (!state.consent || !state.consent.mlab) { go('onboarding-consent.html'); await new Promise(() => {}); }
@@ -29,11 +30,14 @@ function samePlan(listed, provider, plan) {
   const have = new Set(words(`${provider || ''} ${plan || ''}`)); const want = words(listed);
   return want.length > 0 && words(plan).length > 0 && want.every((w) => have.has(w));
 }
+const FEW = 4;          // providers shown before "Show all"
+let showAll = false;
 function matches() {
   const term = q.value.trim().toLowerCase();
   if (!term) return providers.map((p) => ({ ...p, shown: p.plans }));
   return providers.map((p) => {
-    const whole = p.name.toLowerCase().includes(term);
+    // a provider matches by its name or by its type of connection ("fiber", "cable", "5g", "satellite")
+    const whole = p.name.toLowerCase().includes(term) || String(p.type || '').toLowerCase().includes(term);
     return { ...p, shown: whole ? p.plans : p.plans.filter((pl) => pl.name.toLowerCase().includes(term)) };
   }).filter((p) => p.shown.length);
 }
@@ -43,12 +47,21 @@ function drawPick() {
   if (list.length && !list.some((p) => p.id === providerId)) providerId = list[0].id;
   const cur = list.find((p) => p.id === providerId);
   $('#pcount').textContent = `${list.length} provider${list.length === 1 ? '' : 's'}`;
-  $('#providers').innerHTML = list.length ? list.map((p) => `<button type="button" class="lrow prow${p.id === providerId ? ' on' : ''}" data-provider="${esc(p.id)}" aria-pressed="${p.id === providerId}"><div class="itile ${p.id === providerId ? '' : 'mute'}" style="font:700 14px var(--body)">${esc(p.name.charAt(0))}</div><div class="grow"><div class="dt">${esc(p.name)}</div><div class="small">${p.shown.length} plan${p.shown.length === 1 ? '' : 's'}</div></div>${p.id === providerId ? `<span class="pcheck">${CHECK}</span>` : `<span style="color:var(--ink-3)">${CHEV}</span>`}</button>`).join('')
-    : `<div class="empty" id="nomatch">No provider or plan matches "${esc(q.value.trim())}". Try a shorter search.</div>`;
+  // A long list starts short: the first few providers plus the chosen one. Searching always shows every match.
+  const searching = !!q.value.trim();
+  const short = !searching && !showAll && list.length > FEW + 1;
+  const rows = short ? list.filter((p, i) => i < FEW || p.id === providerId) : list;
+  const more = $('#moreProv');
+  more.hidden = searching || list.length <= FEW + 1;
+  more.textContent = short ? `Show all ${list.length} providers` : 'Show fewer providers';
+  more.setAttribute('aria-expanded', String(!short));
+  $('#providers').classList.toggle('all', !short && rows.length > 5);
+  $('#providers').innerHTML = list.length ? rows.map((p) => `<button type="button" class="lrow prow${p.id === providerId ? ' on' : ''}" data-provider="${esc(p.id)}" aria-pressed="${p.id === providerId}"><div class="itile ${p.id === providerId ? '' : 'mute'}" style="font:700 14px var(--body)">${esc(p.name.charAt(0))}</div><div class="grow"><div class="dt pname"><span>${esc(p.name)}</span>${p.type ? `<span class="ptype">${esc(p.type)}</span>` : ''}</div><div class="small">${p.shown.length} plan${p.shown.length === 1 ? '' : 's'}</div></div>${p.id === providerId ? `<span class="pcheck">${CHECK}</span>` : `<span style="color:var(--ink-3)">${CHEV}</span>`}</button>`).join('')
+    : `<div class="empty" id="nomatch">No provider, plan, or type matches "${esc(q.value.trim())}". Try a shorter search.</div>`;
   $('#plansTitle').textContent = cur ? `${cur.name} plans` : 'Plans';
   $('#plans').innerHTML = cur ? cur.shown.map((pl) => { const on = selected && selected.id === pl.id; return `<button type="button" class="radio-card${on ? ' on' : ''}" role="radio" aria-checked="${!!on}" data-plan="${esc(pl.id)}"><div class="row gap12"><span class="radio"></span><div><div class="dt">${esc(pl.name)}</div><div class="small pm">Typical download <b>${n(pl.down)} Mbps</b><span class="sep"> · </span><span class="up">upload <b>${n(pl.up)} Mbps</b></span></div></div></div><div class="price"><div class="num">$${n(pl.price)}</div><div class="small">a month</div></div></button>`; }).join('') : '';
   const shownPlan = selected && cur && selected.providerId === cur.id ? selected : null;
-  $('#source').textContent = shownPlan ? `Demo values, set out like a provider's broadband label. Typical response time ${shownPlan.latency} ms.` : 'Demo values, set out like a provider\'s broadband label. A real build uses each provider\'s own label.';
+  $('#source').textContent = shownPlan ? `These providers and plans are fictional example values, set out like a provider's broadband label. Typical response time ${shownPlan.latency} ms.` : 'These providers and plans are fictional example values, set out like a provider\'s broadband label. A real build would use each provider\'s own label.';
 }
 
 function drawFair() {
@@ -71,6 +84,7 @@ function choose(id, source = 'picked') {
 }
 
 q.addEventListener('input', drawPick);
+$('#moreProv').addEventListener('click', () => { showAll = !showAll; drawPick(); });
 $('#providers').addEventListener('click', (e) => { const b = e.target.closest('[data-provider]'); if (b) { providerId = b.dataset.provider; drawPick(); } });
 $('#plans').addEventListener('click', (e) => { const b = e.target.closest('[data-plan]'); if (b) { choose(b.dataset.plan); const again = $(`[data-plan="${b.dataset.plan}"]`); if (again) again.focus(); } });
 $$('[data-way]').forEach((w) => w.addEventListener('click', () => {
@@ -99,6 +113,7 @@ const STEPS = ['Reading the photo', 'Finding prices and fees', 'Checking fee nam
 const REVEAL_GAP = 350;
 let thumbUrl = null, bill = null, runId = 0, scanState = 'idle', current = null, takeOn = false;
 const status = await AI.status();
+const stack = await modelStack();   // names the model that reads photos, from what the server reports
 // Known values and line positions for the fictional demo bills in the repo's demo-files folder.
 // The images are not on the website. When someone uploads one of those exact files it is recognized by its SHA-256.
 let manifest = { bills: [] };
@@ -230,7 +245,7 @@ async function runScan({ src, getDataUrl, sample }) {
   const my = ++runId; bill = null; current = sample || null; takeOn = false; scanState = 'working';
   thumb.src = src; thumb.alt = sample ? `${sample.title}, a fictional sample bill` : 'The bill photo you chose';
   stage.classList.toggle('up', false); stage.classList.add('reading'); boxes.innerHTML = '';
-  $('#billcap').textContent = sample ? 'Recognized as a Wi-Fight demo bill (fictional). Shown here only.' : 'Your bill photo. Shown here only.';
+  $('#billcap').textContent = sample ? 'Recognized as a fictional Wi-Fight demo bill. It is shown here only.' : 'Your bill photo, shown here only.';
   show('scanWork');
   $('#scanErr').hidden = true; $('#scanActions').hidden = true; $('#frows').innerHTML = ''; $('#scanChips').innerHTML = ''; $('#scanNote').textContent = '';
   $('#scanMatch').hidden = true; $('#scanOffNote').hidden = true; $('#usePlan').hidden = true; $('#take').hidden = false;
@@ -253,7 +268,7 @@ async function runScan({ src, getDataUrl, sample }) {
   bill = { planPrice: num(fl.planPrice ?? 0), equipment: num(fl.equipment ?? 0), fees: (fl.fees || []).map((x) => ({ name: String(x.name || ''), amount: num(x.amount ?? 0), junk: !!x.junk, why: x.why ? String(x.why) : '' })), promoEnds: fl.promoEnds ? String(fl.promoEnds) : null, printedTotal: fl.total == null ? null : num(fl.total), provider: fl.provider ? String(fl.provider) : null, plan: fl.plan ? String(fl.plan) : null, mode: res.mode };
   drawFields();
   $('#scanMeta').textContent = live ? 'Read just now · live' : sample ? 'Known sample values · offline mode' : 'Sample values · offline mode';
-  $('#scanText').textContent = live ? 'Here is what Proof AI read.' : 'Filling in the fields.';
+  $('#scanText').textContent = live ? 'Here is what Proof AI read from the photo.' : 'Filling in the fields now.';
 
   // Reveal one value at a time. On a recognized demo bill, each value also gets a box on its line of the bill.
   // The box positions come with the sample (manifest regions). A photo you upload has none, so it gets no boxes.
@@ -288,13 +303,14 @@ async function runScan({ src, getDataUrl, sample }) {
   const hit = live || sample ? planFor(sample) : null;
   const use = $('#usePlan');
   if (hit) { use.dataset.plan = hit.id; use.textContent = `Use this plan: ${hit.name}`; use.disabled = false; use.hidden = false; }
-  const chips = live ? [`Confidence: ${res.confidence}`, (res.model || status.model) ? `Model: ${res.model || status.model}` : null, sample ? 'Based on 1 photo' : 'Based on 1 photo', `${found} fields found`]
+  // a photo can be read by a different model than the one that writes text, so name the one that read it
+  const readBy = live ? (res.model || (stack.photo && stack.photo.id) || status.model || '') : '';
+  const chips = live ? [`Confidence: ${res.confidence}`, 'Based on 1 photo', `${found} fields found`]
     : sample ? ['Confidence: none, not an AI reading', 'Known sample values', `${found} fields filled`]
       : ['Confidence: none, sample values', 'Not read from your photo', `${found} fields filled`];
-  $('#scanChips').innerHTML = chips.filter(Boolean).map((c) => `<span class="evidence">${esc(c)}</span>`).join('');
-  // a photo can be read by a different model than the one that writes text, so name the one that read it
-  const readNote = res.mode === 'live' && res.model && res.model !== status.model ? `Read by AI (${res.model}). It can make mistakes, so check each value.` : AI.note(res.mode);
-  $('#scanNote').textContent = `${readNote} ${sample ? 'The outlines mark where each value sits on this demo bill. ' : ''}Check each field before you continue.`;
+  $('#scanChips').innerHTML = (readBy ? `<span data-model="${esc(readBy)}">${modelChip(readBy)}</span>` : '') + chips.filter(Boolean).map((c) => `<span class="evidence">${esc(c)}</span>`).join('');
+  const readNote = live ? `This photo was read by ${readBy ? modelChip(readBy, { maker: false }) : 'an AI model'}${stack.host ? `, hosted on ${esc(stack.host.name)}` : ''}. It can make mistakes, so check each value before you continue.` : esc(`${AI.note(res.mode)} Check each field before you continue.`);
+  $('#scanNote').innerHTML = `${readNote}${sample ? ' The outlines mark where each value sits on this demo bill.' : ''}`;
   $('#scanActions').hidden = false; $('#billOk').hidden = false; $('#billEdit').hidden = false; $('#billOk').disabled = false; $('#billOk span').textContent = 'Looks right';
   $('#scan').dataset.mode = res.mode;
   scanState = 'done';
@@ -331,12 +347,20 @@ $('#billOk').addEventListener('click', async () => {
   toast('Bill details saved on this device. The photo was not saved.');
 });
 
-if (!state.consent.ai) { show('scanOff'); $('#photoNote').hidden = true; $('.way.ai').classList.add('disabled'); $('.way.ai .k').textContent = 'Off. You did not agree to Proof AI'; }
+if (!state.consent.ai) { show('scanOff'); $('#photoNote').hidden = true; $('#how').hidden = true; $('.way.ai').classList.add('disabled'); $('.way.ai .k').textContent = 'Off. You did not agree to Proof AI'; }
 else {
   show('scanIdle');
+  // Say exactly which model reads the photo, from what the server reports (models.js). Nothing is named by hand.
+  const pm = stack.live ? stack.photo : null, where = stack.provider === 'local' ? 'on this computer' : stack.host ? `on ${esc(stack.host.name)}` : '';
+  const reader = $('#reader');
+  reader.classList.toggle('off', !pm); reader.dataset.model = pm ? pm.id : 'offline';
+  reader.innerHTML = pm ? `<span>Read by</span>${modelChip(pm.id)}<span>${where ? `${where}, ` : ''}then checked by the app's own code.</span>`
+    : 'No AI model is connected right now, so a photo cannot be read. A practice bill shows its known values instead.';
+  $('#howSend').innerHTML = pm ? `Your browser shrinks the photo and sends it once to ${modelChip(pm.id, { maker: false })}, a vision-language model from ${esc(pm.maker)} that can read text in an image${where ? `, running ${where}` : ''}. Wi-Fight does not store the photo.`
+    : 'When a model is connected, your browser shrinks the photo and sends it once to a vision-language model, which is a model that can read text in an image. Wi-Fight does not store the photo. No model is connected right now, so this step is skipped and nothing is sent.';
   $('#photoHow').textContent = status.provider === 'local' ? `The photo stays in this page while you check the fields. It is read once by a language model running on this computer (${status.model}), so it does not leave this device, and it is gone when you leave this page.`
-    : status.live ? `The photo stays in this page while you check the fields. It is sent once to ${status.label || 'the AI service'} to be read, and it is gone when you leave this page.`
-      : 'The photo stays in this page while you check the fields and is gone when you leave. Proof AI is in offline mode, so the photo is not sent anywhere and cannot be read. A recognized demo bill shows its known values. Your own photo gets sample values to edit.';
+    : status.live ? `The photo stays in this page while you check the fields. It is sent once to ${stack.photo ? `${stack.photo.name} (${stack.photo.maker})` : 'the AI service'}${stack.host ? `, hosted on ${stack.host.name}` : ''}, to be read, and it is gone when you leave this page.`
+      : 'The photo stays in this page while you check the fields and is gone when you leave. Proof AI is in offline mode, so the photo is not sent anywhere and cannot be read. A recognized demo bill shows its known values, and your own photo gets sample values to edit.';
 }
 window.addEventListener('pagehide', () => { if (thumbUrl) URL.revokeObjectURL(thumbUrl); });
 
@@ -368,6 +392,7 @@ window.wfDemoFill = async () => {
     if (!selected || selected.id !== 'ns500') {
       q.value = ''; q.dispatchEvent(new Event('input', { bubbles: true }));
       bring($('#pick')); await sleep(600);
+      if (!$('[data-provider="northstar"]')) { showAll = true; drawPick(); }
       const pr = $('[data-provider="northstar"]'); if (pr) pr.click(); await sleep(500);
       const pl = $('[data-plan="ns500"]'); if (pl) pl.click(); await sleep(700);
     }

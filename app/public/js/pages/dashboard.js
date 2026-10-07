@@ -1,5 +1,6 @@
 import { boot, bind, $, $$, setRing, barsHTML, xlabelsHTML, daysHTML, chipsHTML, reasonsHTML, labelHTML, badge, statusKind, AI, esc } from '../shell.js';
 import { now } from '../engine.js';
+import { modelStack, modelChip } from '../models.js';
 
 const { state, facts } = await boot({ need: 'plan' });
 const h = now(state).getHours();
@@ -14,14 +15,14 @@ if (!facts.headline) {
   bind({
     eyebrow: facts.complete ? `Day ${facts.totalDays} of ${facts.totalDays} · check complete` : `Day ${facts.dayNumber} of ${facts.totalDays} · ${facts.testsCount} tests so far`,
     statusHtml: badge(statusKind(H.status), H.statusWord), pct: H.pct, got: H.mbps, got3: H.mbps, paid: facts.plan.down, paid2: facts.plan.down,
-    fair: `80% · ${facts.fairLine} Mbps`,
-    basis: `Median of ${H.basis}, from ${facts.testsCount} tests. The black mark on the ring is the 80% fair line.`,
+    fair: facts.fairLine,
+    basis: `This is the median of ${H.basis}, taken from ${facts.testsCount} ${facts.testsCount === 1 ? 'test' : 'tests'}. The black mark on the ring is the fair line.`,
     progress: `${facts.daysDone} of ${facts.totalDays}`,
     nextHtml: facts.complete ? 'Your check is complete. <a href="verdict.html" style="color:var(--cobalt);font-weight:600">See your verdict</a>.' : `${facts.totalDays - facts.daysDone} more day${facts.totalDays - facts.daysDone === 1 ? '' : 's'} and your verdict and report are ready. Next test <b style="color:var(--ink)">${esc(facts.nextTest.label)}</b>.`,
     downBadgeHtml: badge(statusKind(H.status), `${H.pct}% of plan`),
     up: facts.upload ? facts.upload.mbps : 0, upBadgeHtml: facts.upload ? badge(statusKind(facts.upload.status), facts.upload.statusWord) : '',
     lat: facts.latency ? facts.latency.ms : 0, latBadgeHtml: facts.latency ? badge(statusKind(facts.latency.status), facts.latency.statusWord) : '',
-    lost: facts.money.lostMonth, lostNote: facts.money.lostMonth ? `${facts.money.pctLost}% of a $${facts.money.price} bill, estimated` : 'You are getting what you pay for',
+    lost: facts.money.lostMonth, lostNote: facts.money.lostMonth ? `${facts.money.pctLost}% of your $${facts.money.price} bill, estimated` : 'You are getting what you pay for',
   });
   setRing($('#ring'), H.pct, H.status);
   $('#days').innerHTML = daysHTML(facts);
@@ -33,6 +34,7 @@ if (!facts.headline) {
     $('#bars').innerHTML = barsHTML(facts, days, { values: n !== 14 || window.innerWidth > 720 });
     $('#xlabels').innerHTML = xlabelsHTML(days, n === 14 ? 'day' : 'weekday');
     $$('[data-range]').forEach((c) => c.classList.toggle('on', Number(c.dataset.range) === n));
+    bind({ barsTitle: n === 14 ? 'Your two weeks' : days.length < 7 ? 'So far' : 'This week' });
   };
   $$('[data-range]').forEach((c) => { c.style.cursor = 'pointer'; c.onclick = () => drawBars(Number(c.dataset.range)); });
   drawBars(7);
@@ -50,11 +52,18 @@ if (!facts.headline) {
     { href: 'history.html', text: `Compared <b>${facts.daysDone}</b> ${plural(facts.daysDone, 'day', 'days')} to the fair line`, sub: `${facts.daysBelow} below it` },
     { href: 'diagnosis.html', text: `Weighed <b>${ev}</b> ${plural(ev, 'piece', 'pieces')} of evidence`, sub: 'Wi-Fi or provider' },
   ];
-  $('#pipeSteps').innerHTML = pipeline.map((p, i) => `<a class="pstep" href="${p.href}" data-step="${i + 1}"><span class="k">${TICK}STEP ${i + 1}</span><span>${p.text}</span><small>${esc(p.sub)}</small></a>`).join('');
+  $('#pipeSteps').innerHTML = pipeline.map((p, i) => `<a class="pstep" href="${p.href}" data-step="${i + 1}" title="${esc(p.sub)}"><span class="k">${TICK}STEP ${i + 1}</span><span>${p.text}</span></a>`).join('');
   $('#pipe').hidden = false;
 
   // Proof AI insight: numbers from the engine, wording from Claude (live) or the built-in writer (offline)
   const insight = AI.insight(facts, state);
+  // Who wrote the words: the real model name and maker from models.js when a model wrote them, the built-in writer when not.
+  const author = async (ai) => {
+    const stack = await modelStack();
+    // The model that answered this request if the server named it, otherwise the text model it reports.
+    const id = ai.mode === 'live' ? ai.model || (stack.text && stack.text.id) : null;
+    return id ? modelChip(id) : `<span class="mchip" title="No AI model wrote this text"><b>Built-in writer</b><span>${stack.live ? 'for this card' : 'offline mode'}</span></span>`;
+  };
   const reduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const wait = (ms) => new Promise((r) => setTimeout(r, ms));
   let runId = 0;
@@ -72,8 +81,9 @@ if (!facts.headline) {
       await wait(200);
     }
     const ai = await insight;
+    const by = await author(ai);
     if (id !== runId) return;
-    bind({ aiSentenceHtml: AI.html(ai.sentence), aiReasonsHtml: reasonsHTML(ai.reasons), aiChipsHtml: chipsHTML(ai.chips), aiNote: AI.note(ai.mode), aiMeta: `Updated after your last test · ${ai.mode === 'live' ? 'live' : 'offline mode'}` });
+    bind({ aiSentenceHtml: AI.html(ai.sentence), aiReasonsHtml: reasonsHTML(ai.reasons), aiChipsHtml: chipsHTML(ai.chips), aiNote: AI.note(ai.mode), aiMetaHtml: `<span>${ai.mode === 'live' ? 'Written by' : 'Worded by'}</span>${by}` });
     body.classList.remove('wait'); body.dataset.insight = 'ready';
   };
   playPipeline();

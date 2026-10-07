@@ -1,28 +1,48 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Wi-Fight · Dashboard</title><link rel="stylesheet" href="css/ds.css">
 <style>
-.ringwrap{position:relative;width:208px;height:208px;flex:none}
+.ringwrap{position:relative;width:240px;height:240px;flex:none;margin:0 auto}
+.ringwrap .hero-num{font-size:72px}
 .ringwrap svg{width:100%;height:100%;transform:rotate(-90deg)}
 .ringcenter{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
-.legend .kv{padding:10px 0}
+.scorecard{gap:18px;justify-content:space-between}
+.trio{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.trio > div{display:flex;flex-direction:column;gap:6px;padding:14px 0 14px 16px}
+.trio > div:first-child{padding-left:0}
+.trio > div + div{border-left:1px solid var(--line)}
+.trio .k{font:600 12.5px/1.2 var(--body);color:var(--ink-3)}
+.trio .v{font-size:24px;line-height:1;white-space:nowrap}
+.trio .v .unit{font-size:12px}
+.aihead{display:flex;justify-content:space-between;align-items:center;gap:8px 12px;flex-wrap:wrap}
+.aihead .ai-meta{display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ai-text,.pstep{text-wrap:pretty}
+/* bar values sit inside the bar on a patch of the bar's own colour, so the fair line never runs through a number */
+.bars .fill{z-index:auto}
+.bars .val{z-index:3;top:6px;left:50%;right:auto;transform:translateX(-50%);padding:2px 5px;border-radius:6px;background:var(--cobalt);color:#fff}
+.bars .bar.low .val{background:var(--bad)}
+.bars .threshold span{top:-24px}
+.tile .eyebrow{white-space:normal;line-height:1.3}
+#labelCard #label{flex:1;display:flex}
+#labelCard .bf{flex:1;display:flex;flex-direction:column}
+#labelCard .bf-row{flex:1}
+.weekfoot{margin-top:auto;display:flex;flex-direction:column;gap:14px}
 .reasons{counter-reset:r;display:flex;flex-direction:column;gap:10px}
 .reasons div{display:flex;gap:10px;font:500 14px/1.4 var(--body);color:var(--ink-2)}
 .reasons div::before{counter-increment:r;content:counter(r);flex:none;width:22px;height:22px;border-radius:50%;background:var(--surface-2);border:1px solid var(--line);display:grid;place-items:center;font:700 11px var(--body);color:var(--ink)}
 .reasons b{color:var(--ink);font-weight:600}
 .statnum{font-size:30px}
-.half{grid-column:span 6;justify-content:center;padding:20px}
-.half .statnum{font-size:40px}
-@media (max-width:720px){.scorebody{flex-direction:column;align-items:stretch !important}.ringwrap{margin:0 auto}}
+.half{grid-column:span 6;justify-content:center;padding:22px}
+.half .statnum{font-size:44px;line-height:1}
+@media (max-width:720px){.half{padding:16px;justify-content:flex-start}.half .statnum{font-size:32px;white-space:nowrap}.ringwrap .hero-num{font-size:64px}.trio .v{font-size:21px}.trio > div{padding-left:10px}.ringwrap{width:208px;height:208px}}
 /* How Proof AI got here: four steps, each with a real number from the engine */
 .pipe{display:flex;flex-direction:column;gap:8px}
 .pipe-steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
-.pstep{display:flex;flex-direction:column;gap:3px;padding:10px 12px;border-radius:14px;background:var(--surface-2);border:1px solid var(--line);text-decoration:none;color:var(--ink-2);font:600 12.5px/1.3 var(--body);opacity:0;transform:translateY(8px);transition:opacity .3s,transform .3s cubic-bezier(.2,.9,.3,1.2),border-color .2s}
+.pstep{display:flex;flex-direction:column;gap:4px;padding:10px 12px;border-radius:14px;background:var(--surface-2);border:1px solid var(--line);text-decoration:none;color:var(--ink-2);font:600 12.5px/1.3 var(--body);opacity:0;transform:translateY(8px);transition:opacity .3s,transform .3s cubic-bezier(.2,.9,.3,1.2),border-color .2s}
 .pstep.in{opacity:1;transform:none}
 .pstep:hover,.pstep:focus-visible{border-color:var(--cobalt);outline:none}
 .pstep .k{display:flex;align-items:center;gap:6px;font:700 10.5px/1 var(--body);letter-spacing:.07em;color:var(--ink-3)}
 .pstep .k svg{width:13px;height:13px;color:var(--good);flex:none}
 .pstep b{font:700 17px/1 var(--display);color:var(--ink);font-variant-numeric:tabular-nums}
-.pstep small{font:500 11.5px/1.3 var(--body);color:var(--ink-3)}
 .aibody{display:flex;flex-direction:column;gap:16px;transition:opacity .35s}
 .aibody.wait .reasons,.aibody.wait .aichips{visibility:hidden}
 .aibody.wait .ai-text{color:var(--ink-3)}
@@ -59,33 +79,31 @@
       </div>
     </div>
 
-    <div class="empty" id="empty" hidden><div class="h2" style="margin-bottom:8px">No tests yet</div><p class="body" style="max-width:460px;margin:0 auto 16px">Run your first speed test to start your two-week check. For a demo, you can also load two weeks of labelled sample data.</p><div class="row gap12" style="justify-content:center;flex-wrap:wrap"><button class="btn primary" data-href="test.html">Run my first test</button><button class="btn ghost" data-demo>Load sample data</button></div></div>
+    <div class="empty" id="empty" hidden><div class="h2" style="margin-bottom:8px">No tests yet</div><p class="body" style="max-width:460px;margin:0 auto 16px">Run your first speed test to start your two-week check. If you are giving a demo, you can load two weeks of labelled sample data instead.</p><div class="row gap12" style="justify-content:center;flex-wrap:wrap"><button class="btn primary" data-href="test.html">Run my first test</button><button class="btn ghost" data-demo>Load sample data</button></div></div>
     <div class="g" id="grid" data-wait>
       <!-- SCORE -->
-      <section class="card span-5 col gap16">
-        <div class="row between"><div class="eyebrow">Get vs. pay for</div><span data-b="statusHtml"></span></div>
-        <div class="row gap20 scorebody" style="align-items:center">
-          <div class="ringwrap">
-            <svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="84" fill="none" stroke="var(--surface-2)" stroke-width="18"/>
-              <circle id="ring" cx="100" cy="100" r="84" fill="none" stroke="var(--bad)" stroke-width="18" stroke-linecap="round" stroke-dasharray="0 527.800"/>
-              <!-- 80% threshold tick -->
-              <g transform="rotate(288 100 100)"><line x1="170" y1="100" x2="198" y2="100" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/></g></svg>
-            <div class="ringcenter"><div class="num hero-num"><span data-b="pct">0</span><span class="unit" style="font-size:24px">%</span></div><div class="small">of your plan speed</div></div>
-          </div>
-          <div class="legend grow">
-            <div class="kv"><span class="k">You get</span><span class="v num" style="font-size:20px"><span data-b="got">0</span><span class="unit" style="font-size:12px">Mbps</span></span></div>
-            <div class="kv"><span class="k">You pay for</span><span class="v num" style="font-size:20px"><span data-b="paid">0</span><span class="unit" style="font-size:12px">Mbps</span></span></div>
-            <div class="kv"><span class="k">Fair line</span><span class="v" data-b="fair"></span></div>
-          </div>
+      <section class="card span-5 col scorecard">
+        <div class="row between gap12"><div class="eyebrow">Get vs. pay for</div><span data-b="statusHtml"></span></div>
+        <div class="ringwrap">
+          <svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="84" fill="none" stroke="var(--surface-2)" stroke-width="18"/>
+            <circle id="ring" cx="100" cy="100" r="84" fill="none" stroke="var(--bad)" stroke-width="18" stroke-linecap="round" stroke-dasharray="0 527.800"/>
+            <!-- 80% threshold tick -->
+            <g transform="rotate(288 100 100)"><line x1="170" y1="100" x2="198" y2="100" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/></g></svg>
+          <div class="ringcenter"><div class="num hero-num"><span data-b="pct">0</span><span class="unit" style="font-size:24px">%</span></div><div class="small">of your plan speed</div></div>
+        </div>
+        <div class="trio">
+          <div><span class="k">You get</span><span class="num v"><span data-b="got">0</span><span class="unit">Mbps</span></span></div>
+          <div><span class="k">You pay for</span><span class="num v"><span data-b="paid">0</span><span class="unit">Mbps</span></span></div>
+          <div><span class="k">Fair line</span><span class="num v"><span data-b="fair">0</span><span class="unit">Mbps</span></span></div>
         </div>
         <div class="small" data-b="basis"></div>
       </section>
 
       <!-- AI INSIGHT -->
       <section class="ai-card span-7 col gap16">
-        <div class="row between">
+        <div class="aihead">
           <span class="ai-tag"><svg viewBox="0 0 24 24" fill="#8B5CF6"><path d="M12 2l1.900 5.600a3 3 0 0 0 1.900 1.900L21.400 11.400l-5.600 1.900a3 3 0 0 0-1.900 1.900L12 20.800l-1.900-5.600a3 3 0 0 0-1.900-1.900L2.600 11.400l5.600-1.900a3 3 0 0 0 1.900-1.900z"/></svg>PROOF AI · WHAT THIS MEANS</span>
-          <span class="ai-meta" data-b="aiMeta"></span>
+          <span class="ai-meta" data-b="aiMetaHtml"></span>
         </div>
         <div class="pipe" id="pipe" hidden>
           <div class="eyebrow">How Proof AI got here</div>
@@ -104,13 +122,13 @@
 
       <!-- DAILY BARS -->
       <section class="card span-8 col gap16">
-        <div class="row between"><div><div class="h3">This week</div><div class="small">Daily median download speed</div></div>
+        <div class="row between"><div><div class="h3" data-b="barsTitle">This week</div><div class="small">The median download speed of each day</div></div>
           <div class="row gap8"><span class="chip on" data-range="7">7 days</span><span class="chip" data-range="14">14 days</span></div></div>
         <div style="padding-top:22px">
           <div class="bars" id="bars"></div>
           <div class="xlabels" id="xlabels"></div>
         </div>
-        <div class="small">Dashed outline is your <span data-b="paid2">500</span> Mbps plan. <b style="color:var(--bad)">Red</b> days fell below the fair line.</div>
+        <div class="small">The dashed outline shows your <span data-b="paid2">0</span> Mbps plan, and the <b style="color:var(--bad)">red</b> days fell below the fair line.</div>
       </section>
 
       <!-- 14-DAY TRACKER -->
@@ -118,13 +136,15 @@
         <div class="row between"><div class="h3">Your two-week check</div><span class="small" data-b="progress"></span></div>
         <div class="days" id="days"></div>
         <div class="row gap12 small" style="flex-wrap:wrap"><span class="row gap4"><span class="dot" style="color:var(--good)"></span>On plan</span><span class="row gap4"><span class="dot" style="color:var(--bad)"></span>Below fair line</span></div>
-        <div class="divider"></div>
-        <div class="small" style="color:var(--ink-2)" data-b="nextHtml"></div>
+        <div class="weekfoot">
+          <div class="divider"></div>
+          <div class="small" style="color:var(--ink-2)" data-b="nextHtml"></div>
+        </div>
       </section>
 
       <!-- PROMISED VS GOT -->
       <section class="card span-5 col gap12" id="labelCard">
-        <div><div class="h3">Promised vs. what you got</div><div class="small">Your plan's label beside your own measurements</div></div>
+        <div><div class="h3">Promised vs. what you got</div><div class="small">The label for your plan, next to your own measurements</div></div>
         <div id="label"></div>
       </section>
       <div class="span-7"><div class="g" style="height:100%">

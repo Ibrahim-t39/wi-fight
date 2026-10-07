@@ -20,6 +20,9 @@ $$('.ibtn').forEach((b) => b.addEventListener('click', () => {
   box.hidden = !open; b.setAttribute('aria-expanded', String(open));
 }));
 
+// A shortcut from the top of the page to the two checkboxes.
+$('#jump').addEventListener('click', () => { $('#choices').scrollIntoView({ block: 'start', behavior: 'smooth' }); mlab.focus({ preventScroll: true }); });
+
 agree.addEventListener('click', async () => {
   if (!mlab.checked) return;
   agree.disabled = true;

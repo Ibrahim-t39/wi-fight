@@ -3,6 +3,7 @@
 import { Store } from './store.js';
 import { summarize } from './engine.js';
 import { AI } from './ai.js';
+import { modelName } from './models.js';
 
 export const $ = (s, r = document) => r.querySelector(s);
 export const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
@@ -57,7 +58,7 @@ function wireNav(state, facts, ai) {
     const foot = $('.sidefoot', side);
     if (foot) foot.innerHTML = `<span class="badge lock" style="align-self:flex-start"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2.500"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>${Store.isEncrypted() ? 'Encrypted on this device' : 'Stored on this device'}</span>
       <div class="small" style="color:var(--ink-2)">Nothing is sent without your approval.</div>
-      <div class="small" data-ai-mode>${ai.provider === 'local' ? 'Proof AI: live, on this computer' : ai.live ? 'Proof AI: live (' + esc(ai.label || 'AI') + ')' : 'Proof AI: offline mode'}</div>
+      <div class="small" data-ai-mode>${ai.provider === 'local' ? 'Proof AI: ' + esc(modelName(ai.model)) + ', on this computer' : ai.live ? 'Proof AI: ' + esc(modelName(ai.model)) + (ai.provider === 'groq' ? ' on Groq' : '') : 'Proof AI: offline mode'}</div>
       <button class="btn ghost sm" data-demo style="align-self:stretch">${ICON.flask}Demo</button>
       <button class="btn ghost sm" data-logout style="align-self:stretch">${ICON.logout}Log out</button>`;
   }

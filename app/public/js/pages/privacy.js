@@ -2,6 +2,7 @@
 import { boot, bind, $, $$, esc, go, toast, download, AI, Store } from '../shell.js';
 import { now, fmtDate, fmtTime, fmtWeekday, SCHEDULE } from '../engine.js';
 import { openSheet, paintSwitch, pause, bringIntoView } from './ui-sheet.js';
+import { STEPS as TOUR_STEPS } from '../tour.js';   // only to state how many stops the guided demo has
 
 const { facts } = await boot({ need: 'plan' });
 const S = () => Store.get();
@@ -34,7 +35,7 @@ function glance() {
     { key: 'sent', title: 'Nothing sent without approval', kind: 'ok', word: sent ? `${sent} sent` : 'Nothing sent',
       detail: sent ? `${plural(sent, 'report')} left, each one after you approved it.` : 'No report has left this device.' },
     { key: 'ai', title: 'Proof AI under your control', kind: aiOn ? 'ok' : 'off', word: aiOn ? 'On' : 'Off',
-      detail: aiOn ? 'You can switch it off below.' : 'It reads nothing until you switch it on.' },
+      detail: aiOn ? 'You can switch it off further down this page.' : 'It reads nothing until you switch it on.' },
   ];
 }
 const glanceHTML = () => glance().map((g) => `<li class="${g.kind === 'ok' ? '' : g.kind}" data-glance="${g.key}"><span class="gt">${esc(g.title)}</span><span class="gw"><i>${g.kind === 'ok' ? CHECK : g.kind === 'warn' ? WARN : ''}</i><span data-word>${esc(g.word)}</span></span><span class="gd">${esc(g.detail)}</span></li>`).join('');
@@ -48,6 +49,7 @@ function paint() {
   const chk = (ok, text) => `<div class="chk${ok ? '' : ' warn'}"><i>${ok ? CHECK : WARN}</i>${esc(text)}</div>`;
   bind({
     eyebrow: `Account · ${st.user.name || st.user.email || 'you'}`,
+    tourStops: Array.isArray(TOUR_STEPS) ? TOUR_STEPS.length : 11,
     title: enc ? 'Your data is protected' : 'Your data is stored without encryption',
     statusBadgeHtml: `<span class="badge ${enc ? 'good' : 'warn'}"><span class="dot"></span>${enc ? 'All good' : 'Check this'}</span>`,
     encBadge: enc ? 'Encrypted on this device' : 'Stored on this device',
@@ -73,7 +75,7 @@ function paint() {
   });
   const paused = isPaused();
   $('#pause').hidden = paused; $('#resume').hidden = !paused;
-  $('#pausenote').textContent = paused ? `Paused until ${when(set.pausedUntil)}` : 'Need a break? Tests start again on their own.';
+  $('#pausenote').textContent = paused ? `Paused until ${when(set.pausedUntil)}` : 'You can pause tests for a day, and they start again on their own.';
   $('#pausenote').classList.toggle('strong', paused);
   if (!$('#finds').hidden) searchDisk();   // the saved text changes with every save, so search it again
 }
@@ -147,6 +149,7 @@ function searchDisk() {
 $('#find').onclick = searchDisk;
 
 /* ---------- guided demo shortcut ---------- */
+// It shows the on-disk comparison and runs the search. It never presses the presenter tools further down the page.
 window.wfDemoFill = async () => {
   const d = $('#disk');
   await bringIntoView(d, 600);

@@ -2,6 +2,7 @@
 import { boot, bind, $, esc, toast, badge, statusKind, barsHTML, xlabelsHTML, daysHTML, chipsHTML, reasonsHTML, labelHTML, AI } from '../shell.js';
 import { recommend, fmtDate } from '../engine.js';
 import { pause, bringIntoView } from './ui-sheet.js';
+import { modelStack, modelChip } from '../models.js';
 
 const { state, facts } = await boot({ need: 'plan' });
 const plan = facts.plan;
@@ -55,19 +56,20 @@ if (!facts.complete) {
     eyebrow: `Day ${facts.totalDays} of ${facts.totalDays} · check complete`,
     heading: `Your verdict is in${state.user && state.user.name ? ', ' + state.user.name : ''}`,
     statusHtml: badge(statusKind(H.status), H.statusWord), pct: H.pct,
-    heroMsg: below ? `That is under the fair line of 80%.` : `Good news. Your provider is delivering what you pay for.`,
-    fairLab: `Fair line: 80%, ${facts.fairLine} Mbps`, planLab: `${plan.down} Mbps`,
+    heroMsg: below ? `That is under the fair line of 80%.` : `Good news: your provider is delivering what you pay for.`,
+    moneyNote: facts.money.lostMonth ? `That is about $${facts.money.lostYear} a year, by our estimate.` : `You are getting the speed your $${facts.money.price} bill pays for.`,
+    fairLab: `Fair line ${facts.fairLine} Mbps`, planLab: `${plan.down} Mbps`,
     paid: plan.down, got: H.mbps, below: facts.daysBelow, ofDays: `of ${facts.daysDone}`, lost: facts.money.lostMonth,
-    basis: `Median of ${H.basis}, from ${plural(facts.testsCount, 'test')}. ${plural(dips, 'one-off dip')} ${dips === 1 ? 'was' : 'were'} ignored. The fair line is 80% of your plan, or ${facts.fairLine} Mbps. The dollar figure is an estimate.`,
+    basis: `This is the median of ${H.basis}, from ${plural(facts.testsCount, 'test')}, with ${plural(dips, 'one-off dip')} left out. The fair line is 80% of your plan, which is ${facts.fairLine} Mbps.`,
     scPct: H.pct, scWord: H.statusWord, scGot: H.mbps, scPaid: plan.down, scDays: facts.daysDone,
     scFoot: `wi-fight · ${plural(facts.testsCount, 'test')}${facts.sample ? ' · sample data' : ''}`,
     reportTitle: below ? 'Send a report to your provider' : 'Keep a record of your results',
     reportText: `Proof AI drafts the report from your ${facts.daysDone} days of tests. You read it, edit it, and approve it. Nothing goes to ${plan.provider || plan.name.split(' ')[0]} until you say so.`,
     stripTitle: `All ${facts.totalDays} days`, stripSub: `Daily median download speed, ${range}`,
     stripBadgeHtml: badge(facts.daysBelow ? 'bad' : 'good', `${plural(facts.daysBelow, 'day')} below the fair line`),
-    stripNoteHtml: `Dashed outline is your ${esc(plan.down)} Mbps plan. <b style="color:var(--bad)">Red</b> days fell below the fair line. ${plural(facts.daysDone - facts.daysBelow, 'day')} ${facts.daysDone - facts.daysBelow === 1 ? 'was' : 'were'} on plan.`,
+    stripNoteHtml: `The dashed outline shows your ${esc(plan.down)} Mbps plan. The <b style="color:var(--bad)">red</b> days fell below the fair line, and ${plural(facts.daysDone - facts.daysBelow, 'day')} ${facts.daysDone - facts.daysBelow === 1 ? 'was' : 'were'} on plan.`,
     hexDays: facts.daysDone,
-    rewardText: `You ran ${plural(facts.testsCount, 'test')} over ${facts.daysDone} days. That is enough proof to stand behind.`,
+    rewardText: `You ran ${plural(facts.testsCount, 'test')} over ${facts.daysDone} days, which is enough proof to stand behind.`,
     rewardBadge: `${facts.daysDone} of ${facts.totalDays} days measured`,
   });
   $('#reveal').classList.add(below ? 'isbad' : 'isgood');
@@ -115,7 +117,12 @@ if (!facts.complete) {
 
   // ---------- Proof AI ----------
   const ai = await AI.verdict(facts, state);
-  bind({ aiSentenceHtml: AI.html(ai.sentence), aiReasonsHtml: reasonsHTML(ai.reasons || []), aiChipsHtml: chipsHTML(ai.chips || []), aiNote: AI.note(ai.mode), aiMeta: `Based on tests from ${range} · ${ai.mode === 'live' ? 'live' : 'offline mode'}` });
+  // Who wrote the words: the real model name and maker from models.js when a model wrote them, the built-in writer when not.
+  const stack = await modelStack();
+  // The model that answered this request if the server named it, otherwise the text model it reports.
+  const id = ai.mode === 'live' ? ai.model || (stack.text && stack.text.id) : null;
+  const chip = id ? modelChip(id) : `<span class="mchip" title="No AI model wrote this text"><b>Built-in writer</b><span>${stack.live ? 'for this card' : 'offline mode'}</span></span>`;
+  bind({ aiSentenceHtml: AI.html(ai.sentence), aiReasonsHtml: reasonsHTML(ai.reasons || []), aiChipsHtml: chipsHTML(ai.chips || []), aiNote: AI.note(ai.mode), aiMetaHtml: `<span>Tests from ${esc(range)}, ${ai.mode === 'live' ? 'written by' : 'worded by'}</span>${chip}` });
 }
 
 /** Draw the share card with canvas calls only. 320 x 420 design units at 3x. */

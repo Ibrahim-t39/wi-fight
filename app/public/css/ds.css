@@ -227,3 +227,19 @@ input,textarea{font-family:inherit}
 .ai-off .ai-card{position:relative;min-height:120px;cursor:pointer}
 .ai-off .ai-card > *{visibility:hidden}
 .ai-off .ai-card::after{content:"Proof AI is off. You chose not to let it analyze your results. Turn it on in Privacy & data.";position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:24px;font:600 15px/1.45 var(--body);color:var(--ink-2)}
+
+/* ---------- AI model names and logos (js/models.js) ---------- */
+.mico{display:inline-grid;place-items:center;width:18px;height:18px;flex:none;color:var(--ink)}
+.mico svg{width:100%;height:100%;display:block}
+.mico.lg{width:38px;height:38px;padding:8px;border-radius:12px;background:var(--surface-2);border:1px solid var(--line)}
+.mchip{display:inline-flex;align-items:center;gap:7px;height:30px;padding:0 11px 0 8px;border-radius:999px;border:1px solid var(--line);background:var(--surface);font:500 12.5px/1 var(--body);color:var(--ink-2);white-space:nowrap;vertical-align:middle}
+.mchip b{font-weight:700;color:var(--ink)}
+.mstack{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.mcard{display:flex;flex-direction:column;gap:8px;padding:18px;border-radius:20px;border:1px solid var(--line);background:var(--surface)}
+.mcard .mtop{display:flex;align-items:center;gap:12px}
+.mcard .mname{font:700 17px/1.2 var(--display);letter-spacing:-.01em;color:var(--ink)}
+.mcard .mmaker{font:500 12.5px/1.3 var(--body);color:var(--ink-3);margin-top:2px}
+.mcard .mrole{font:700 11px/1 var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--cobalt);margin-top:6px}
+.mcard .mdesc{font:500 13.5px/1.5 var(--body);color:var(--ink-2)}
+.mcard.host{background:var(--surface-2)}
+.mcard.off .mrole{color:var(--ink-2)}

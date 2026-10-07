@@ -1,23 +1,41 @@
-import { boot, bind, $, esc, badge, Store, AI } from '../shell.js';
+import { boot, bind, $, $$, esc, badge, Store } from '../shell.js';
+import { modelStack, stackHTML } from '../models.js';
 import { flagOutliers, summarize, median, round, dayKey, fmtTime, FAIR, STREAK } from '../engine.js';
 import { buildSample, SAMPLE_PLAN } from '../sample.js';
 
 // Public page: it opens in every state, including a wiped store and a visitor who is not signed in.
 await boot({ need: 'none' });
 
-// Live status lines, read from the running app.
-const status = await AI.status();
-$('#aiStatus').classList.add(status.live ? 'good' : 'warn');
+// Small icons for the tick lists and theme cards, so the page markup stays short.
+const IC = {
+  check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>',
+  lim: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 6v7M12 17.5v.5"/></svg>',
+  next: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',
+  spark: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.9 5.6a3 3 0 0 0 1.9 1.9l5.6 1.9-5.6 1.9a3 3 0 0 0-1.9 1.9L12 20.800l-1.9-5.6a3 3 0 0 0-1.9-1.9l-5.6-1.9 5.6-1.9a3 3 0 0 0 1.9-1.9z"/></svg>',
+  lock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>',
+};
+$$('.tick i').forEach((i) => { const t = i.parentElement.classList; i.innerHTML = t.contains('lim') ? IC.lim : t.contains('next') ? IC.next : IC.check; });
+$$('[data-ic]').forEach((i) => { i.innerHTML = IC[i.dataset.ic] || ''; });
+
+// The AI models behind Proof AI, named from what the server reports. Nothing here names a model by hand.
+const stack = await modelStack();
+const host = stack.host ? stack.host.name : '';
+$('#aiStatus').classList.add(stack.live ? 'good' : 'warn');
+$('#models').dataset.live = stack.live ? '1' : '0';
 bind({
-  aiStatus: status.live ? (status.provider === 'local' ? 'Proof AI is running live on this computer.' : `Proof AI is running live with ${status.label || 'a language model'}.`) : 'Proof AI is in offline mode on this computer.',
-  aiStatusNote: status.live ? (status.model ? `Model: ${status.model}.` : '') : 'No AI key is set on the server, so the built-in writer produces the wording.',
+  aiStatus: stack.live ? (stack.provider === 'local' ? 'Connected now, on this computer' : `Connected now${host ? `, through ${host}` : ''}`) : 'Offline mode on this computer',
+  stackHtml: stackHTML(stack),
+  whyOpen: !stack.live ? 'When a model is connected, this section names it and its maker. The live site uses openly published models, which the team chose because it can name exactly which model wrote each answer and swap it for another one, and because the host serves them quickly enough for a live demo.'
+    : stack.provider === 'groq' ? `Why open models? They are openly published, so the team can name exactly which model wrote each answer and swap it for another one, and ${host} serves them quickly enough for a live demo.`
+      : stack.provider === 'local' ? 'This model is openly published and runs on this computer, so the team can name it, swap it for another one, and keep every question on this device.'
+        : 'The server is using a hosted model right now. The team prefers openly published models, because it can name exactly which model wrote each answer and swap it for another one.',
   fairPct: Math.round(FAIR * 100), streak: STREAK,
 });
 const enc = Store.isEncrypted();
 $('#encStatus').classList.add(enc ? 'good' : 'warn');
 bind({
   encStatus: enc ? 'Encryption is on in this browser.' : 'Encryption is not available in this browser.',
-  encStatusNote: enc ? 'AES-GCM 256, non-extractable key.' : 'Data is stored on this device without encryption.',
+  encStatusNote: enc ? 'AES-GCM 256 with a key that cannot be read out.' : 'Data is stored on this device without encryption.',
 });
 
 // Interactive demonstration: the real one-off dip detector on day 4 of the sample two weeks.
@@ -33,7 +51,7 @@ const MIN = Number(range.min), MAX = Number(range.max);
 
 // The demo always uses sample values, so its chip shows in every state.
 const chip = $('#demoSample'); chip.hidden = false; chip.classList.add('show');
-bind({ demoIntro: `These are the ${dayTests.length} tests from day ${DAY} of the sample two weeks. One of them, at ${fmtTime(dip.t)}, came in at ${original} Mbps. Change it and watch the engine decide.` });
+bind({ demoIntro: `These are the ${dayTests.length} tests from day ${DAY} of the sample two weeks. One of them, at ${fmtTime(dip.t)}, came in at ${original} Mbps. Change that number and watch the engine decide.` });
 
 function render(value) {
   const v = Math.min(MAX, Math.max(MIN, Math.round(Number(value) || MIN)));

@@ -8,7 +8,11 @@
 .chart{padding-top:6px;flex:1;display:flex;flex-direction:column}
 .chart .bars{height:auto;flex:1;min-height:250px;gap:10px;align-items:stretch}
 .chart .bar{height:auto}
-.chart .bar .val{left:50%;right:auto;top:9px;transform:translateX(-50%);color:#fff;font-size:12px}
+.chart .bar .val{left:50%;right:auto;top:8px;transform:translateX(-50%);color:#fff;font-size:12px;z-index:3;padding:2px 5px;border-radius:6px;background:var(--cobalt)}
+.chart .bar.low .val{background:var(--bad)}
+.chart .bar .fill{z-index:auto}
+.headline,.dip .why,.count .t{text-wrap:pretty}
+.aihead{display:flex;justify-content:space-between;align-items:center;gap:6px 12px;flex-wrap:wrap}
 .chart .bar.empty .ghost{background:transparent}
 .chart .xlabels span{line-height:1.35}
 .chart .xlabels span b{display:block;font-weight:700;color:var(--ink-2)}
@@ -73,7 +77,7 @@
 @media (max-width:720px){
   .headline{font-size:22px}
   .chart .bars{min-height:190px;gap:5px}.chart .xlabels{gap:5px}.marks14{column-gap:5px}
-  .chart .bar .val{font-size:9px;top:6px;letter-spacing:-.03em}
+  .chart .bar .val{font-size:9px;top:5px;letter-spacing:-.03em;padding:1px 2px;border-radius:4px}
   .chart .bar .fill,.chart .bar .ghost{border-radius:6px 6px 3px 3px}
   .chart .xlabels span{font-size:11px}.chart .xlabels em{display:none}
   .bracket{font-size:10px}
@@ -131,7 +135,7 @@
       </div>
     </div>
 
-    <div class="empty" id="empty" hidden><div class="h2" style="margin-bottom:8px">No tests yet</div><p class="body" style="max-width:460px;margin:0 auto 16px">Your history fills in as you run speed tests. Run your first test, or load two weeks of labelled sample data for a demo.</p><div class="row gap12" style="justify-content:center;flex-wrap:wrap"><button class="btn primary" data-href="test.html">Run my first test</button><button class="btn ghost" data-demo>Load sample data</button></div></div>
+    <div class="empty" id="empty" hidden><div class="h2" style="margin-bottom:8px">No tests yet</div><p class="body" style="max-width:460px;margin:0 auto 16px">Your history fills in as you run speed tests. You can run your first test now, or load two weeks of labelled sample data for a demo.</p><div class="row gap12" style="justify-content:center;flex-wrap:wrap"><button class="btn primary" data-href="test.html">Run my first test</button><button class="btn ghost" data-demo>Load sample data</button></div></div>
 
     <div class="g" id="grid" data-wait>
       <!-- 14-DAY CHART -->
@@ -159,7 +163,7 @@
 
       <!-- AI ANOMALY CARD -->
       <section class="ai-card span-4 col gap16">
-        <div class="row between">
+        <div class="aihead">
           <span class="ai-tag"><svg viewBox="0 0 24 24" fill="#8B5CF6"><path d="M12 2l1.900 5.600a3 3 0 0 0 1.900 1.900L21.400 11.400l-5.600 1.900a3 3 0 0 0-1.900 1.900L12 20.800l-1.900-5.600a3 3 0 0 0-1.900-1.900L2.600 11.400l5.600-1.900a3 3 0 0 0 1.900-1.900z"/></svg>PROOF AI</span>
           <span class="ai-meta">Computed on this device</span>
         </div>
@@ -174,7 +178,7 @@
         </div>
         <p class="body" style="font-size:14px" data-b="keptHtml"></p>
         <div class="row gap8" style="flex-wrap:wrap" data-b="chipsHtml"></div>
-        <div class="ai-note">Computed on this device with a median and outlier check. No data left your device.</div>
+        <div class="ai-note">Worked out on this device with no language model called, and no data left your device.</div>
       </section>
 
       <!-- TIME OF DAY -->
@@ -185,9 +189,9 @@
 
       <!-- RECENT TESTS -->
       <section class="card span-12 col gap16">
-        <div class="row between" style="gap:10px"><div><div class="h3" data-b="tableTitle">Recent tests</div><div class="small">Each test measures download, upload, and response time</div></div><button class="chip" id="allBtn" style="cursor:pointer"></button></div>
+        <div class="row between" style="gap:10px"><div><div class="h3" data-b="tableTitle">Recent tests</div><div class="small">Every test measures download speed, upload speed, and response time</div></div><button class="chip" id="allBtn" style="cursor:pointer"></button></div>
         <div class="tt" id="table"></div>
-        <div class="small">Ignored tests stay in your history. They are left out of the daily median so one bad moment cannot decide your result. Practice tests and router checks are labelled.</div>
+        <div class="small">Ignored tests stay in your history, but they are left out of the daily median so that one bad moment cannot decide your result. Practice tests and router checks are labelled.</div>
       </section>
     </div>
   </main>

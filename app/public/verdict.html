@@ -2,7 +2,7 @@
 <title>Wi-Fight · Your verdict</title><link rel="stylesheet" href="css/ds.css">
 <style>
 /* ---------- dark reveal ---------- */
-.reveal{position:relative;overflow:hidden;border-radius:28px;background:var(--bg);color:var(--ink);padding:28px 36px 30px;display:flex;flex-direction:column;gap:22px;min-height:100%}
+.reveal{position:relative;overflow:hidden;border-radius:28px;background:var(--bg);color:var(--ink);padding:26px 36px 26px;display:flex;flex-direction:column;justify-content:space-between;gap:20px;min-height:100%}
 .reveal .glow.bad{background:radial-gradient(75% 62% at 18% 34%,rgba(229,72,77,.44),transparent 70%),radial-gradient(50% 50% at 96% 100%,rgba(39,71,245,.28),transparent 70%)}
 .reveal > *:not(.glow){position:relative;z-index:1}
 .story{display:flex;gap:6px}
@@ -10,18 +10,26 @@
 .story i.on{background:#fff}
 .story i.now{background:linear-gradient(90deg,#fff 70%,rgba(255,255,255,.22) 70%)}
 .reveal .eyebrow{color:var(--ink-2)}
-.hero{font-size:124px;line-height:.9;letter-spacing:-.045em}
+.hero{font-size:120px;line-height:.9;letter-spacing:-.045em}
 .hero .pct{font-size:.5em;letter-spacing:-.02em;margin-left:2px;color:var(--ink-2)}
 .herosub{font:600 20px/1.2 var(--body);color:var(--ink)}
-.replay{display:grid;grid-template-columns:1fr 1fr;gap:0 28px;border-top:1px solid rgba(255,255,255,.14)}
-.replay .cell{padding:16px 0 14px;display:flex;flex-direction:column;gap:6px}
-.replay .cell:nth-child(n+3){border-top:1px solid rgba(255,255,255,.14)}
+.replay{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0 24px;border-top:1px solid rgba(255,255,255,.14);border-bottom:1px solid rgba(255,255,255,.14)}
+.replay .cell{padding:14px 0 14px;display:flex;flex-direction:column;gap:6px}
 .replay .lab{font:600 13px/1.2 var(--body);color:var(--ink-2)}
 .replay .val{font-size:34px;line-height:1}
 .replay .val .unit{font-size:14px;color:var(--ink-2)}
 .replay .val .pre{font:600 14px var(--body);color:var(--ink-2);letter-spacing:0;margin-right:5px}
 .replay .val.bad{color:var(--bad)}
-.revealfoot{font:500 12px/1.4 var(--body);color:var(--ink-3)}
+.revealfoot{font:500 12px/1.4 var(--body);color:var(--ink-3);text-wrap:pretty}
+/* the two headline figures side by side: the share of speed, and what it costs */
+.herorow{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,260px);gap:24px;align-items:center}
+.moneybox{border-radius:20px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06);padding:18px 18px 16px;display:flex;flex-direction:column;gap:8px;backdrop-filter:blur(6px)}
+.moneybox .lab{font:600 13px/1.2 var(--body);color:var(--ink-2)}
+.moneybox .amt{font-size:56px;line-height:.95;white-space:nowrap}
+.moneybox .amt .pre{font:600 14px var(--body);color:var(--ink-2);letter-spacing:0;margin-right:6px}
+.moneybox .amt .unit{font-size:14px;color:var(--ink-2)}
+.moneybox small{font:500 12.5px/1.4 var(--body);color:var(--ink-2);text-wrap:pretty}
+.reveal.isbad .moneybox .amt .n{color:var(--bad)}.reveal.isgood .moneybox .amt .n{color:var(--good)}
 
 /* ---------- share card ---------- */
 .sharecol{align-items:center;gap:16px;height:100%}
@@ -64,13 +72,16 @@
 
 /* ---------- 14-day strip ---------- */
 .bars.strip{height:132px;gap:8px}
-.bars.strip .val{top:7px;color:#fff}
 .bars.strip .threshold span{top:-24px}
+/* bar values sit on a patch of the bar's own colour, so the fair line never runs through a number */
+.bars.strip .fill{z-index:auto}
+.bars.strip .val{z-index:3;top:6px;left:50%;right:auto;transform:translateX(-50%);padding:2px 4px;border-radius:6px;background:var(--cobalt);color:#fff}
+.bars.strip .bar.low .val{background:var(--bad)}
 .meter{position:relative;height:14px;border-radius:7px;background:rgba(255,255,255,.12);margin-top:10px}
 .meter b{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:7px;background:var(--bad)}
 .meter u{position:absolute;left:80%;top:-5px;bottom:-5px;width:3px;border-radius:2px;background:#fff}
-.meterlab{display:flex;justify-content:space-between;font:600 12px var(--body);color:var(--ink-2);margin-top:9px}
-.meterlab span:nth-child(2){color:var(--ink)}
+.meterlab{position:relative;display:flex;justify-content:space-between;font:600 12px var(--body);color:var(--ink-2);margin-top:9px}
+.meterlab span:nth-child(2){position:absolute;right:20%;margin-right:8px;color:var(--ink);white-space:nowrap}
 .xlabels.strip{gap:8px}
 
 /* ---------- reward badge ---------- */
@@ -86,14 +97,16 @@
   .reveal{padding:20px 20px 22px;border-radius:24px;gap:18px}
   .hero{font-size:92px}
   .herosub{font-size:18px}
-  .replay{gap:0 16px}
-  .replay .val{font-size:27px}
+  .herorow{grid-template-columns:1fr;gap:18px}
+  .moneybox .amt{font-size:48px}
+  .replay{gap:0 12px}
+  .replay .val{font-size:24px;white-space:nowrap}
+  .meterlab span:first-child{visibility:hidden}
   .replay .val .unit,.replay .val .pre{font-size:12px}
   .replay .lab{font-size:12px}
   .aiwrap{padding:18px}
   .aigrid{grid-template-columns:1fr;gap:18px}
   .bars.strip{gap:4px;height:120px}.xlabels.strip{gap:4px}
-  .bars.strip .val{font-size:8.5px;letter-spacing:-.03em;top:6px}
   .threshold span{font-size:10px}
   .act .btn{align-self:stretch}
 }
@@ -115,6 +128,12 @@ button.quiet{background:none;border:0;cursor:pointer;padding:6px 2px}
 #sofar.isbad .sfnum{color:var(--bad)}#sofar.isgood .sfnum{color:var(--good)}
 @media (max-width:720px){.waithead{font-size:30px}.sfnum{font-size:64px}}
 /* guided demo: the block being talked about gets a ring for a moment */
+.aihead{display:flex;justify-content:space-between;align-items:center;gap:8px 12px;flex-wrap:wrap}
+.aihead .ai-meta{display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ai-text{text-wrap:pretty}
+#labelCard #label{flex:1;display:flex}
+#labelCard .bf{flex:1;display:flex;flex-direction:column}
+#labelCard .bf-row{flex:1}
 #reveal,.aiwrap,#sharecard,.waitcard{scroll-margin:16px 0;transition:box-shadow .3s}
 .beat{box-shadow:0 0 0 4px rgba(39,71,245,.55),0 0 0 10px rgba(39,71,245,.14) !important}
 </style></head><body>
@@ -173,13 +192,13 @@ button.quiet{background:none;border:0;cursor:pointer;padding:6px 2px}
           <div class="kv"><span class="k">You pay for</span><span class="v" data-b="sfPaid"></span></div>
           <div class="kv"><span class="k">Days below the fair line so far</span><span class="v" data-b="sfBelow"></span></div>
         </div>
-        <div class="small">So far only. This is a preview, not your verdict. It can still change before day 14.</div>
+        <div class="small">This is only a preview of your verdict, and it can still change before day 14.</div>
         <button class="btn ghost sm" data-href="dashboard.html" style="align-self:flex-start">Open the dashboard</button>
       </section>
       <section class="card span-5 col gap12" id="nosofar" hidden>
         <div class="eyebrow">So far</div>
         <div class="h3">No tests yet</div>
-        <p class="body">Run your first test to start the two-week check. A preview of your reading will show here as soon as there is one.</p>
+        <p class="body">Run your first test to start the two-week check, and a preview of your result will appear here as soon as there is one.</p>
       </section>
     </div>
 
@@ -194,18 +213,24 @@ button.quiet{background:none;border:0;cursor:pointer;padding:6px 2px}
             <div class="eyebrow">Your two-week verdict</div>
             <span data-b="statusHtml"></span>
           </div>
-          <div class="col gap12">
-            <div class="num hero"><span data-b="pct">0</span><span class="pct">%</span></div>
-            <div class="herosub">of the speed you pay for</div>
-            <div class="heromsg" data-b="heroMsg"></div>
-            <div><div class="meter" role="img" id="meter"><b id="meterFill"></b><u></u></div>
-            <div class="meterlab"><span>0</span><span data-b="fairLab"></span><span data-b="planLab"></span></div></div>
+          <div class="herorow">
+            <div class="col gap12">
+              <div class="num hero"><span data-b="pct">0</span><span class="pct">%</span></div>
+              <div class="herosub">of the speed you pay for</div>
+              <div class="heromsg" data-b="heroMsg"></div>
+            </div>
+            <div class="moneybox">
+              <span class="lab">Paid for, not received</span>
+              <span class="num amt"><span class="pre">about</span><span class="n">$<span data-b="lost">0</span></span><span class="unit">a month</span></span>
+              <small data-b="moneyNote"></small>
+            </div>
           </div>
-          <div class="replay" style="margin-top:auto">
+          <div><div class="meter" role="img" id="meter"><b id="meterFill"></b><u></u></div>
+          <div class="meterlab"><span>0</span><span data-b="fairLab"></span><span data-b="planLab"></span></div></div>
+          <div class="replay">
             <div class="cell"><span class="lab">You paid for</span><span class="num val"><span data-b="paid">0</span><span class="unit">Mbps</span></span></div>
             <div class="cell"><span class="lab">You got</span><span class="num val" id="gotVal"><span data-b="got">0</span><span class="unit">Mbps</span></span></div>
-            <div class="cell"><span class="lab">Days below the fair line</span><span class="num val"><span data-b="below">0</span><span class="unit" data-b="ofDays"></span></span></div>
-            <div class="cell"><span class="lab">Paid for, not received</span><span class="num val"><span class="pre">about</span>$<span data-b="lost">0</span><span class="unit">a month</span></span></div>
+            <div class="cell"><span class="lab">Below fair line</span><span class="num val"><span data-b="below">0</span><span class="unit" data-b="ofDays"></span></span></div>
           </div>
           <div class="revealfoot" data-b="basis"></div>
         </section>
@@ -231,20 +256,20 @@ button.quiet{background:none;border:0;cursor:pointer;padding:6px 2px}
           <button class="btn sm" id="shareBtn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg>Share</button>
           <button class="quiet" id="saveBtn" type="button">Save image</button>
         </div>
-        <div class="small" style="text-align:center">No name, address, or provider on this card.</div>
+        <div class="small" style="text-align:center;text-wrap:balance">The card shows no name, no address, and no provider.</div>
       </section>
 
       <!-- BROADBAND FACTS -->
-      <section class="card span-5 col gap12">
-        <div><div class="h3">Promised vs. what you got</div><div class="small">The plan label beside your own measurements</div></div>
+      <section class="card span-5 col gap12" id="labelCard">
+        <div><div class="h3">Promised vs. what you got</div><div class="small">The label for your plan, next to your own measurements</div></div>
         <div id="label"></div>
       </section>
 
       <!-- PROOF AI EXPLANATION -->
       <section class="ai-card span-7 aiwrap col gap20">
-        <div class="row between" style="flex-wrap:wrap;gap:8px">
+        <div class="aihead">
           <span class="ai-tag" style="font-size:13px"><svg viewBox="0 0 24 24" fill="#8B5CF6"><path d="M12 2l1.900 5.600a3 3 0 0 0 1.900 1.900L21.400 11.400l-5.600 1.900a3 3 0 0 0-1.900 1.900L12 20.800l-1.900-5.600a3 3 0 0 0-1.900-1.900L2.600 11.400l5.600-1.900a3 3 0 0 0 1.900-1.900z"/></svg>PROOF AI · YOUR VERDICT IN PLAIN WORDS</span>
-          <span class="ai-meta" data-b="aiMeta"></span>
+          <span class="ai-meta" data-b="aiMetaHtml"></span>
         </div>
         <p class="ai-text" style="font-size:20px;line-height:1.4" data-b="aiSentenceHtml">Proof AI is reading your results.</p>
         <div class="reasons" data-b="aiReasonsHtml"></div>

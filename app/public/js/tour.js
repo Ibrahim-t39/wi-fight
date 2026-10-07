@@ -1,26 +1,25 @@
 // Wi-Fight guided demo. A presenter bar that walks through the app one step at a time,
 // so a live demo never gets stuck. Loaded on every page. Does nothing until the demo is started.
 //   Start:  a button with [data-tour-start], or add ?tour=1 to any address.
-//   Keys:   Right arrow = next, Left arrow = back, H = hide or show the bar, Esc = hide.
+//   Keys:   Right arrow = next, Left arrow = back, S = show or hide what to say, H = hide or show the bar, Esc = hide.
 //   Pages can offer a shortcut by defining window.wfDemoFill = async () => { ... } ("Do it for me").
 import { Store } from './store.js';
 
 const KEY = 'wf.tour.v1';
 export const STEPS = [
-  { page: 'index.html', tag: 'The goal', title: 'The problem', say: 'You pay for a speed. You cannot tell if you get it, and you cannot prove it. Wi-Fight checks, and gives you proof. That is UN Goal 9, target 9.c: affordable internet.', act: 'Point at the three cards under the headline, then press Next.' },
-  { page: 'onboarding-consent.html', tag: 'Security', title: 'Consent comes first', say: 'Nothing runs until you agree. We list what is collected and what never is. We are honest that M-Lab publishes test results.', act: 'Tick both boxes and continue. Or press "Do it for me".' },
-  { page: 'onboarding-signin.html', tag: 'Security', title: 'No password to steal', say: 'Sign-in uses a one-time code or a passkey, so there is no password to leak. In this prototype no email is sent, so any 6 digits work.', act: 'Type any email, press the button, then type any 6 digits. Or press "Do it for me".' },
-  { page: 'onboarding-plan.html', tag: 'Proof AI', title: 'Proof AI reads the bill', say: 'Proof AI reads a photo of the bill, pulls out the price, and flags a fee that is not a tax. The photo is never stored.', act: 'Press "Do it for me" and choose northstar-bill.png from the demo-files folder. Or upload it yourself.' },
-  { page: 'test.html', tag: 'Core', title: 'The first speed test', say: "For the demo this is a simulated test, and the app labels it that way. The real one is M-Lab's open test, the same one researchers use, one click away.", act: 'Press "Start test", or "Do it for me". Then press Next.' },
-  { page: 'dashboard.html', prep: 9, tag: 'Core', title: 'The answer at a glance', say: 'Nine days in, we get 78 percent of the speed we pay for. Proof AI says it has lasted four days in a row and points to the provider.', act: 'Point at the ring, the Proof AI card, and the Broadband Facts card.' },
-  { page: 'history.html', tag: 'Proof AI', title: 'Real problems, not flukes', say: 'Two slow tests were one-off dips, so Proof AI ignored them. Four full days stayed low, so those count.', act: 'Press "Show what Proof AI ignored".' },
-  { page: 'diagnosis.html', tag: 'Proof AI', title: 'Watch Proof AI decide', say: 'Is it our Wi-Fi or the provider? Each piece of evidence moves the score. It lands on the provider, with high confidence.', act: 'It plays by itself. Press "Watch Proof AI decide" to play it again.' },
-  { page: 'chat.html', tag: 'Proof AI', title: 'Ask it anything', say: 'This is a real language model answering from our own results. Every number it writes is checked against our data.', act: 'Press "Do it for me" to ask a question. Then type "Can I talk to a person?" to show the handoff to a support agent.' },
-  { page: 'verdict.html', prep: 14, tag: 'Core', title: 'The two-week verdict', say: 'After 14 days the verdict is in: 78 percent, below the fair line on 9 of 14 days. There is a card to share.', act: 'Point at the verdict and the share card.' },
-  { page: 'report.html', tag: 'Security', title: 'AI drafts, you approve', say: 'Proof AI drafts the message. Nothing is sent until we approve it. The fingerprint breaks if anyone changes a number.', act: 'Press "Try to tamper with it" and change the number. Or press "Do it for me".' },
-  { page: 'privacy.html', tag: 'Security', title: 'Your data, locked', say: 'Everything is encrypted on this device. Here is what is actually stored. One button deletes it all, key included.', act: 'Open "See what is stored on disk", then search for your name. Or press "Do it for me".' },
-  { page: 'about.html', tag: 'The goal', title: 'Why it matters', say: 'Affordable internet only counts if you get what you pay for. Here is what works today, what does not yet, and what comes next.', act: 'Show the dip detector slider, then the limitations.' },
+  { page: 'index.html', secs: 20, tag: 'UN Goal 9', title: 'The problem and the goal', say: 'People pay for an internet speed and have no way to tell whether they get it. Wi-Fight checks for two weeks and gives them proof, which supports UN Goal 9: affordable internet access.', act: 'Point at the headline and the 78 percent example, then press Next.' },
+  { page: 'onboarding-consent.html', secs: 15, tag: 'Security', title: 'Consent comes first', say: 'Nothing runs until the user agrees. The page lists what is collected and what never is.', act: 'Press "Do it for me", or tick both boxes and continue.' },
+  { page: 'onboarding-signin.html', secs: 15, tag: 'Security', title: 'No password to steal', say: 'Sign-in uses a one-time code, so there is no password to leak. For the demo any 6 digits work.', act: 'Press "Do it for me", or type any email and any 6 digits.' },
+  { page: 'onboarding-plan.html', secs: 35, tag: 'Proof AI', title: 'Proof AI reads the bill', say: 'Instead of typing the plan, we give Proof AI a photo of the bill. It reads the plan, the price, and each fee, and it flags the fee that is not a tax. The photo is never stored.', act: 'Press "Do it for me" and choose northstar-bill.png from the demo-files folder.' },
+  { page: 'test.html', secs: 20, tag: 'Core', title: 'The first speed test', say: "For the demo this is a simulated test, and the app labels it that way. The real one uses M-Lab's open test and is one click away.", act: 'Press "Do it for me", wait for the result, then press Next.' },
+  { page: 'dashboard.html', prep: 9, secs: 35, tag: 'Core', title: 'Nine days later', say: 'This home gets 78 percent of the speed it pays for. Proof AI set aside two one-off dips, and it still found four full days in a row under the fair line.', act: 'Point at the ring, then at the steps inside the Proof AI card.' },
+  { page: 'diagnosis.html', secs: 35, tag: 'Proof AI', title: 'Provider or home Wi-Fi?', say: 'Each piece of evidence moves the score. The speed is slow next to the router too, it drops in the evening, and it has lasted for days, so the score lands on the provider.', act: 'It plays by itself. Read the score as it moves from 50 to 86.' },
+  { page: 'chat.html', secs: 35, tag: 'Proof AI', title: 'Ask it anything', say: 'This is a real language model answering from our own results, and the app checks every number it writes. If it cannot help, it can hand the case to a support agent.', act: 'Press "Do it for me". If there is time, type "Can I talk to a person?"' },
+  { page: 'verdict.html', prep: 14, secs: 20, tag: 'Core', title: 'The two-week verdict', say: 'After 14 days the verdict is in. This home was below the fair line on 9 of 14 days, which is about 18 dollars a month paid for speed that never arrived.', act: 'Point at the 78 percent and the dollar figure, then press Next.' },
+  { page: 'report.html', secs: 35, tag: 'Security', title: 'A report nobody can quietly edit', say: 'Proof AI drafts the letter, and nothing is sent until we approve it. Every report carries a fingerprint, so changing a single number makes it stop matching.', act: 'Press "Do it for me" and watch the fingerprint break.' },
+  { page: 'privacy.html', secs: 25, tag: 'Security', title: 'Your data, locked', say: 'Everything is encrypted on this device. On the left is what we see, and on the right is what is actually saved. Our name is nowhere in it.', act: 'Press "Do it for me". Then go to the closing slides.' },
 ];
+export const BUDGET = 300; // seconds: the live demo may take at most 5 minutes
 
 const here = () => (location.pathname.split('/').pop() || 'index.html');
 const read = () => { try { return JSON.parse(localStorage.getItem(KEY)) || null; } catch { return null; } };
@@ -32,27 +31,31 @@ function css() {
   if (document.getElementById('tour-css')) return;
   const st = document.createElement('style'); st.id = 'tour-css';
   st.textContent = `
-.tour{position:fixed;right:18px;bottom:18px;z-index:80;width:400px;max-width:calc(100vw - 24px);background:#0B0F1A;color:#F5F7FB;border-radius:20px;box-shadow:0 18px 50px rgba(11,15,26,.45);font-family:var(--body,system-ui);overflow:hidden;border:1px solid #232A3B}
+.tour{position:fixed;right:14px;bottom:14px;z-index:80;width:336px;max-width:calc(100vw - 24px);background:#0B0F1A;color:#F5F7FB;border-radius:20px;box-shadow:0 18px 50px rgba(11,15,26,.45);font-family:var(--body,system-ui);overflow:hidden;border:1px solid #232A3B}
 .tour *{box-sizing:border-box}
-.tour-top{display:flex;align-items:center;gap:8px;padding:11px 12px 9px 16px}
+.tour-top{display:flex;align-items:center;gap:7px;padding:9px 10px 7px 14px}
 .tour-step{font:700 11px/1 var(--body,system-ui);letter-spacing:.08em;text-transform:uppercase;color:#AEB5C6}
 .tour-tag{font:700 11px/1 var(--body,system-ui);padding:5px 8px;border-radius:999px;background:rgba(39,71,245,.28);color:#B8C4FF}
 .tour-tag.ai{background:linear-gradient(120deg,#2747F5,#8B5CF6 55%,#2FD9A0);color:#fff}
 .tour-tag.sec{background:rgba(61,220,151,.18);color:#6EE7B0}
-.tour-time{margin-left:auto;font:600 12px/1 ui-monospace,Menlo,monospace;color:#AEB5C6}
+.tour-time{margin-left:auto;font:600 12px/1 ui-monospace,Menlo,monospace;color:#AEB5C6;white-space:nowrap}
+.tour-step,.tour-tag{white-space:nowrap}
+.tour-time.late{color:#FFC24B}
 .tour-x{width:28px;height:28px;border-radius:50%;border:0;background:rgba(255,255,255,.08);color:#F5F7FB;font:600 14px/1 system-ui;cursor:pointer}
 .tour-bar{height:3px;background:#232A3B}.tour-bar i{display:block;height:100%;background:linear-gradient(90deg,#2747F5,#8B5CF6,#2FD9A0);transition:width .3s}
-.tour-body{padding:12px 16px 4px}
-.tour-title{font:700 19px/1.2 var(--display,system-ui);letter-spacing:-.01em}
-.tour-row{display:flex;gap:9px;margin-top:9px;font:500 13.5px/1.4 var(--body,system-ui);color:#D8DCE8}
+.tour-body{padding:9px 14px 2px}
+.tour-title{font:700 16px/1.2 var(--display,system-ui);letter-spacing:-.01em}
+.tour-row{display:flex;gap:8px;margin-top:6px;font:500 12.5px/1.38 var(--body,system-ui);color:#D8DCE8}
 .tour-row b{flex:none;width:34px;font:700 10.5px/1.9 var(--body,system-ui);letter-spacing:.08em;text-transform:uppercase;color:#8A90A0}
+.tour-due{margin-top:8px;font:600 11.5px/1 var(--body,system-ui);color:#8A90A0}
 .tour-off{margin-top:9px;padding:8px 10px;border-radius:10px;background:rgba(255,194,75,.14);color:#FFD88A;font:600 12.5px/1.35 var(--body,system-ui)}
 .tour-off a{color:#fff;text-decoration:underline;cursor:pointer}
-.tour-btns{display:flex;gap:8px;padding:12px 12px 12px 16px;align-items:center}
-.tour-btns button{height:38px;border-radius:999px;border:0;padding:0 15px;font:600 13.5px/1 var(--body,system-ui);cursor:pointer}
+.tour-btns{display:flex;gap:6px;padding:9px 10px 10px 14px;align-items:center}
+.tour-btns button{height:34px;border-radius:999px;border:0;padding:0 13px;font:600 13px/1 var(--body,system-ui);cursor:pointer}
 .tour-fill{background:rgba(255,255,255,.1);color:#F5F7FB}.tour-fill[disabled]{opacity:.6;cursor:progress}
 .tour-back{background:transparent;color:#AEB5C6;margin-left:auto}
-.tour-next{background:#2747F5;color:#fff;min-width:92px}
+.tour-next{background:#2747F5;color:#fff;min-width:76px}
+.tour-say{background:transparent;color:#8FA4FF;border:0;padding:0;margin-top:6px;font:600 11.5px/1 var(--body,system-ui);cursor:pointer;text-decoration:underline;text-underline-offset:3px}
 .tour.min{width:auto}.tour.min .tour-body,.tour.min .tour-btns,.tour.min .tour-bar,.tour.min .tour-time{display:none}.tour.min .tour-top{padding:9px 9px 9px 14px;cursor:pointer}
 .tour-skip{position:fixed;inset:0;z-index:90;background:#070A12;color:#F5F7FB;display:grid;place-items:center;text-align:center;padding:24px;animation:tourfade .25s}
 .tour-skip .big{font:700 clamp(40px,7vw,84px)/1.05 var(--display,system-ui);letter-spacing:-.03em}
@@ -79,17 +82,19 @@ function render() {
   const step = STEPS[s.i]; const off = here() !== step.page;
   const el = document.createElement('aside'); el.className = 'tour' + (s.min ? ' min' : ''); el.setAttribute('aria-label', 'Guided demo');
   const tagClass = step.tag === 'Proof AI' ? 'ai' : step.tag === 'Security' ? 'sec' : '';
-  el.innerHTML = `<div class="tour-top"><span class="tour-step">Demo ${s.i + 1} of ${STEPS.length}</span><span class="tour-tag ${tagClass}">${esc(step.tag)}</span><span class="tour-time" data-t>0:00</span><button class="tour-x" data-min title="Hide or show (H)" aria-label="Hide or show the demo bar">${s.min ? '+' : '−'}</button><button class="tour-x" data-end title="End the demo" aria-label="End the demo">×</button></div>
+  el.innerHTML = `<div class="tour-top"><span class="tour-step">Stop ${s.i + 1}/${STEPS.length}</span><span class="tour-tag ${tagClass}">${esc(step.tag)}</span><span class="tour-time" data-t>0:00</span><button class="tour-x" data-min title="Hide or show (H)" aria-label="Hide or show the demo bar">${s.min ? '+' : '−'}</button><button class="tour-x" data-end title="End the demo" aria-label="End the demo">×</button></div>
     <div class="tour-bar"><i style="width:${((s.i + 1) / STEPS.length) * 100}%"></i></div>
     <div class="tour-body"><div class="tour-title">${esc(step.title)}</div>
-      <div class="tour-row"><b>Say</b><span>${esc(step.say)}</span></div>
+      ${s.say ? `<div class="tour-row"><b>Say</b><span>${esc(step.say)}</span></div>` : ''}
       <div class="tour-row"><b>Do</b><span>${esc(step.act)}</span></div>
+      <div class="tour-due">Leave this stop by ${Math.floor(STEPS.slice(0, s.i + 1).reduce((n, x) => n + (x.secs || 0), 0) / 60)}:${pad(STEPS.slice(0, s.i + 1).reduce((n, x) => n + (x.secs || 0), 0) % 60)}<button type="button" class="tour-say" data-say style="margin:0 0 0 10px">${s.say ? 'Hide what to say' : 'Show what to say'}</button></div>
       ${off ? `<div class="tour-off">This page is not part of step ${s.i + 1}. <a data-return>Go to step ${s.i + 1}</a></div>` : ''}</div>
     <div class="tour-btns"><button class="tour-fill" data-fill hidden>Do it for me</button><button class="tour-back" data-back ${s.i === 0 ? 'disabled style="opacity:.35"' : ''}>Back</button><button class="tour-next" data-next>${s.i === STEPS.length - 1 ? 'Finish' : 'Next'}</button></div>`;
   document.body.appendChild(el);
   // on phones the bar sits at the top, so make room for it instead of covering the page header
   if (window.matchMedia('(max-width:720px)').matches) document.body.style.paddingTop = (el.offsetHeight + 14) + 'px';
-  const tick = () => { const st = read(); const t = el.querySelector('[data-t]'); if (!st || !t) return; const sec = Math.max(0, Math.floor((Date.now() - st.t0) / 1000)); t.textContent = `${Math.floor(sec / 60)}:${pad(sec % 60)}`; };
+  const due = STEPS.slice(0, s.i + 1).reduce((n, x) => n + (x.secs || 0), 0); const mmss = (n) => `${Math.floor(n / 60)}:${pad(n % 60)}`;
+  const tick = () => { const st = read(); const t = el.querySelector('[data-t]'); if (!st || !t) return; const sec = Math.max(0, Math.floor((Date.now() - st.t0) / 1000)); t.textContent = `${mmss(sec)}/${mmss(BUDGET)}`; t.classList.toggle('late', sec > due); t.title = `Aim to leave this stop by ${mmss(due)}`; };
   tick(); clearInterval(render.h); render.h = setInterval(tick, 1000);
   // "Do it for me" appears when the page offers a shortcut
   const fill = el.querySelector('[data-fill]');
@@ -99,6 +104,7 @@ function render() {
   el.querySelector('[data-next]').onclick = () => go(s.i + 1);
   el.querySelector('[data-back]').onclick = () => { if (s.i > 0) go(s.i - 1); };
   el.querySelector('[data-end]').onclick = end;
+  el.querySelector('[data-say]').onclick = () => { const st = read(); if (!st) return; st.say = !st.say; write(st); render(); };
   el.querySelector('[data-min]').onclick = (e) => { e.stopPropagation(); toggleMin(); };
   if (s.min) el.querySelector('.tour-top').onclick = toggleMin;
   const ret = el.querySelector('[data-return]'); if (ret) ret.onclick = () => go(s.i);
@@ -137,7 +143,7 @@ export function startDialog() {
   css();
   const back = document.createElement('div'); back.className = 'tour-dialog-back';
   back.innerHTML = `<div class="tour-dialog" role="dialog" aria-modal="true" aria-label="Start the guided demo">
-    <h2>Guided demo</h2><p>${STEPS.length} short steps, about 6 minutes. A bar in the corner tells you what to say and what to press. Right arrow goes to the next step.</p>
+    <h2>Guided demo</h2><p>${STEPS.length} stops, timed to fit a 5 minute demo. A small bar in the corner shows what to press and how you are doing on time. Press S to see what to say, and the right arrow key to go to the next stop.</p>
     <button class="pri" data-go="clean"><b>Start from the beginning</b><span>Clears Wi-Fight's data in this browser, then walks through sign-up, a speed test, and the results.</span></button>
     <button data-go="skip"><b>Skip the setup</b><span>Loads nine days of sample data and starts at the dashboard.</span></button>
     <button class="quiet" data-go="no">Not now</button></div>`;
@@ -148,7 +154,7 @@ export function startDialog() {
     if (how === 'no') { back.remove(); return; }
     await Store.load();
     if (how === 'clean') { await Store.wipe(); write({ on: true, i: 0, t0: Date.now(), min: false }); location.href = 'index.html'; }
-    else { write({ on: true, i: 5, t0: Date.now(), min: false }); back.remove(); await go(5); }
+    else { const at = STEPS.findIndex((x) => x.page === 'dashboard.html'); write({ on: true, i: at, t0: Date.now() - STEPS.slice(0, at).reduce((n, x) => n + (x.secs || 0), 0) * 1000, min: false }); back.remove(); await go(at); }
   });
 }
 
@@ -171,6 +177,7 @@ function init() {
     if (e.key === 'ArrowRight') { e.preventDefault(); go(st.i + 1); }
     else if (e.key === 'ArrowLeft') { e.preventDefault(); if (st.i > 0) go(st.i - 1); }
     else if (e.key === 'h' || e.key === 'H' || e.key === 'Escape') toggleMin();
+    else if (e.key === 's' || e.key === 'S') { st.say = !st.say; write(st); render(); }
   });
 }
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();

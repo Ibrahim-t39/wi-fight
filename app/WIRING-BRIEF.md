@@ -58,3 +58,29 @@ New shared pieces (read them, do not edit them):
 - Any element with the attribute `data-tour-start` opens the guided demo's start dialog.
 
 The server is running at http://localhost:4810 with a real local model (`gemma3:4b`). Do not stop or restart it.
+
+## Update: midterm polish round
+
+Read this section last. It overrides anything above that conflicts.
+
+**Why.** The team presents this to a professor and class. The live demo is at most 5 minutes. It is graded on design completeness, a working prototype, and clear use of AI and cybersecurity toward UN Goal 9 (affordable internet, targets 9.c and 9.1). The look must be excellent, and nothing may be overstated.
+
+**Writing rules for anything a user reads.**
+- No em dashes or en dashes anywhere. No arrows.
+- Avoid staccato copy: strings of two to four word sentences ("Fast. Simple. Honest."). Write full, natural sentences that flow, at about a 9th grade level. Short is good, choppy is not.
+- Never claim something the code does not do. Sample data, the simulated speed test, demo sign-in, and the simulated support agent are all labelled as such and must stay labelled.
+- The three themes must be easy to see and must not be buried: Proof AI, visible security, and UN Goal 9.
+
+**Naming the AI models.** Do not just say "Groq" or "AI". `public/js/models.js` names the real models from what the server reports:
+- `modelStack()` (async) returns `{ live, provider, host, text, photo }`.
+- `stackHTML(stack)` returns ready cards (model name, maker, logo, what it does, where it runs).
+- `modelChip(id)` returns a small pill with the logo and name. `modelInfo(id)` returns `{ id, name, maker, icon }`.
+- Styles `.mchip`, `.mstack`, `.mcard`, `.mico` are in `ds.css`.
+On the live site today that is GPT-OSS 120B (OpenAI's open-weight model) for writing, Qwen 3.8 27B (Alibaba Cloud's Qwen family) for reading bill photos, both hosted on Groq. Locally the server is in offline mode, so to see the live look in a test, stub the two endpoints with Playwright:
+`page.route('**/api/status', lambda r: r.fulfill(json={'live': True, 'provider': 'groq', 'model': 'openai/gpt-oss-120b', 'label': 'Groq (openai/gpt-oss-120b)'}))` and
+`page.route('**/api/models', lambda r: r.fulfill(json={'text': 'openai/gpt-oss-120b', 'photo': 'qwen/qwen3.8-27b', 'available': []}))`.
+Never hard-code a model name in a page: always render from `models.js`, and handle offline mode.
+
+**Recent behaviour you must not break.** Guided demo bar (`js/tour.js`, `window.wfDemoFill` per page); sign-in takes any 6 digits; the bill is uploaded by the user from `demo-files/` and recognized by hash; "Start test" runs the simulated test; "Simulate the two weeks" (`data-simulate`); the simulated agent handoff in chat; Log out (`data-logout`). `tests/e2e.py` must still pass (45 checks): run it from a scratch folder because it writes screenshots to the current folder.
+
+**How to work.** Edit only the files you are given. Look before you change: take screenshots at 1440x900 and 393x852 and open them. Fix what a careful designer would flag: uneven spacing, misaligned edges, cramped or orphaned text, weak hierarchy, inconsistent card padding or radius, low contrast, awkward empty space, anything that overflows on a phone. Keep the existing design language (see `design/04-design-direction.md`, `public/css/ds.css`). Do not edit `ds.css`, `shell.js`, `ai.js`, `tour.js`, `models.js`, `engine.js`, `store.js`, or `server.js`; if one needs a change, say so in your report. Finish with: files changed, what you checked and how, what you did not verify, `CONSOLE ERRORS`, and confirm no dashes.

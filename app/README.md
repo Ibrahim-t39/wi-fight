@@ -41,9 +41,9 @@ Every number the model writes is checked against your data. If it writes a numbe
 
 The app has a guided demo so a presenter never gets stuck.
 
-1. Open the site and press "Start the guided demo". Choose "Start from the beginning". You can also add `?tour=1` to any address.
-2. A bar in the corner shows what to say and what to press at each of the 13 stops. Right arrow is next, left arrow is back, H hides the bar.
-3. "Do it for me" on the bar does the step for you: it ticks consent, signs in, opens the file picker for the bill, runs the practice test, asks the chat question, and runs the tamper test.
+1. Add `?tour=1` to the site address, for example `wi-fight.vercel.app/?tour=1`, and choose "Start from the beginning". Inside the app, the same button is on the Privacy and data page under "Demo and presenter tools", and under Demo in the sidebar.
+2. A bar in the corner shows what to say and what to press at each of the 11 stops, and a clock that counts toward the 5 minute limit. Right arrow is next, left arrow is back, H hides the bar.
+3. "Do it for me" on the bar does the step for you: it ticks consent, signs in, opens the file picker for the bill, runs the simulated test, asks the chat question, and runs the tamper test.
 4. The demo jumps ahead in time by loading sample data for day 9 and day 14. Sample data is labelled on every page.
 
 Shortcuts for a live demo, all labelled in the app:

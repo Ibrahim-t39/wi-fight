@@ -31,7 +31,8 @@
 .sh-mark svg{width:16px;height:16px}
 .sh-meta{font:500 10.5px/1.5 var(--body);color:var(--ink-3);text-align:right}
 .sh-title{font:700 28px/1.1 var(--display);letter-spacing:-.02em;margin-top:24px}
-.sh-info{display:grid;grid-template-columns:auto auto 1fr;gap:6px 26px;margin-top:16px}
+.sh-info{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:6px 26px;margin-top:16px}
+.sh-info div:last-child b{white-space:nowrap}
 .sh-info span{display:block;font:600 9.5px var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin-bottom:3px}
 .sh-info b{font:600 12.5px/1.3 var(--body)}
 .sh-sum{margin-top:22px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);padding:14px 16px}
@@ -65,6 +66,11 @@
 .draftmsg .subj b{color:var(--ink)}
 .tonerow{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .tonerow .chip{height:32px}
+.tonerow .pager[hidden]{display:none}
+#dnote{line-height:1.7}
+#dnote .mchip{height:24px;font-size:11.5px;padding:0 9px 0 6px;gap:5px;margin:0 2px;vertical-align:baseline}
+#dnote .mico{width:14px;height:14px;align-self:center}
+.draftcard .ai-text{text-wrap:balance}
 .ctl{display:grid;grid-template-columns:1.25fr 1fr 1.25fr;gap:8px}
 .ctl .btn{padding:0 10px;height:46px;font-size:14.5px}
 .ctl .btn svg{width:16px;height:16px;flex:none}
@@ -93,9 +99,9 @@
   .thumbpage{width:112px;height:146px;flex:none;border-radius:8px;background:#E9EBF0;overflow:hidden;position:relative;border:1px solid var(--line)}
   .thumbpage .paper{position:absolute;left:8px;top:8px;width:600px;max-width:none;transform:scale(.16);transform-origin:0 0;box-shadow:0 2px 14px rgba(11,15,26,.25)}
   .ctl .btn{font-size:14px;gap:6px}
-  .stickybar{display:flex;flex-direction:column;gap:10px;position:fixed;left:0;right:0;bottom:0;z-index:5;background:var(--surface);border-top:1px solid var(--line);border-radius:26px 26px 0 0;padding:14px 16px 98px;box-shadow:0 -8px 30px rgba(11,15,26,.10)}
-  .stickybar .btn{height:50px}
-  .stickybar .nosend{justify-content:center;font-size:12.5px}
+  .stickybar{display:flex;align-items:center;justify-content:space-between;gap:12px;position:fixed;left:0;right:0;bottom:0;z-index:5;background:var(--surface);border-top:1px solid var(--line);border-radius:24px 24px 0 0;padding:12px 16px 96px;box-shadow:0 -8px 30px rgba(11,15,26,.10)}
+  .stickybar .btn{height:48px;order:2;flex:none;padding:0 18px;font-size:15px}
+  .stickybar .nosend{display:none}
   .sendcard .sendbtn{display:none}
 }
 
@@ -147,9 +153,14 @@ pre.mono{max-height:160px;overflow:auto}
 /* tamper test and approval checklist */
 .leftcol{display:flex;flex-direction:column;gap:20px;min-width:0}
 .leftcol .viewer{flex:1 1 auto}
-.tamper{scroll-margin-top:16px}
+.tamper{scroll-margin-top:16px;padding:16px 18px}
+.tp-head{display:flex;align-items:center;gap:12px}
+.tp-head .btn{flex:none}
+.tp-head .h3{text-wrap:balance}
+@media (max-width:1280px){.tp-head{flex-wrap:wrap}.tp-head .grow{flex:1 1 60%}.tp-head .btn{margin-left:48px}}
+@media (max-width:720px){.tp-head{align-items:flex-start}.tp-head .btn{margin-left:0;width:100%}}
 .tamper .itile{flex:none}
-.tp-panel{display:flex;flex-direction:column;gap:14px;padding-top:16px;border-top:1px solid var(--line)}
+.tp-panel{display:flex;flex-direction:column;gap:12px;padding-top:14px;border-top:1px solid var(--line)}
 .tp-lab{font:600 11px var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin-bottom:6px}
 .tp-hash{display:block;font:600 13.5px/1.6 ui-monospace,Menlo,monospace;letter-spacing:.02em;color:var(--ink);background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;word-break:break-all;min-height:44px}
 .tp-hash mark{background:var(--bad);color:#fff;border-radius:3px;padding:1px 0}
@@ -162,13 +173,13 @@ pre.mono{max-height:160px;overflow:auto}
 .tp-step input::-webkit-outer-spin-button,.tp-step input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 .tp-step input.changed{border-color:var(--bad);color:var(--bad)}
 .tp-step button:focus-visible,.tp-step input:focus-visible{outline:2px solid var(--cobalt);outline-offset:2px}
-.tp-verdict{display:flex;align-items:center;gap:12px;border-radius:var(--r-tile);padding:14px 16px;font:700 20px/1.25 var(--display);letter-spacing:-.01em;background:var(--good-bg);color:var(--good);scroll-margin:120px 0}
+.tp-verdict{display:flex;align-items:center;gap:12px;border-radius:var(--r-tile);padding:12px 16px;font:700 20px/1.25 var(--display);letter-spacing:-.01em;background:var(--good-bg);color:var(--good);scroll-margin:120px 0}
 .tp-verdict i{width:34px;height:34px;border-radius:50%;background:var(--good);color:#fff;display:grid;place-items:center;flex:none}
 .tp-verdict i svg{width:19px;height:19px}
 .tp-verdict small{display:block;font:600 13px/1.35 var(--body);letter-spacing:0;color:var(--ink-2);margin-top:3px}
 .tp-verdict.bad{background:var(--bad-bg);color:var(--bad)}.tp-verdict.bad i{background:var(--bad)}
 .tp-verdict.idle{background:var(--surface-2);color:var(--ink-2)}.tp-verdict.idle i{background:var(--ink-3)}
-.tp-why{font:500 14px/1.5 var(--body);color:var(--ink-2)}
+.tp-why{font:500 13.5px/1.5 var(--body);color:var(--ink-2)}
 .tp-why b{color:var(--ink)}
 .sendlist{display:flex;gap:8px 16px;flex-wrap:wrap;align-items:center;margin:0;padding:0;list-style:none}
 .sendlist li{display:flex;align-items:center;gap:7px;font:600 13px/1.3 var(--body);color:var(--ink-2)}
@@ -176,9 +187,9 @@ pre.mono{max-height:160px;overflow:auto}
 .sendlist li i svg{width:11px;height:11px}
 .sendlist li.done{color:var(--good)}
 .sendlist li.done i{background:var(--good);border-color:var(--good);color:#fff}
-.stickybar .sendlist{justify-content:center}
+.stickybar .sendlist{flex-direction:column;align-items:flex-start;gap:5px;min-width:0}
 @media (max-width:720px){
-  .reportmain{padding-bottom:290px}
+  .reportmain{padding-bottom:184px}
   .sendcard .sendlist{display:none}
   .tp-hash{font-size:12.5px}
   .tp-step{margin-left:0;width:100%;justify-content:center}
@@ -236,25 +247,13 @@ pre.mono{max-height:160px;overflow:auto}
 
       <!-- document preview -->
       <div class="span-7 leftcol">
-      <section class="card viewer" id="viewer">
-        <div class="vbar">
-          <div class="fn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg><span>Wi-Fight speed report</span></div>
-          <div class="pager"><button type="button" id="pgprev" aria-label="Page 1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"/></svg></button><span id="pglabel">Page 1 of 2</span><button type="button" id="pgnext" aria-label="Page 2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></button></div>
-        </div>
-        <div class="canvas" id="canvas" tabindex="0" aria-label="Report preview"></div>
-        <div class="vfoot">
-          <span class="small">This is the report that Download PDF saves.</span>
-          <span class="small row gap4" style="color:var(--cobalt);font-weight:700;white-space:nowrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4.5 6v6c0 4.5 3.2 7.6 7.5 9 4.3-1.4 7.5-4.5 7.5-9V6z"/><path d="m9 12 2 2 4-4"/></svg><span data-b="signed"></span></span>
-        </div>
-      </section>
-
       <!-- TAMPER TEST -->
       <section class="card col gap16 tamper" id="tamper">
-        <div class="row gap12" style="align-items:flex-start">
+        <div class="tp-head">
           <div class="itile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4.5 6v6c0 4.5 3.2 7.6 7.5 9 4.3-1.4 7.5-4.5 7.5-9V6z"/><path d="m9 12 2 2 4-4"/></svg></div>
-          <div class="col gap4" style="min-width:0"><h2 class="h3">Can this report be changed without anyone knowing?</h2><div class="small" style="color:var(--ink-2)">No. Try it on a copy. Your real report is not touched.</div></div>
+          <div class="col gap4 grow" style="min-width:0"><h2 class="h3">Can this report be changed without anyone knowing?</h2><div class="small" style="color:var(--ink-2)">No. Change one number on a copy and watch the fingerprint break. Your real report is never touched.</div></div>
+          <button class="btn primary sm" id="tamperbtn" type="button" aria-expanded="false" aria-controls="tp-panel">Try to tamper with it</button>
         </div>
-        <button class="btn primary sm" id="tamperbtn" type="button" aria-expanded="false" aria-controls="tp-panel" style="align-self:flex-start">Try to tamper with it</button>
         <div class="tp-panel" id="tp-panel" hidden>
           <div><div class="tp-lab">Original fingerprint</div><code class="tp-hash" id="tp-orig"></code></div>
           <div class="tp-edit">
@@ -268,8 +267,19 @@ pre.mono{max-height:160px;overflow:auto}
           </div>
           <div><div class="tp-lab" id="tp-newlab">Fingerprint of the copy</div><code class="tp-hash" id="tp-new" aria-labelledby="tp-newlab"></code></div>
           <div class="tp-verdict" id="tp-verdict" role="status" aria-live="polite"><i></i><div><span id="tp-word"></span><small id="tp-count"></small></div></div>
-          <p class="tp-why">Changing one digit changes the whole fingerprint, so a provider, or anyone else, can check that the numbers were not edited after Wi-Fight produced them.</p>
-          <p class="tp-why"><b>The limit:</b> a fingerprint shows that the report changed, it does not prove who made it. A real product would add a digital signature from a server.</p>
+          <p class="tp-why">Changing one digit changes the whole fingerprint, so a provider, or anyone else, can check that the numbers were not edited after Wi-Fight produced them. <b>The limit:</b> a fingerprint shows that the report changed, but it does not prove who made it. A real product would add a digital signature from a server.</p>
+        </div>
+      </section>
+      <!-- the document -->
+      <section class="card viewer" id="viewer">
+        <div class="vbar">
+          <div class="fn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg><span>Wi-Fight speed report</span></div>
+          <div class="pager"><button type="button" id="pgprev" aria-label="Page 1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"/></svg></button><span id="pglabel">Page 1 of 2</span><button type="button" id="pgnext" aria-label="Page 2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></button></div>
+        </div>
+        <div class="canvas" id="canvas" tabindex="0" aria-label="Report preview"></div>
+        <div class="vfoot">
+          <span class="small">This is the report that Download PDF saves.</span>
+          <span class="small row gap4" style="color:var(--cobalt);font-weight:700;white-space:nowrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4.5 6v6c0 4.5 3.2 7.6 7.5 9 4.3-1.4 7.5-4.5 7.5-9V6z"/><path d="m9 12 2 2 4-4"/></svg><span data-b="signed"></span></span>
         </div>
       </section>
       </div>
@@ -291,10 +301,10 @@ pre.mono{max-height:160px;overflow:auto}
             <input id="esubj" class="tin" type="text" maxlength="160">
             <label class="small" for="ebody">Message</label>
             <textarea id="ebody" class="tin" rows="13" maxlength="4000"></textarea>
-            <div class="small">Your changes are saved as you type. An edited draft needs your approval again.</div>
+            <div class="small">Your changes are saved as you type, and an edited draft needs your approval again.</div>
           </div>
           <div class="tonerow"><span class="small" style="margin-right:2px">Tone</span><button type="button" class="chip" data-tone="polite">Polite</button><button type="button" class="chip" data-tone="firm">Firm</button><button type="button" class="chip" data-tone="short">Short</button>
-            <span class="pager" style="margin-left:auto"><button type="button" id="dprev" aria-label="Previous draft"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"/></svg></button><span id="dlabel">Draft 1 of 1</span><button type="button" id="dnext" aria-label="Next draft"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></button></span></div>
+            <span class="pager" id="dpager" style="margin-left:auto"><button type="button" id="dprev" aria-label="Previous draft"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"/></svg></button><span id="dlabel">Draft 1 of 1</span><button type="button" id="dnext" aria-label="Next draft"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></button></span></div>
           <div class="row gap8" style="flex-wrap:wrap" id="dchips"></div>
           <div class="ctl">
             <button class="btn" id="approve" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Approve</button>
@@ -306,17 +316,17 @@ pre.mono{max-height:160px;overflow:auto}
 
         <!-- REVIEW -->
         <section class="card col gap16 sendcard">
-          <div class="col gap4"><div class="h2">Review before sending</div><div class="small">Check each line. You can change the first two.</div></div>
+          <div class="col gap4"><div class="h2">Review before sending</div><div class="small">Check each line before you send. You can change the first two.</div></div>
           <div>
             <div class="rrow"><div style="min-width:0"><div class="l">Send to</div><div class="v" id="tov"></div></div><button class="editpill" id="toedit" type="button">Edit</button></div>
             <div class="tobox col gap8" id="tobox" hidden>
               <label class="small" for="toname">Recipient name</label><input id="toname" class="tin" type="text" maxlength="80">
               <label class="small" for="toemail">Recipient email</label><input id="toemail" class="tin" type="email" maxlength="120" placeholder="support@your-provider.example" autocomplete="off">
-              <div class="small">Wi-Fight does not know your provider's address. Find it on your bill or their website.</div>
+              <div class="small">Wi-Fight does not know your provider's address, so look for it on your bill or their website.</div>
             </div>
             <div class="rrow"><div><div class="l">Also send to the FCC</div><div class="v"><span id="fccword">Off</span>. Opens the FCC complaint page for you to file yourself.</div></div><button type="button" class="switch" role="switch" aria-checked="false" aria-label="Also send to the FCC" data-switch="fcc"></button></div>
-            <div class="rrow"><div><div class="l">Attach</div><div class="v">An email link cannot carry a file. Use Download PDF, then attach the file in your email app.</div></div></div>
-            <div class="rrow"><div><div class="l">Includes</div><div class="v">The message above, plus the report fingerprint on the last line. The report holds your first name, speed results, and plan. No home address, no browsing.</div></div></div>
+            <div class="rrow"><div><div class="l">Attach</div><div class="v">An email link cannot carry a file, so use Download PDF and attach the file in your email app.</div></div></div>
+            <div class="rrow"><div><div class="l">Includes</div><div class="v">The message above, plus the report fingerprint on the last line. The report holds your first name, speed results, and plan. It has no home address and no browsing.</div></div></div>
           </div>
           <label class="agree"><input type="checkbox" class="approvechk"><span class="box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span><span>I have read this and I approve sending it</span></label>
           <button class="btn primary sendbtn" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Approve and send</button>
@@ -336,7 +346,7 @@ pre.mono{max-height:160px;overflow:auto}
             <button class="btn ghost sm" id="pdf"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v13M6 12l6 6 6-6M5 21h14"/></svg>Download PDF</button>
             <button class="btn ghost sm" id="share"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg>Share</button>
           </div>
-          <div class="small">Download PDF opens the print window. Choose "Save as PDF" there.</div>
+          <div class="small">Download PDF opens the print window, where you choose "Save as PDF".</div>
           <details class="verify" id="verify">
             <summary><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4.5 6v6c0 4.5 3.2 7.6 7.5 9 4.3-1.4 7.5-4.5 7.5-9V6z"/><path d="m9 12 2 2 4-4"/></svg><span>Verify · <span data-b="signed"></span></span></summary>
             <div class="col gap8" style="padding-top:10px">

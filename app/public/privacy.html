@@ -2,11 +2,11 @@
 <title>Wi-Fight · Privacy & data</title><link rel="stylesheet" href="css/ds.css">
 <style>
 .badge svg{width:12px;height:12px;flex:none}.chip svg{width:14px;height:14px;flex:none}.btn svg{width:16px;height:16px;flex:none}.ic16{display:inline-grid}.ic16 svg{width:16px;height:16px}
-.status{display:grid;grid-template-columns:auto 1fr;gap:22px 28px;align-items:center;padding:24px}
-.status .shieldbig{width:64px;height:64px;border-radius:20px;background:var(--good-bg);color:var(--good);display:grid;place-items:center}
-.status .shieldbig svg{width:32px;height:32px}
+.status{display:grid;grid-template-columns:auto 1fr;gap:16px 20px;align-items:center;padding:22px}
+.status .shieldbig{width:56px;height:56px;border-radius:18px;background:var(--good-bg);color:var(--good);display:grid;place-items:center}
+.status .shieldbig svg{width:28px;height:28px}
 .checks{grid-column:1 / -1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
-.chk{display:flex;gap:10px;align-items:flex-start;padding:14px;border-radius:var(--r-tile);background:var(--surface-2);border:1px solid var(--line);font:600 14px/1.4 var(--body)}
+.chk{display:flex;gap:10px;align-items:center;padding:11px 14px;border-radius:var(--r-tile);background:var(--surface-2);border:1px solid var(--line);font:600 14px/1.4 var(--body)}
 .chk i{width:22px;height:22px;border-radius:50%;background:var(--good);color:#fff;display:grid;place-items:center;flex:none}
 .chk i svg{width:13px;height:13px}
 .sec{padding:22px}
@@ -33,12 +33,19 @@
 .ctlbox .t{font:600 15px/1.3 var(--body)}
 .ctlbox .n{font:500 13px/1.35 var(--body);color:var(--ink-3);margin-top:2px}
 .ctlbox > svg{width:18px;height:18px;color:var(--ink-3);flex:none;margin-left:auto}
+.tools{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.tool{display:flex;flex-direction:column;justify-content:space-between;gap:14px;padding:16px;border-radius:var(--r-tile);border:1px solid var(--line);background:var(--surface-2)}
+.tool .t{font:600 15px/1.3 var(--body)}.tool .n{font:500 13px/1.4 var(--body);color:var(--ink-3);margin-top:3px}
+.tool .btn{align-self:flex-start}
+code.q{font:600 12.5px ui-monospace,Menlo,monospace;background:var(--surface-2);border:1px solid var(--line);border-radius:6px;padding:1px 5px;color:var(--ink-2)}
+@media (max-width:1100px){.tools{grid-template-columns:1fr}.tool{flex-direction:row;align-items:center}.tool .btn{align-self:center;flex:none}}
+@media (max-width:720px){.tool{flex-direction:column;align-items:stretch}.tool .btn{align-self:stretch}}
 .danger{display:flex;flex-direction:column;align-items:center;gap:12px;padding:36px 16px 8px;text-align:center}
 .btn.outline{background:transparent;border:1.5px solid var(--ink);color:var(--ink);min-width:320px}
 .btn.outline svg{width:18px;height:18px}
 @media (max-width:1100px){.checks{grid-template-columns:1fr}}
 @media (max-width:720px){
-  .status{padding:18px;gap:16px}
+  .status{padding:18px;gap:14px;align-items:start}
   .status .shieldbig{width:52px;height:52px;border-radius:16px}
   .status .shieldbig svg{width:26px;height:26px}
   .sec{padding:18px}
@@ -56,6 +63,9 @@ button.ctlbox{width:100%;text-align:left;cursor:pointer;font-family:inherit;colo
 .status .shieldbig.warn{background:var(--warn-bg);color:var(--warn)}
 .disk{grid-column:1 / -1;border-radius:var(--r-tile);border:1px solid var(--line);background:var(--surface-2);padding:12px 14px;min-width:0}
 .disk summary{display:flex;align-items:center;gap:8px;cursor:pointer;font:700 14px var(--body);color:var(--cobalt);list-style:none}
+.disk summary .chev{margin-left:auto;color:var(--ink-3);transition:transform .2s}
+.disk[open] summary .chev{transform:rotate(180deg)}
+.disk summary small{font:500 13px var(--body);color:var(--ink-3)}
 .disk summary::-webkit-details-marker{display:none}
 .disk summary svg{width:16px;height:16px;flex:none}
 .mono{font:500 12px/1.55 ui-monospace,Menlo,monospace;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px;margin:10px 0 6px;word-break:break-all;white-space:pre-wrap}
@@ -128,11 +138,6 @@ button.ctlbox{width:100%;text-align:left;cursor:pointer;font-family:inherit;colo
     </div>
 
     <div class="g" data-wait>
-      <section class="card span-12 glance" aria-labelledby="glance-h">
-        <div class="row between" style="gap:10px;flex-wrap:wrap"><h2 class="h3" id="glance-h">Security at a glance</h2><span class="small">Each line is checked when this page opens.</span></div>
-        <ul class="glist" id="glance" data-b="glanceHtml"></ul>
-      </section>
-
       <section class="card span-12 status">
         <div class="shieldbig"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4.5 6v6c0 4.5 3.2 7.6 7.5 9 4.3-1.4 7.5-4.5 7.5-9V6z"/><path d="m9 12 2 2 4-4"/></svg></div>
         <div class="col gap4">
@@ -140,10 +145,10 @@ button.ctlbox{width:100%;text-align:left;cursor:pointer;font-family:inherit;colo
           <div class="body" data-b="statusLine"></div>
         </div>
         <div class="checks" data-b="checksHtml"></div>
-        <details class="disk" id="disk">
-          <summary><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span>See what is stored on disk</span></summary>
+        <details class="disk" id="disk" open>
+          <summary><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span>See what is stored on disk</span><small class="only-desktop">What you see, next to what is really saved</small><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></summary>
           <div class="cmp">
-            <div class="cmpbox"><div class="cmplab">What you see</div><div id="plainbox" data-b="plainHtml"></div><div class="small" style="margin-top:6px">Unlocked for you, in this browser, while the app is open.</div></div>
+            <div class="cmpbox"><div class="cmplab">What you see</div><div id="plainbox" data-b="plainHtml"></div><div class="small" style="margin-top:6px">This is unlocked for you in this browser while the app is open.</div></div>
             <div class="cmpbox"><div class="cmplab">What is saved on this device</div><pre class="mono" id="diskraw" data-b="disk"></pre><div class="small" data-b="diskSize"></div><div class="small" style="color:var(--ink-2);margin-top:4px" data-b="diskCap"></div></div>
           </div>
           <div class="findrow"><button type="button" class="btn sm" id="find">Search the saved data for my name</button><span class="small" id="findnote" role="status"></span></div>
@@ -151,15 +156,20 @@ button.ctlbox{width:100%;text-align:left;cursor:pointer;font-family:inherit;colo
         </details>
       </section>
 
+      <section class="card span-12 glance" aria-labelledby="glance-h">
+        <div class="row between" style="gap:10px;flex-wrap:wrap"><h2 class="h3" id="glance-h">Security at a glance</h2><span class="small">Each line is worked out from your stored data when this page opens.</span></div>
+        <ul class="glist" id="glance" data-b="glanceHtml"></ul>
+      </section>
+
       <div class="span-6 col gap20" style="min-width:0">
         <section class="card sec col gap8">
           <div class="sechead"><div class="itile"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 4 14h6l-1 8 9-12h-6z"/></svg></div><div><div class="h3">Speed tests</div><div class="small" data-b="testsSub"></div></div></div>
           <div>
-            <div class="srow"><div><div class="t">Run scheduled tests</div><div class="n">So your two-week check stays complete. In this prototype a test runs only while the app is open.</div></div><div class="state"><b data-word="scheduled" class="off">Off</b><button type="button" class="switch" role="switch" aria-checked="false" aria-label="Run scheduled tests" data-switch="scheduled"></button></div></div>
+            <div class="srow"><div><div class="t">Run scheduled tests</div><div class="n">This keeps your two-week check complete. In this prototype a test runs only while the app is open.</div></div><div class="state"><b data-word="scheduled" class="off">Off</b><button type="button" class="switch" role="switch" aria-checked="false" aria-label="Run scheduled tests" data-switch="scheduled"></button></div></div>
             <div class="srow"><div><div class="t">Tests on mobile data</div><div class="n">A test uses a lot of data.</div></div><div class="state"><b data-word="mobileData" class="off">Off</b><button type="button" class="switch" role="switch" aria-checked="false" aria-label="Tests on mobile data" data-switch="mobileData"></button></div></div>
           </div>
           <div class="row between" style="gap:12px;flex-wrap:wrap;padding-top:14px;border-top:1px solid var(--line)">
-            <div class="small" id="pausenote" style="color:var(--ink-2)" role="status">Need a break? Tests start again on their own.</div>
+            <div class="small" id="pausenote" style="color:var(--ink-2)" role="status">You can pause tests for a day, and they start again on their own.</div>
             <button class="btn ghost sm" id="pause"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Pause for 24 hours</button>
             <button class="btn sm" id="resume" hidden>Resume</button>
           </div>
@@ -169,7 +179,7 @@ button.ctlbox{width:100%;text-align:left;cursor:pointer;font-family:inherit;colo
           <div class="sechead"><div class="itile" style="background:var(--surface-2);color:var(--ai-b);border:1px solid var(--line)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.9 5.6a3 3 0 0 0 1.9 1.9L21.4 11.4l-5.6 1.9a3 3 0 0 0-1.9 1.9L12 20.8l-1.9-5.6a3 3 0 0 0-1.9-1.9L2.600 11.4l5.6-1.9a3 3 0 0 0 1.9-1.9z"/></svg></div><div><div class="h3">Proof AI</div><div class="small">You choose what Proof AI can read.</div></div></div>
           <div>
             <div class="srow"><div><div class="t">Let Proof AI analyze my results</div><div class="n">Explains your speeds and finds the likely cause.</div></div><div class="state"><b data-word="aiAnalyze" class="off">Off</b><button type="button" class="switch" role="switch" aria-checked="false" aria-label="Let Proof AI analyze my results" data-switch="aiAnalyze"></button></div></div>
-            <div class="srow"><div><div class="t">Let Proof AI read bill photos</div><div class="n">Reads the price and fees. The photo is never stored.</div></div><div class="state"><b data-word="aiBill" class="off">Off</b><button type="button" class="switch" role="switch" aria-checked="false" aria-label="Let Proof AI read bill photos" data-switch="aiBill"></button></div></div>
+            <div class="srow"><div><div class="t">Let Proof AI read bill photos</div><div class="n">It reads the price and fees, and the photo is never stored.</div></div><div class="state"><b data-word="aiBill" class="off">Off</b><button type="button" class="switch" role="switch" aria-checked="false" aria-label="Let Proof AI read bill photos" data-switch="aiBill"></button></div></div>
           </div>
           <div class="row gap8" style="padding-top:14px;border-top:1px solid var(--line);font:600 14px/1.4 var(--body)"><span class="ic16" style="color:var(--cobalt)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span>AI answers use only your own data.</div>
         </section>
@@ -178,7 +188,7 @@ button.ctlbox{width:100%;text-align:left;cursor:pointer;font-family:inherit;colo
           <div class="sechead"><div class="itile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></div><div><div class="h3">Consent</div><div class="small" data-b="consentWhen"></div></div></div>
           <div class="body" style="font-size:14px" data-b="consentWhat"></div>
           <div class="row between" style="gap:12px;flex-wrap:wrap;padding-top:14px;border-top:1px solid var(--line)">
-            <div class="small" style="color:var(--ink-2);flex:1;min-width:180px">Withdrawing stops all tests. You can agree again later.</div>
+            <div class="small" style="color:var(--ink-2);flex:1;min-width:180px">Withdrawing stops all tests, and you can agree again later.</div>
             <button class="btn ghost sm" id="withdraw">Withdraw consent</button>
           </div>
         </section>
@@ -208,16 +218,26 @@ button.ctlbox{width:100%;text-align:left;cursor:pointer;font-family:inherit;colo
       </div>
 
       <section class="card sec span-12 col gap16">
-        <div class="sechead"><div class="itile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4.5 6v6c0 4.5 3.2 7.6 7.5 9 4.3-1.4 7.5-4.5 7.5-9V6z"/><path d="m9 12 2 2 4-4"/></svg></div><div><div class="h3">Your controls</div><div class="small">Your data stays yours. Take it with you or check what left.</div></div></div>
+        <div class="sechead"><div class="itile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4.5 6v6c0 4.5 3.2 7.6 7.5 9 4.3-1.4 7.5-4.5 7.5-9V6z"/><path d="m9 12 2 2 4-4"/></svg></div><div><div class="h3">Your controls</div><div class="small">Your data stays yours, so you can take it with you or check what has left.</div></div></div>
         <div class="ctlrow">
           <button type="button" class="ctlbox" id="dl"><div class="itile mute" style="background:var(--surface)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v13M6 12l6 6 6-6M5 21h14"/></svg></div><div><div class="t">Download my data</div><div class="n" data-b="dlNote"></div></div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></button>
           <button type="button" class="ctlbox" id="sentbtn" data-view="sent"><div class="itile mute" style="background:var(--surface)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m4 7 8 6 8-6"/></svg></div><div><div class="t">See what was sent</div><div class="n" data-b="sentNote"></div></div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></button>
         </div>
       </section>
 
+      <section class="card sec span-12 col gap16" id="presenter" aria-labelledby="presenter-h">
+        <div class="sechead"><div class="itile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H4zM9 20h6M12 16v4"/><path d="m10.500 8.500 4 2-4 2z"/></svg></div><div><h2 class="h3" id="presenter-h">Demo and presenter tools</h2><div class="small">These are for showing Wi-Fight to a class, and each one says what it does to your data.</div></div></div>
+        <div class="tools">
+          <div class="tool"><div><div class="t">Start the guided demo</div><div class="n">A walkthrough of <span data-b="tourStops">11</span> stops, timed for 5 minutes, with a bar that shows what to say and what to press.</div></div><button type="button" class="btn primary sm" data-tour-start>Start the guided demo</button></div>
+          <div class="tool"><div><div class="t">Simulate the two weeks</div><div class="n">This loads 14 days of sample data, which is labelled as sample data on every page.</div></div><button type="button" class="btn ghost sm" data-simulate="14">Simulate the two weeks</button></div>
+          <div class="tool"><div><div class="t">Log out and start over</div><div class="n">After you confirm, this deletes Wi-Fight's data in this browser and returns to the start, ready for the next person.</div></div><button type="button" class="btn ghost sm" data-logout>Log out and start over</button></div>
+        </div>
+        <div class="small">A presenter can also add <code class="q">?tour=1</code> to the end of any Wi-Fight address to start the guided demo.</div>
+      </section>
+
       <section class="span-12 danger">
         <button class="btn outline" id="wipe"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg>Delete everything</button>
-        <div class="small" style="max-width:420px">Removes your results, plan, messages, and the encryption key for good. This cannot be undone.</div>
+        <div class="small" style="max-width:420px">This removes your results, plan, messages, and the encryption key for good, and it cannot be undone.</div>
       </section>
     </div>
   </main>

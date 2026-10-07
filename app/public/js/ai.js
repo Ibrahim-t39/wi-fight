@@ -5,6 +5,7 @@
 // Text may contain **bold** markers. Use AI.html() to turn it into safe HTML.
 import { recommend, fmtTime } from './engine.js';
 import { Store } from './store.js';
+import { modelInfo } from './models.js';
 
 let statusCache = null;
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -55,11 +56,11 @@ function reasons(f) {
   const out = [];
   const dips = f.ignored.length;
   if (f.headline.status === 'below') {
-    out.push({ title: 'It is a real shortfall, not a blip.', detail: `${dips} one-off dip${dips === 1 ? ' was' : 's were'} ignored. ${f.daysBelow} full day${f.daysBelow === 1 ? '' : 's'} still had a median under ${f.fairLine} Mbps.` });
-  } else out.push({ title: 'Your speed holds up.', detail: `Your median is ${f.headline.mbps} Mbps, which is ${f.headline.pct}% of your plan. ${dips} one-off dip${dips === 1 ? ' was' : 's were'} ignored.` });
-  if (f.router.pairs && f.diagnosis.cause === 'provider') out.push({ title: 'It is not your Wi-Fi.', detail: `Next to the router you got ${f.router.near} Mbps. In the far room, ${f.router.far} Mbps. That gap is small.` });
+    out.push({ title: 'It is a real shortfall, not a blip.', detail: `Even after ${dips} one-off dip${dips === 1 ? ' was' : 's were'} set aside, ${f.daysBelow} full day${f.daysBelow === 1 ? '' : 's'} still had a median under ${f.fairLine} Mbps.` });
+  } else out.push({ title: 'Your speed holds up.', detail: `Your median is ${f.headline.mbps} Mbps, which is ${f.headline.pct}% of your plan, with ${dips} one-off dip${dips === 1 ? '' : 's'} set aside.` });
+  if (f.router.pairs && f.diagnosis.cause === 'provider') out.push({ title: 'It is not your Wi-Fi.', detail: `You got ${f.router.near} Mbps next to the router and ${f.router.far} Mbps in the far room, which is a small gap.` });
   else if (f.router.pairs && f.diagnosis.cause === 'wifi') out.push({ title: 'It looks like your Wi-Fi.', detail: `Next to the router you got ${f.router.near} Mbps, but only ${f.router.far} Mbps in the far room.` });
-  if (f.evening.avg != null && f.daytime.avg != null && f.evening.avg < f.daytime.avg * 0.92) out.push({ title: 'It follows the clock.', detail: `Evening tests, 7 to 11 PM, averaged ${f.evening.avg} Mbps. Daytime tests averaged ${f.daytime.avg} Mbps.` });
+  if (f.evening.avg != null && f.daytime.avg != null && f.evening.avg < f.daytime.avg * 0.92) out.push({ title: 'It follows the clock.', detail: `Evening tests, from 7 to 11 PM, averaged ${f.evening.avg} Mbps, while daytime tests averaged ${f.daytime.avg} Mbps.` });
   if (!f.router.pairs && f.headline.status === 'below') out.push({ title: 'One check is still missing.', detail: 'Run a test next to your router and one in a far room so Proof AI can tell Wi-Fi from your provider.' });
   return out.slice(0, 3);
 }
@@ -74,8 +75,10 @@ export const AI = {
   note: (mode) => {
     const p = statusCache && statusCache.provider;
     if (mode !== 'live') return p ? 'Numbers computed on this device. Wording by the built-in writer, which cannot invent a number. Ask Proof AI for a fuller explanation.' : 'Numbers computed on this device. Wording by the built-in writer (offline mode). Check the evidence.';
-    if (p === 'local') return `Written by a language model running on this computer (${statusCache.model}). Nothing left this device. It can make mistakes, so check the evidence.`;
-    return `Written by AI (${(statusCache && statusCache.label) || 'Claude'}) from your own test results. It can make mistakes, so check the evidence.`;
+    const m = modelInfo(statusCache.model);
+    if (p === 'local') return `Written by ${m.name}, a ${m.maker} model running on this computer. Nothing left this device. It can make mistakes, so check the evidence.`;
+    if (p === 'groq') return `Written by ${m.name}, a model from ${m.maker} hosted on Groq, from your own test results. It can make mistakes, so check the evidence.`;
+    return `Written by ${m.name} from ${m.maker}, from your own test results. It can make mistakes, so check the evidence.`;
   },
   /** Drop the cached status, for example after the user starts a local model. */
   resetStatus() { statusCache = null; },

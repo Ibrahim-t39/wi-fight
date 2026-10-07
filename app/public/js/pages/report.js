@@ -4,8 +4,9 @@
 import { boot, bind, $, $$, esc, toast, AI, Store, sha256 } from '../shell.js';
 import { fmtDate, fmtTime, dayKey } from '../engine.js';
 import { paintSwitch, copyText, pause, bringIntoView } from './ui-sheet.js';
+import { modelChip } from '../models.js';
 
-const { state, facts } = await boot({ need: 'plan' });
+const { state, facts, ai: status } = await boot({ need: 'plan' });
 const FCC_URL = 'https://consumercomplaints.fcc.gov/';
 const MARK = '<svg viewBox="0 -1.300 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.300 16.200A8.300 8.300 0 0 1 16.900 6.300"/><path d="M19.900 12.300a8.300 8.300 0 0 1-.6 3.900"/><path d="m8 12.600 3 3 8.400-9.700"/></svg>';
 const SEAL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4.5 6v6c0 4.5 3.2 7.6 7.5 9 4.3-1.4 7.5-4.5 7.5-9V6z"/><path d="m9 12 2 2 4-4"/></svg>';
@@ -142,7 +143,7 @@ if (!facts.headline) {
     try { d = await AI.draft(facts, Store.get(), tone); } catch { d = null; }
     busy = false;
     if (!d || !d.body) { toast('Proof AI could not write a draft. Try again.'); paint(); return; }
-    const next = { subject: String(d.subject || 'Speeds below my plan'), body: String(d.body), mode: d.mode === 'live' ? 'live' : 'offline', tone, edited: false, approved: false, at: new Date().toISOString() };
+    const next = { subject: String(d.subject || 'Speeds below my plan'), body: String(d.body), mode: d.mode === 'live' ? 'live' : 'offline', model: d.mode === 'live' ? (d.model || status.model || null) : null, tone, edited: false, approved: false, at: new Date().toISOString() };
     const same = cur() && !cur().edited && cur().body === next.body && cur().subject === next.subject;
     R.drafts = cur() ? [cur(), next] : [next];   // keep the draft that was on screen, so the user can flip back
     R.idx = R.drafts.length - 1;
@@ -165,7 +166,11 @@ if (!facts.headline) {
       $$('[data-tone]').forEach((c) => { c.classList.toggle('on', c.dataset.tone === d.tone); c.setAttribute('aria-pressed', c.dataset.tone === d.tone ? 'true' : 'false'); c.disabled = busy; });
       $('#dchips').innerHTML = [`${facts.testsCount} tests`, `${facts.daysDone} day${facts.daysDone === 1 ? '' : 's'}`, 'Your plan label', ...(facts.router.pairs ? ['Router check'] : [])].map((c) => `<span class="evidence">${esc(c)}</span>`).join('');
       $('#dmeta').textContent = `${d.edited ? 'Edited by you' : `Drafted ${fmtTime(d.at)}`} · ${d.mode === 'live' ? 'live' : 'offline mode'}`;
-      $('#dnote').textContent = `${AI.note(d.mode)}${d.edited ? ' You edited this draft.' : ''} Approving the draft does not send it.`;
+      // who wrote it: the model saved with the draft, named through models.js. Offline drafts say the built-in writer wrote them.
+      const by = d.mode === 'live' ? (d.model || status.model || '') : '';
+      $('#dpager').hidden = R.drafts.length < 2;
+      $('#dnote').dataset.model = by || 'offline';
+      $('#dnote').innerHTML = `${d.mode === 'live' ? `Written by ${by ? modelChip(by) : 'an AI model'} from your own test results. It can make mistakes, so read it before you approve it.` : esc(AI.note(d.mode))}${d.edited ? ' You edited this draft.' : ''} Approving the draft does not send it.`;
       const ap = $('#approve');
       ap.innerHTML = `${CHECK}${d.approved ? 'Approved' : 'Approve'}`; ap.classList.toggle('approved', !!d.approved); ap.setAttribute('aria-pressed', d.approved ? 'true' : 'false'); ap.disabled = busy || editing;
       $('#edit').lastChild.textContent = editing ? 'Done' : 'Edit';
@@ -284,7 +289,7 @@ if (!facts.headline) {
     return tp.done;
   }
   const stepTamper = (by) => { const now = Number($('#tp-val').value); return setTamper(Math.max(0, (Number.isFinite(now) && $('#tp-val').value !== '' ? now : ORIG) + by)); };
-  const openTamper = (open) => { $('#tp-panel').hidden = !open; const b = $('#tamperbtn'); b.setAttribute('aria-expanded', open ? 'true' : 'false'); b.textContent = open ? 'Close the test' : 'Try to tamper with it'; b.classList.toggle('primary', !open); b.classList.toggle('ghost', open); };
+  const openTamper = (open) => { $('#tp-panel').hidden = !open; const b = $('#tamperbtn'); b.setAttribute('aria-expanded', open ? 'true' : 'false'); b.textContent = open ? 'Close the test' : 'Try to tamper with it'; if (open && window.matchMedia('(min-width:721px)').matches) $('#tamper').scrollIntoView({ block: 'nearest', behavior: 'smooth' }); b.classList.toggle('primary', !open); b.classList.toggle('ghost', open); };
   $('#tp-orig').textContent = hash;
   $('#tp-origval').textContent = `The report says ${ORIG}. Change it by any amount.`;
   $('#tamperbtn').onclick = () => openTamper($('#tp-panel').hidden);

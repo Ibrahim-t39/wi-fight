@@ -29,7 +29,7 @@ function issue() {
   card.hidden = false;
   bind({ email: addr });
   const note = $('#demonote');
-  note.textContent = 'Demo sign-in: no email is sent in this prototype. Type any 6 digits.';
+  note.textContent = 'This is a demo sign-in, so no email is sent in this prototype and any 6 digits work as the code.';
   boxes.forEach((i) => { i.value = ''; i.classList.remove('f'); });
   $('#otp').classList.remove('bad'); show(codeErr, '');
   boxes[0].focus();
